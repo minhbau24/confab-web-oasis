@@ -1,4 +1,3 @@
-
 // Hardcoded fake data for conferences and users
 
 // Sample conferences data
@@ -32,6 +31,11 @@ const conferences = [
             { time: "11:30", title: "Panel: Blockchain Revolution", speaker: "Mike Chen" },
             { time: "13:00", title: "Lunch & Networking", speaker: "" },
             { time: "14:30", title: "Workshop: Green Technology", speaker: "Emily Rodriguez" }
+        ],
+        attendeesData: [
+            { id: 1, name: 'Alice Johnson', email: 'alice.johnson@email.com', registrationDate: '2024-01-05', status: 'confirmed' },
+            { id: 2, name: 'Bob Smith', email: 'bob.smith@email.com', registrationDate: '2024-01-08', status: 'registered' },
+            { id: 3, name: 'Carol Davis', email: 'carol.davis@email.com', registrationDate: '2024-01-10', status: 'attended' }
         ]
     },
     {
@@ -60,6 +64,10 @@ const conferences = [
             { time: "09:30", title: "Welcome & Introductions", speaker: "" },
             { time: "10:00", title: "Building Design Systems at Scale", speaker: "Alex Thompson" },
             { time: "11:30", title: "User Research in Design Systems", speaker: "Lisa Park" }
+        ],
+        attendeesData: [
+            { id: 1, name: 'David Wilson', email: 'david.wilson@email.com', registrationDate: '2024-02-01', status: 'confirmed' },
+            { id: 2, name: 'Eva Brown', email: 'eva.brown@email.com', registrationDate: '2024-02-03', status: 'registered' }
         ]
     },
     {
@@ -88,7 +96,8 @@ const conferences = [
             { time: "09:00", title: "Registration", speaker: "" },
             { time: "10:00", title: "Digital Transformation in Marketing", speaker: "David Wilson" },
             { time: "12:00", title: "Building Authentic Brands", speaker: "Maria Garcia" }
-        ]
+        ],
+        attendeesData: []
     },
     {
         id: 4,
@@ -116,7 +125,8 @@ const conferences = [
             { time: "09:00", title: "Welcome Keynote", speaker: "John Smith" },
             { time: "10:30", title: "Modern CI/CD Practices", speaker: "Jennifer Lee" },
             { time: "14:00", title: "Workshop: Kubernetes Deep Dive", speaker: "John Smith" }
-        ]
+        ],
+        attendeesData: []
     },
     {
         id: 5,
@@ -144,7 +154,8 @@ const conferences = [
             { time: "09:30", title: "Innovation in the Digital Age", speaker: "Hiroshi Tanaka" },
             { time: "11:00", title: "Global Market Strategies", speaker: "Rachel Kim" },
             { time: "15:30", title: "Panel: Future of Business", speaker: "Both speakers" }
-        ]
+        ],
+        attendeesData: []
     },
     {
         id: 6,
@@ -172,7 +183,8 @@ const conferences = [
             { time: "09:00", title: "The State of AI", speaker: "Dr. Amanda Foster" },
             { time: "11:00", title: "Scaling ML in Production", speaker: "Robert Zhang" },
             { time: "14:00", title: "Hands-on: Building Neural Networks", speaker: "Dr. Amanda Foster" }
-        ]
+        ],
+        attendeesData: []
     }
 ];
 
