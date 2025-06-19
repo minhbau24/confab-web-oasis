@@ -7,10 +7,83 @@
     <title>ConferenceHub - Conference Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=600&fit=crop');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 120px 0 80px;
+        }
+        .conference-card {
+            transition: transform 0.3s ease;
+        }
+        .conference-card:hover {
+            transform: translateY(-5px);
+        }
+        .speaker-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .speaker-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+        }
+        .timeline-item {
+            border-left: 3px solid #007bff;
+            padding-left: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #007bff;
+            border-radius: 50%;
+            position: absolute;
+            left: -7.5px;
+            top: 0;
+        }
+        .credibility-badge {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 10px;
+            font-weight: bold;
+        }
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: #007bff;
+        }
+        .registration-card {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+        }
+        .faq-item {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
                 <i class="fas fa-calendar-alt me-2"></i>ConferenceHub
@@ -44,9 +117,388 @@
         </div>
     </nav>
 
-    <!-- Conference Details -->
-    <div class="container my-5" id="conference-details">
-        <!-- Content will be loaded here by JavaScript -->
+    <!-- Hero Banner -->
+    <section class="hero-banner" id="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-primary mb-3 fs-6" id="conference-category">Technology</span>
+                    <h1 class="display-4 fw-bold mb-4" id="conference-title">Loading...</h1>
+                    <p class="lead mb-4" id="conference-description">Loading conference details...</p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar me-2"></i>
+                            <span id="conference-date">Loading...</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span id="conference-location">Loading...</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users me-2"></i>
+                            <span id="conference-attendees">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="registration-card p-4">
+                        <h3 class="mb-3">Register Now</h3>
+                        <h2 class="display-6 mb-3" id="conference-price">$299</h2>
+                        <p class="mb-3" id="spots-remaining">Limited spots available</p>
+                        <button class="btn btn-light btn-lg w-100 mb-2" onclick="joinConference(1)">
+                            <i class="fas fa-ticket-alt me-2"></i>Register
+                        </button>
+                        <button class="btn btn-outline-light w-100" onclick="shareConference(1)">
+                            <i class="fas fa-share me-2"></i>Share Event
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Credibility Section -->
+    <section class="py-4 bg-light">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-12">
+                    <div class="credibility-badge">
+                        <i class="fas fa-trophy me-2"></i>10 Years of Excellence
+                    </div>
+                    <div class="credibility-badge">
+                        <i class="fas fa-certificate me-2"></i>Industry Certified
+                    </div>
+                    <div class="credibility-badge">
+                        <i class="fas fa-star me-2"></i>4.9/5 Rating
+                    </div>
+                    <div class="credibility-badge">
+                        <i class="fas fa-users me-2"></i>10,000+ Alumni
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Description & Objectives -->
+                <section class="mb-5">
+                    <h2 class="section-title">About This Conference</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="lead" id="detailed-description">Loading conference description...</p>
+                            <h5>Objectives</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Learn cutting-edge technologies</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Network with industry leaders</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Gain practical insights</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Earn continuing education credits</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Target Audience -->
+                <section class="mb-5">
+                    <h2 class="section-title">Who Should Attend?</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-code fa-3x text-primary mb-3"></i>
+                                    <h5>Developers</h5>
+                                    <p>Software engineers, full-stack developers, and coding enthusiasts</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+                                    <h5>Tech Leaders</h5>
+                                    <p>CTOs, engineering managers, and technical decision makers</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-rocket fa-3x text-primary mb-3"></i>
+                                    <h5>Entrepreneurs</h5>
+                                    <p>Startup founders and innovation-driven business owners</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                                    <h5>Students</h5>
+                                    <p>Computer science students and early-career professionals</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Agenda Section -->
+                <section class="mb-5">
+                    <h2 class="section-title">Conference Agenda</h2>
+                    <div class="accordion" id="agendaAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#day1">
+                                    <strong>Day 1 - January 15, 2024</strong>
+                                </button>
+                            </h2>
+                            <div id="day1" class="accordion-collapse collapse show" data-bs-parent="#agendaAccordion">
+                                <div class="accordion-body">
+                                    <div id="agenda-day1">
+                                        <!-- Agenda items will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#day2">
+                                    <strong>Day 2 - January 16, 2024</strong>
+                                </button>
+                            </h2>
+                            <div id="day2" class="accordion-collapse collapse" data-bs-parent="#agendaAccordion">
+                                <div class="accordion-body">
+                                    <div class="timeline-item">
+                                        <h6>09:00 - 10:00</h6>
+                                        <h5>Advanced Workshops</h5>
+                                        <p>Hands-on sessions with industry experts</p>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>10:30 - 12:00</h6>
+                                        <h5>Panel Discussion</h5>
+                                        <p>Future of Technology - Multiple Speakers</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Speakers Section -->
+                <section class="mb-5">
+                    <h2 class="section-title">Featured Speakers</h2>
+                    <div class="row" id="speakers-section">
+                        <!-- Speakers will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Resources & Links -->
+                <section class="mb-5">
+                    <h2 class="section-title">Resources & Downloads</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                                    <h6>Conference Brochure</h6>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-video fa-3x text-info mb-3"></i>
+                                    <h6>Live Stream</h6>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">Watch Live</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-calendar-plus fa-3x text-success mb-3"></i>
+                                    <h6>Add to Calendar</h6>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">Export Event</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section class="mb-5">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="faq-item">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    What's included in the registration fee?
+                                </button>
+                            </div>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Registration includes access to all sessions, networking events, meals, and conference materials.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Is there a cancellation policy?
+                                </button>
+                            </div>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Full refund available up to 30 days before the event. 50% refund up to 14 days before.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Will sessions be recorded?
+                                </button>
+                            </div>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes, all main sessions will be recorded and available to attendees for 90 days post-event.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Testimonials -->
+                <section class="mb-5">
+                    <h2 class="section-title">What Past Attendees Say</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex mb-3">
+                                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" class="rounded-circle me-3" width="60" height="60" alt="Testimonial">
+                                        <div>
+                                            <h6 class="mb-0">Sarah Chen</h6>
+                                            <small class="text-muted">Senior Developer, TechCorp</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0">"Incredible insights and networking opportunities. This conference helped me advance my career significantly."</p>
+                                    <div class="mt-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex mb-3">
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face" class="rounded-circle me-3" width="60" height="60" alt="Testimonial">
+                                        <div>
+                                            <h6 class="mb-0">Michael Rodriguez</h6>
+                                            <small class="text-muted">CTO, StartupXYZ</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0">"Best tech conference I've attended. The speakers were world-class and the content was incredibly valuable."</p>
+                                    <div class="mt-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Registration Info -->
+                <div class="card mb-4 sticky-top" style="top: 100px;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>Registration Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Early Bird Deadline:</strong>
+                            <p class="text-muted mb-0">December 15, 2023</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Regular Price:</strong>
+                            <p class="text-muted mb-0">$299 (Save $100 with early bird)</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Group Discounts:</strong>
+                            <p class="text-muted mb-0">15% off for 5+ attendees</p>
+                        </div>
+                        <button class="btn btn-success w-100 mb-2" onclick="joinConference(1)">
+                            <i class="fas fa-credit-card me-2"></i>Register Now
+                        </button>
+                        <small class="text-muted">Secure payment via Stripe</small>
+                    </div>
+                </div>
+
+                <!-- Location & Travel -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Location & Travel</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3152.1!2d-122.4194!3d37.7749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDQ2JzI5LjYiTiAxMjLCsDI1JzA5LjgiVw!5e0!3m2!1sen!2sus!4v1" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-building me-2"></i>Venue</h6>
+                            <p class="mb-0">Moscone Convention Center<br>San Francisco, CA</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-car me-2"></i>Parking</h6>
+                            <p class="mb-0">$25/day on-site parking available</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-bed me-2"></i>Hotels</h6>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View Partner Hotels</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Support -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-headset me-2"></i>Need Help?</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:support@conferencehub.com">support@conferencehub.com</a>
+                        </div>
+                        <div class="mb-3">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Follow Us:</strong><br>
+                            <a href="#" class="text-decoration-none me-2"><i class="fab fa-twitter fa-lg"></i></a>
+                            <a href="#" class="text-decoration-none me-2"><i class="fab fa-linkedin fa-lg"></i></a>
+                            <a href="#" class="text-decoration-none me-2"><i class="fab fa-facebook fa-lg"></i></a>
+                            <a href="#" class="text-decoration-none"><i class="fab fa-instagram fa-lg"></i></a>
+                        </div>
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="fas fa-comments me-2"></i>Live Chat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -60,5 +512,3 @@
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
     <script src="js/conference-detail.js"></script>
-</body>
-</html>

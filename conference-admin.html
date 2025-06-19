@@ -7,11 +7,59 @@
     <title>ConferenceHub - Conference Administration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-sidebar {
+            background: #f8f9fa;
+            min-height: 100vh;
+            border-right: 1px solid #dee2e6;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .action-btn {
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .nav-pills .nav-link {
+            border-radius: 25px;
+            margin-bottom: 5px;
+        }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+        }
+        .management-card {
+            border: none;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        .management-card:hover {
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="index.html">
                 <i class="fas fa-calendar-alt me-2"></i>ConferenceHub
             </a>
@@ -44,108 +92,452 @@
         </div>
     </nav>
 
-    <!-- Conference Header -->
-    <div class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <a href="admin.html" class="btn btn-outline-secondary mb-2">
-                    <i class="fas fa-arrow-left me-1"></i>Back to Admin Dashboard
-                </a>
-                <h1 class="mb-0" id="conference-title">Loading...</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 admin-sidebar p-0">
+                <div class="p-3">
+                    <div class="d-flex align-items-center mb-4">
+                        <a href="admin.html" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h6 class="mb-0">Admin Panel</h6>
+                    </div>
+                    
+                    <div class="nav flex-column nav-pills" role="tablist">
+                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#overview">
+                            <i class="fas fa-chart-line me-2"></i>Overview
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#attendees">
+                            <i class="fas fa-users me-2"></i>Attendees
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#agenda">
+                            <i class="fas fa-calendar me-2"></i>Agenda
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#speakers">
+                            <i class="fas fa-microphone me-2"></i>Speakers
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#resources">
+                            <i class="fas fa-folder me-2"></i>Resources
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#analytics">
+                            <i class="fas fa-chart-bar me-2"></i>Analytics
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#communication">
+                            <i class="fas fa-envelope me-2"></i>Communication
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="text-end">
-                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editConferenceModal">
-                    <i class="fas fa-edit me-1"></i>Edit Conference Info
-                </button>
-                <button class="btn btn-warning" onclick="toggleConferenceStatus()">
-                    <i class="fas fa-archive me-1"></i>Archive Conference
-                </button>
-            </div>
-        </div>
 
-        <!-- Conference Details Card -->
-        <div class="card mb-4" id="conference-details-card">
-            <!-- Content loaded by JavaScript -->
-        </div>
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <!-- Conference Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 class="mb-0" id="conference-title">TechCrunch Disrupt 2024</h1>
+                            <p class="text-muted mb-0">Conference Management Dashboard</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-success action-btn me-2" data-bs-toggle="modal" data-bs-target="#editConferenceModal">
+                                <i class="fas fa-edit me-1"></i>Edit Conference
+                            </button>
+                            <button class="btn btn-warning action-btn" onclick="toggleConferenceStatus()">
+                                <i class="fas fa-archive me-1"></i>Archive
+                            </button>
+                        </div>
+                    </div>
 
-        <!-- Summary Stats -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-primary"><i class="fas fa-users"></i></h5>
-                        <h3 id="attendee-count">0</h3>
-                        <p class="card-text text-muted">Total Attendees</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-success"><i class="fas fa-dollar-sign"></i></h5>
-                        <h3 id="total-revenue">$0</h3>
-                        <p class="card-text text-muted">Estimated Revenue</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-info"><i class="fas fa-percentage"></i></h5>
-                        <h3 id="capacity-percentage">0%</h3>
-                        <p class="card-text text-muted">Capacity Filled</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-warning"><i class="fas fa-clock"></i></h5>
-                        <h3 id="days-until">0</h3>
-                        <p class="card-text text-muted">Days Until Event</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview">
+                            <!-- Summary Stats -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card p-4 text-center">
+                                        <i class="fas fa-users fa-2x mb-2"></i>
+                                        <h3 id="attendee-count">4,200</h3>
+                                        <p class="mb-0">Total Attendees</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card p-4 text-center">
+                                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                        <h3 id="total-revenue">$1.2M</h3>
+                                        <p class="mb-0">Total Revenue</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card p-4 text-center">
+                                        <i class="fas fa-percentage fa-2x mb-2"></i>
+                                        <h3 id="capacity-percentage">84%</h3>
+                                        <p class="mb-0">Capacity Filled</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card p-4 text-center">
+                                        <i class="fas fa-clock fa-2x mb-2"></i>
+                                        <h3 id="days-until">25</h3>
+                                        <p class="mb-0">Days Until Event</p>
+                                    </div>
+                                </div>
+                            </div>
 
-        <!-- Attendees Management -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Attendees Management</h5>
-                <div>
-                    <input type="text" id="attendee-search" class="form-control form-control-sm d-inline-block me-2" 
-                           placeholder="Search attendees..." style="width: 200px;">
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addAttendeeModal">
-                        <i class="fas fa-plus me-1"></i>Add Attendee
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Registration Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendees-table">
-                            <!-- Content loaded by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-                <div id="no-attendees-message" class="text-center py-4 d-none">
-                    <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No attendees found</h5>
-                    <p class="text-muted">Add attendees to start managing registrations.</p>
+                            <!-- Charts -->
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="chart-container p-4">
+                                        <h5>Registration Trends</h5>
+                                        <canvas id="registrationChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="chart-container p-4">
+                                        <h5>Attendee Categories</h5>
+                                        <canvas id="categoryChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-bullhorn fa-3x text-primary mb-3"></i>
+                                        <h5>Send Announcement</h5>
+                                        <p class="text-muted">Broadcast updates to all attendees</p>
+                                        <button class="btn btn-primary action-btn">Send Message</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-download fa-3x text-success mb-3"></i>
+                                        <h5>Export Data</h5>
+                                        <p class="text-muted">Download attendee lists and reports</p>
+                                        <button class="btn btn-success action-btn">Export CSV</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-cog fa-3x text-warning mb-3"></i>
+                                        <h5>Settings</h5>
+                                        <p class="text-muted">Configure conference settings</p>
+                                        <button class="btn btn-warning action-btn">Configure</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attendees Tab -->
+                        <div class="tab-pane fade" id="attendees">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3>Attendees Management</h3>
+                                <div>
+                                    <input type="text" id="attendee-search" class="form-control d-inline-block me-2" 
+                                           placeholder="Search attendees..." style="width: 250px;">
+                                    <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addAttendeeModal">
+                                        <i class="fas fa-plus me-1"></i>Add Attendee
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="management-card">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Registration Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="attendees-table">
+                                            <!-- Content loaded by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agenda Tab -->
+                        <div class="tab-pane fade" id="agenda">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3>Agenda Management</h3>
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addSessionModal">
+                                    <i class="fas fa-plus me-1"></i>Add Session
+                                </button>
+                            </div>
+                            <div class="management-card p-4">
+                                <div id="agenda-management">
+                                    <!-- Agenda sessions will be loaded here -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-2"><strong>Time</strong></div>
+                                        <div class="col-md-4"><strong>Session Title</strong></div>
+                                        <div class="col-md-3"><strong>Speaker</strong></div>
+                                        <div class="col-md-2"><strong>Duration</strong></div>
+                                        <div class="col-md-1"><strong>Actions</strong></div>
+                                    </div>
+                                    <hr>
+                                    <div class="row mb-3 p-3 bg-light rounded">
+                                        <div class="col-md-2">09:00</div>
+                                        <div class="col-md-4">Registration & Welcome</div>
+                                        <div class="col-md-3">-</div>
+                                        <div class="col-md-2">60 min</div>
+                                        <div class="col-md-1">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 p-3 bg-light rounded">
+                                        <div class="col-md-2">10:00</div>
+                                        <div class="col-md-4">Keynote: The Future of AI</div>
+                                        <div class="col-md-3">Sarah Johnson</div>
+                                        <div class="col-md-2">90 min</div>
+                                        <div class="col-md-1">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Speakers Tab -->
+                        <div class="tab-pane fade" id="speakers">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3>Speakers Management</h3>
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addSpeakerModal">
+                                    <i class="fas fa-plus me-1"></i>Add Speaker
+                                </button>
+                            </div>
+                            <div class="row" id="speakers-management">
+                                <!-- Speakers will be loaded here -->
+                                <div class="col-md-6 mb-4">
+                                    <div class="management-card p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="https://images.unsplash.com/photo-1494790108755-2616b9997c94?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Speaker">
+                                            <div>
+                                                <h5>Sarah Johnson</h5>
+                                                <p class="text-muted mb-0">CEO, InnovateTech</p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-3">Leading expert in AI and machine learning with 15+ years of experience.</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-primary btn-sm">Edit</button>
+                                            <button class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="management-card p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Speaker">
+                                            <div>
+                                                <h5>Mike Chen</h5>
+                                                <p class="text-muted mb-0">CTO, StartupCorp</p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-3">Pioneer in blockchain technology and cryptocurrency innovation.</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-primary btn-sm">Edit</button>
+                                            <button class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resources Tab -->
+                        <div class="tab-pane fade" id="resources">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3>Resources & Files</h3>
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#uploadResourceModal">
+                                    <i class="fas fa-upload me-1"></i>Upload Resource
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                                        <h6>Conference Brochure</h6>
+                                        <p class="text-muted small">2.5 MB • PDF</p>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm">Download</button>
+                                            <button class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-file-powerpoint fa-3x text-warning mb-3"></i>
+                                        <h6>Presentation Template</h6>
+                                        <p class="text-muted small">1.8 MB • PPTX</p>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm">Download</button>
+                                            <button class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="management-card p-4 text-center">
+                                        <i class="fas fa-file-image fa-3x text-info mb-3"></i>
+                                        <h6>Logo Assets</h6>
+                                        <p class="text-muted small">3.2 MB • ZIP</p>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm">Download</button>
+                                            <button class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analytics Tab -->
+                        <div class="tab-pane fade" id="analytics">
+                            <h3 class="mb-4">Analytics Dashboard</h3>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="chart-container p-4">
+                                        <h5>Registration Over Time</h5>
+                                        <canvas id="registrationTrendChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-container p-4">
+                                        <h5>Attendee Demographics</h5>
+                                        <canvas id="demographicsChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="chart-container p-4">
+                                        <h5>Revenue Breakdown</h5>
+                                        <canvas id="revenueChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-container p-4">
+                                        <h5>Top Referral Sources</h5>
+                                        <div class="list-group">
+                                            <div class="list-group-item d-flex justify-content-between">
+                                                <span>Direct Traffic</span>
+                                                <span class="badge bg-primary">45%</span>
+                                            </div>
+                                            <div class="list-group-item d-flex justify-content-between">
+                                                <span>Social Media</span>
+                                                <span class="badge bg-primary">28%</span>
+                                            </div>
+                                            <div class="list-group-item d-flex justify-content-between">
+                                                <span>Email Marketing</span>
+                                                <span class="badge bg-primary">18%</span>
+                                            </div>
+                                            <div class="list-group-item d-flex justify-content-between">
+                                                <span>Partner Websites</span>
+                                                <span class="badge bg-primary">9%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Communication Tab -->
+                        <div class="tab-pane fade" id="communication">
+                            <h3 class="mb-4">Communication Center</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="management-card p-4">
+                                        <h5><i class="fas fa-envelope me-2"></i>Email Campaign</h5>
+                                        <form>
+                                            <div class="mb-3">
+                                                <label class="form-label">Recipients</label>
+                                                <select class="form-select">
+                                                    <option>All Attendees</option>
+                                                    <option>Confirmed Only</option>
+                                                    <option>VIP Attendees</option>
+                                                    <option>Speakers</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Subject</label>
+                                                <input type="text" class="form-control" placeholder="Enter email subject">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Message</label>
+                                                <textarea class="form-control" rows="4" placeholder="Type your message here..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary action-btn">Send Email</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="management-card p-4">
+                                        <h5><i class="fas fa-download me-2"></i>Export Options</h5>
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-outline-success">
+                                                <i class="fas fa-file-csv me-2"></i>Export Attendees CSV
+                                            </button>
+                                            <button class="btn btn-outline-info">
+                                                <i class="fas fa-file-excel me-2"></i>Export Registration Report
+                                            </button>
+                                            <button class="btn btn-outline-warning">
+                                                <i class="fas fa-chart-bar me-2"></i>Export Analytics Report
+                                            </button>
+                                            <button class="btn btn-outline-secondary">
+                                                <i class="fas fa-file-pdf me-2"></i>Export Speaker List
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="management-card p-4">
+                                        <h5><i class="fas fa-history me-2"></i>Communication History</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Type</th>
+                                                        <th>Subject</th>
+                                                        <th>Recipients</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>2024-01-10</td>
+                                                        <td><span class="badge bg-info">Email</span></td>
+                                                        <td>Welcome to TechCrunch Disrupt 2024</td>
+                                                        <td>4,200</td>
+                                                        <td><span class="badge bg-success">Sent</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2024-01-08</td>
+                                                        <td><span class="badge bg-info">Email</span></td>
+                                                        <td>Conference Schedule Update</td>
+                                                        <td>4,200</td>
+                                                        <td><span class="badge bg-success">Sent</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modals -->
     <!-- Edit Conference Modal -->
     <div class="modal fade" id="editConferenceModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -255,16 +647,56 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2023 ConferenceHub. All rights reserved.</p>
+    <!-- Add Session Modal -->
+    <div class="modal fade" id="addSessionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Session Title</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Speaker</label>
+                            <select class="form-select">
+                                <option value="">Select Speaker</option>
+                                <option value="sarah">Sarah Johnson</option>
+                                <option value="mike">Mike Chen</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success">Add Session</button>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Additional modals for speakers and resources would go here -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
     <script src="js/conference-admin.js"></script>
-</body>
-</html>
