@@ -1,5 +1,5 @@
 
-// Admin page JavaScript logic
+// Admin page JavaScript logic - Tiếng Việt
 
 document.addEventListener('DOMContentLoaded', function() {
     loadAdminDashboard();
@@ -12,9 +12,9 @@ function loadAdminDashboard() {
     // Update statistics cards
     document.getElementById('total-conferences').textContent = stats.totalConferences;
     document.getElementById('active-conferences').textContent = stats.activeConferences;
-    document.getElementById('total-attendees').textContent = stats.totalAttendees.toLocaleString();
+    document.getElementById('total-attendees').textContent = stats.totalAttendees.toLocaleString('vi-VN');
     document.getElementById('total-revenue').textContent = 
-        stats.totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        stats.totalRevenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 }
 
 function loadConferencesTable() {
@@ -29,7 +29,7 @@ function loadConferencesTable() {
 function editConference(conferenceId) {
     const conference = getConferenceById(conferenceId);
     if (conference) {
-        showToast(`Edit functionality for "${conference.title}" would be implemented here!`, 'info');
+        showToast(`Chức năng chỉnh sửa cho "${conference.title}" sẽ được triển khai tại đây!`, 'info');
         // In a real application, this would open a modal or navigate to an edit page
     }
 }
@@ -37,9 +37,9 @@ function editConference(conferenceId) {
 function deleteConference(conferenceId) {
     const conference = getConferenceById(conferenceId);
     if (conference) {
-        if (confirm(`Are you sure you want to delete "${conference.title}"?`)) {
+        if (confirm(`Bạn có chắc chắn muốn xóa "${conference.title}"?`)) {
             // In a real application, this would make an API call to delete the conference
-            showToast(`"${conference.title}" has been deleted!`, 'success');
+            showToast(`"${conference.title}" đã được xóa!`, 'success');
             
             // Remove from the conferences array (simulation)
             const index = conferences.findIndex(c => c.id === conferenceId);
@@ -64,7 +64,7 @@ function addConference() {
     
     // Validate form
     if (!title || !category || !date || !location || !description || !price || !capacity) {
-        showToast('Please fill in all fields!', 'danger');
+        showToast('Vui lòng điền đầy đủ thông tin!', 'danger');
         return;
     }
     
@@ -83,27 +83,26 @@ function addConference() {
         status: 'active',
         image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop',
         organizer: {
-            name: 'ConferenceHub Admin',
-            email: 'admin@conferencehub.com',
-            phone: '+1 (555) 000-0000'
+            name: 'Quản trị viên Trung tâm Hội nghị',
+            email: 'admin@trungtamhoinghi.vn',
+            phone: '(+84) 123-456-789'
         },
         speakers: [
             {
-                name: 'TBD Speaker',
-                title: 'Industry Expert',
-                bio: 'Speaker details to be announced'
+                name: 'Diễn giả (chưa xác định)',
+                title: 'Chuyên gia trong ngành',
+                bio: 'Thông tin diễn giả sẽ được cập nhật sau'
             }
-        ],
-        schedule: [
+        ],        schedule: [
             {
                 time: '09:00',
-                title: 'Registration & Welcome',
+                title: 'Đăng ký & Chào mừng',
                 speaker: ''
             },
             {
                 time: '10:00',
-                title: 'Opening Keynote',
-                speaker: 'TBD Speaker'
+                title: 'Bài phát biểu khai mạc',
+                speaker: 'Diễn giả (chưa xác định)'
             }
         ]
     };
@@ -122,14 +121,14 @@ function addConference() {
     loadAdminDashboard();
     loadConferencesTable();
     
-    showToast(`Conference "${title}" has been added successfully!`, 'success');
+    showToast(`Hội nghị "${title}" đã được thêm thành công!`, 'success');
 }
 
 // Helper function to format currency
 function formatCurrency(amount) {
-    return amount.toLocaleString('en-US', {
+    return amount.toLocaleString('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND'
     });
 }
 

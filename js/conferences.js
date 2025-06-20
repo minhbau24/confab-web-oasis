@@ -1,5 +1,5 @@
 
-// Conferences page JavaScript logic
+// Conferences page JavaScript logic - Tiếng Việt
 
 let allConferences = [];
 let filteredConferences = [];
@@ -58,7 +58,7 @@ if (typeof joinConference === 'undefined') {
         const conference = getConferenceById(conferenceId);
         if (conference) {
             if (conference.attendees < conference.capacity) {
-                showToast(`Successfully registered for ${conference.title}!`);
+                showToast(`Đăng ký thành công cho hội nghị ${conference.title}!`);
                 conference.attendees += 1;
                 
                 const user = getCurrentUser();
@@ -70,7 +70,7 @@ if (typeof joinConference === 'undefined') {
                 // Re-render to update attendee count
                 renderConferences();
             } else {
-                showToast('Sorry, this conference is full!', 'warning');
+                showToast('Rất tiếc, hội nghị này đã đủ số lượng!', 'warning');
             }
         }
     }

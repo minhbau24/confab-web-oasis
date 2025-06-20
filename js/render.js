@@ -1,23 +1,23 @@
 
-// Rendering functions for creating HTML elements with Bootstrap styling
+// Rendering functions for creating HTML elements with Bootstrap styling - Tiếng Việt
 
 function renderConferenceCard(conference, showFullDetails = false) {
-    const dateFormatted = new Date(conference.date).toLocaleDateString('en-US', {
+    const dateFormatted = new Date(conference.date).toLocaleDateString('vi-VN', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
     
     const endDateFormatted = conference.endDate ? 
-        new Date(conference.endDate).toLocaleDateString('en-US', {
+        new Date(conference.endDate).toLocaleDateString('vi-VN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         }) : '';
 
-    const priceFormatted = conference.price.toLocaleString('en-US', {
+    const priceFormatted = conference.price.toLocaleString('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND'
     });
 
     return `
@@ -44,15 +44,14 @@ function renderConferenceCard(conference, showFullDetails = false) {
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
-                                <i class="fas fa-users me-1"></i>${conference.attendees}/${conference.capacity} attendees
+                                <i class="fas fa-users me-1"></i>${conference.attendees}/${conference.capacity} người tham dự
                             </small>
-                        </div>
-                        <div class="mt-3">
+                        </div>                        <div class="mt-3">
                             <a href="conference-detail.html?id=${conference.id}" class="btn btn-primary btn-sm me-2">
-                                View Details
+                                Xem chi tiết
                             </a>
                             <button class="btn btn-outline-success btn-sm" onclick="joinConference(${conference.id})">
-                                <i class="fas fa-plus me-1"></i>Join
+                                <i class="fas fa-plus me-1"></i>Tham gia
                             </button>
                         </div>
                     </div>
@@ -63,7 +62,7 @@ function renderConferenceCard(conference, showFullDetails = false) {
 }
 
 function renderConferenceDetail(conference) {
-    const dateFormatted = new Date(conference.date).toLocaleDateString('en-US', {
+    const dateFormatted = new Date(conference.date).toLocaleDateString('vi-VN', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -71,16 +70,16 @@ function renderConferenceDetail(conference) {
     });
     
     const endDateFormatted = conference.endDate ? 
-        new Date(conference.endDate).toLocaleDateString('en-US', {
+        new Date(conference.endDate).toLocaleDateString('vi-VN', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         }) : '';
 
-    const priceFormatted = conference.price.toLocaleString('en-US', {
+    const priceFormatted = conference.price.toLocaleString('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND'
     });
 
     const speakersHtml = conference.speakers.map(speaker => `
@@ -218,7 +217,7 @@ function renderProjectCard(project) {
                     </div>
                     <div class="d-flex justify-content-between">
                         <a href="${project.github}" target="_blank" class="btn btn-outline-dark btn-sm">
-                            <i class="fab fa-github me-1"></i>Code
+                            <i class="fab fa-github me-1"></i>Mã nguồn
                         </a>
                         <a href="${project.demo}" target="_blank" class="btn btn-primary btn-sm">
                             <i class="fas fa-external-link-alt me-1"></i>Demo
@@ -231,7 +230,8 @@ function renderProjectCard(project) {
 }
 
 function renderAdminConferenceRow(conference) {
-    const dateFormatted = new Date(conference.date).toLocaleDateString();
+    const dateFormatted = new Date(conference.date).toLocaleDateString('vi-VN');
+    const statusText = conference.status === 'active' ? 'đang diễn ra' : 'kết thúc';
     const statusBadge = conference.status === 'active' ? 'success' : 'secondary';
     
     return `
@@ -242,7 +242,7 @@ function renderAdminConferenceRow(conference) {
             <td>${conference.location}</td>
             <td><span class="badge bg-primary">${conference.category}</span></td>
             <td>${conference.attendees}/${conference.capacity}</td>
-            <td><span class="badge bg-${statusBadge}">${conference.status}</span></td>
+            <td><span class="badge bg-${statusBadge}">${statusText}</span></td>
             <td>
                 <button class="btn btn-sm btn-outline-primary me-1" onclick="editConference(${conference.id})">
                     <i class="fas fa-edit"></i>
@@ -255,7 +255,7 @@ function renderAdminConferenceRow(conference) {
     `;
 }
 
-// Utility function to show toast notifications
+// Utility function to show toast notifications - Tiếng Việt
 function showToast(message, type = 'success') {
     const toastContainer = document.getElementById('toast-container') || createToastContainer();
     const toastId = 'toast-' + Date.now();

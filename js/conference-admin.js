@@ -1,8 +1,13 @@
-
 // Conference Admin page JavaScript logic
 
 let currentConference = null;
 let attendeesData = [];
+
+// Helper function for toasts
+function showToast(message, type = 'info') {
+    // Simple toast implementation if not provided elsewhere
+    alert(message);
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeConferenceAdmin();
@@ -12,9 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeConferenceAdmin() {
     const urlParams = new URLSearchParams(window.location.search);
     const conferenceId = urlParams.get('id');
-    
-    if (!conferenceId) {
-        showToast('No conference ID provided. Redirecting to admin dashboard...', 'warning');
+      if (!conferenceId) {
+        showToast('Không tìm thấy ID hội nghị. Chuyển hướng về trang quản trị...', 'warning');
         setTimeout(() => {
             window.location.href = 'admin.html';
         }, 2000);
@@ -24,7 +28,7 @@ function initializeConferenceAdmin() {
     currentConference = getConferenceById(parseInt(conferenceId));
     
     if (!currentConference) {
-        showToast('Conference not found. Redirecting to admin dashboard...', 'danger');
+        showToast('Không tìm thấy hội nghị. Chuyển hướng về trang quản trị...', 'danger');
         setTimeout(() => {
             window.location.href = 'admin.html';
         }, 2000);
@@ -91,28 +95,27 @@ function loadConferenceInfo() {
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-muted mb-1">Status</h6>
-                            <span class="badge bg-${currentConference.status === 'active' ? 'success' : 'secondary'} fs-6">
-                                ${currentConference.status.charAt(0).toUpperCase() + currentConference.status.slice(1)}
+                            <h6 class="text-muted mb-1">Status</h6>                            <span class="badge bg-${currentConference.status === 'active' ? 'success' : 'secondary'} fs-6">
+                                ${currentConference.status === 'active' ? 'Đang hoạt động' : 'Đã lưu trữ'}
                             </span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-muted mb-1">Category</h6>
-                            <span class="badge bg-primary fs-6">${currentConference.category}</span>
+                            <h6 class="text-muted mb-1">Danh mục</h6>
+                            <span class="badge bg-primary fs-6">${translateCategory(currentConference.category)}</span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-muted mb-1"><i class="fas fa-calendar me-1"></i>Date</h6>
+                            <h6 class="text-muted mb-1"><i class="fas fa-calendar me-1"></i>Ngày</h6>
                             <p class="mb-0">${dateFormatted}${currentConference.endDate ? ` - ${endDateFormatted}` : ''}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i>Location</h6>
+                            <h6 class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i>Địa điểm</h6>
                             <p class="mb-0">${currentConference.location}</p>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <h6 class="text-muted mb-1">Description</h6>
+                        <h6 class="text-muted mb-1">Mô tả</h6>
                         <p class="mb-0">${currentConference.description}</p>
                     </div>
                 </div>
@@ -138,13 +141,13 @@ function loadSummaryStats() {
     const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
     
     // Update stats
-    document.getElementById('attendee-count').textContent = attendeeCount;
-    document.getElementById('total-revenue').textContent = totalRevenue.toLocaleString('en-US', {
+    document.getElementById('attendee-count').textContent = attendeeCount.toLocaleString('vi-VN');
+    document.getElementById('total-revenue').textContent = totalRevenue.toLocaleString('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND'
     });
     document.getElementById('capacity-percentage').textContent = `${capacityPercentage}%`;
-    document.getElementById('days-until').textContent = daysUntil > 0 ? daysUntil : 'Event Passed';
+    document.getElementById('days-until').textContent = daysUntil > 0 ? daysUntil : 'Sự kiện đã qua';
 }
 
 function loadAttendeesTable() {
@@ -170,19 +173,25 @@ function renderAttendeeRow(attendee) {
         'attended': 'bg-success'
     }[attendee.status] || 'bg-secondary';
     
-    const registrationDate = new Date(attendee.registrationDate).toLocaleDateString();
+    const statusTranslation = {
+        'registered': 'Đã đăng ký',
+        'confirmed': 'Đã xác nhận',
+        'attended': 'Đã tham dự'
+    }[attendee.status] || attendee.status;
+    
+    const registrationDate = new Date(attendee.registrationDate).toLocaleDateString('vi-VN');
     
     return `
         <tr>
             <td>${attendee.name}</td>
             <td>${attendee.email}</td>
             <td>${registrationDate}</td>
-            <td><span class="badge ${statusBadgeClass}">${attendee.status}</span></td>
+            <td><span class="badge ${statusBadgeClass}">${statusTranslation}</span></td>
             <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(${attendee.id})" title="Edit">
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(${attendee.id})" title="Sửa">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="removeAttendee(${attendee.id})" title="Remove">
+                <button class="btn btn-sm btn-outline-danger" onclick="removeAttendee(${attendee.id})" title="Xóa">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -202,11 +211,12 @@ function filterAttendees() {
 
 function toggleConferenceStatus() {
     const newStatus = currentConference.status === 'active' ? 'archived' : 'active';
-    const actionText = newStatus === 'archived' ? 'archive' : 'activate';
+    const actionText = newStatus === 'archived' ? 'lưu trữ' : 'kích hoạt';
     
-    if (confirm(`Are you sure you want to ${actionText} this conference?`)) {
+    if (confirm(`Bạn có chắc chắn muốn ${actionText} hội nghị này không?`)) {
         currentConference.status = newStatus;
-        showToast(`Conference has been ${newStatus}!`, 'success');
+        const statusMessage = newStatus === 'archived' ? 'đã được lưu trữ' : 'đã được kích hoạt';
+        showToast(`Hội nghị ${statusMessage}!`, 'success');
         loadConferenceInfo();
     }
 }
@@ -225,7 +235,7 @@ function saveConferenceChanges() {
     
     // Validate form
     if (!title || !category || !date || !location || !price || !capacity || !description) {
-        showToast('Please fill in all required fields!', 'danger');
+        showToast('Vui lòng điền đầy đủ thông tin bắt buộc!', 'danger');
         return;
     }
     
@@ -248,7 +258,7 @@ function saveConferenceChanges() {
     loadConferenceInfo();
     loadSummaryStats();
     
-    showToast('Conference information updated successfully!', 'success');
+    showToast('Thông tin hội nghị đã được cập nhật thành công!', 'success');
 }
 
 function addAttendee() {
@@ -257,13 +267,13 @@ function addAttendee() {
     const status = document.getElementById('attendeeStatus').value;
     
     if (!name || !email || !status) {
-        showToast('Please fill in all fields!', 'danger');
+        showToast('Vui lòng điền đầy đủ thông tin!', 'danger');
         return;
     }
     
     // Check for duplicate email
     if (attendeesData.some(attendee => attendee.email === email)) {
-        showToast('An attendee with this email already exists!', 'warning');
+        showToast('Email này đã được sử dụng bởi người tham dự khác!', 'warning');
         return;
     }
     
@@ -292,21 +302,21 @@ function addAttendee() {
     loadAttendeesTable();
     loadSummaryStats();
     
-    showToast(`${name} has been added as an attendee!`, 'success');
+    showToast(`${name} đã được thêm vào danh sách người tham dự!`, 'success');
 }
 
 function editAttendee(attendeeId) {
     const attendee = attendeesData.find(a => a.id === attendeeId);
     if (attendee) {
         // For now, just show a toast - in a real app, this would open an edit modal
-        showToast(`Edit functionality for ${attendee.name} would be implemented here!`, 'info');
+        showToast(`Chức năng chỉnh sửa cho ${attendee.name} sẽ được triển khai tại đây!`, 'info');
     }
 }
 
 function removeAttendee(attendeeId) {
     const attendee = attendeesData.find(a => a.id === attendeeId);
     if (attendee) {
-        if (confirm(`Are you sure you want to remove ${attendee.name} from this conference?`)) {
+        if (confirm(`Bạn có chắc chắn muốn xóa ${attendee.name} khỏi hội nghị này?`)) {
             attendeesData = attendeesData.filter(a => a.id !== attendeeId);
             
             // Update conference attendee count
@@ -316,9 +326,20 @@ function removeAttendee(attendeeId) {
             loadAttendeesTable();
             loadSummaryStats();
             
-            showToast(`${attendee.name} has been removed from the conference.`, 'success');
+            showToast(`${attendee.name} đã được xóa khỏi hội nghị.`, 'success');
         }
     }
+}
+
+// Helper function to translate category names
+function translateCategory(category) {
+    const translations = {
+        'Technology': 'Công nghệ',
+        'Business': 'Kinh doanh',
+        'Marketing': 'Marketing',
+        'Design': 'Thiết kế'
+    };
+    return translations[category] || category;
 }
 
 // Pre-populate edit modal when it opens

@@ -35,9 +35,9 @@ function loadJoinedConferences() {
         container.innerHTML = `
             <div class="col-12 text-center py-4">
                 <i class="fas fa-calendar-plus fa-2x text-muted mb-2"></i>
-                <p class="text-muted">You haven't joined any conferences yet.</p>
+                <p class="text-muted">Bạn chưa tham gia hội nghị nào.</p>
                 <a href="conferences.html" class="btn btn-primary">
-                    Browse Conferences
+                    Khám phá Hội nghị
                 </a>
             </div>
         `;
@@ -56,9 +56,9 @@ function loadUserProjects() {
         container.innerHTML = `
             <div class="col-12 text-center py-4">
                 <i class="fas fa-project-diagram fa-2x text-muted mb-2"></i>
-                <p class="text-muted">No projects to display.</p>
+                <p class="text-muted">Không có dự án nào để hiển thị.</p>
                 <button class="btn btn-primary" onclick="addProject()">
-                    Add Project
+                    Thêm dự án
                 </button>
             </div>
         `;
@@ -66,11 +66,11 @@ function loadUserProjects() {
 }
 
 function addProject() {
-    showToast('Add project functionality would be implemented here!', 'info');
+    showToast('Chức năng thêm dự án sẽ được triển khai tại đây!', 'info');
 }
 
 function editProfile() {
-    showToast('Edit profile functionality would be implemented here!', 'info');
+    showToast('Chức năng chỉnh sửa hồ sơ sẽ được triển khai tại đây!', 'info');
 }
 
 // Global function for joining conferences (if not already defined)
@@ -79,7 +79,7 @@ if (typeof joinConference === 'undefined') {
         const conference = getConferenceById(conferenceId);
         if (conference) {
             if (conference.attendees < conference.capacity) {
-                showToast(`Successfully registered for ${conference.title}!`);
+                showToast(`Đăng ký thành công cho hội nghị ${conference.title}!`);
                 conference.attendees += 1;
                 
                 const user = getCurrentUser();
@@ -92,7 +92,7 @@ if (typeof joinConference === 'undefined') {
                 loadUserProfile();
                 loadJoinedConferences();
             } else {
-                showToast('Sorry, this conference is full!', 'warning');
+                showToast('Rất tiếc, hội nghị này đã đủ số lượng!', 'warning');
             }
         }
     }

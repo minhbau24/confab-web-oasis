@@ -1,19 +1,22 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConferenceHub - Discover & Host Amazing Conferences</title>
+    <title>Trung tâm Hội nghị - Khám phá & Tổ chức Hội nghị Tuyệt vời</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">    <style>
+        body {
+            padding-top: 55px; /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
+        }
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 120px 0;
             position: relative;
             overflow: hidden;
+            margin-top: -70px; /* Bù trừ padding-top của body để hero section tiếp nối với navbar */
         }
         .hero-section::before {
             content: '';
@@ -149,41 +152,8 @@
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <i class="fas fa-calendar-alt me-2"></i>ConferenceHub
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="conferences.html">Browse Conferences</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="profile.html">My Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin.html">Host Event</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="profile.html">
-                            <i class="fas fa-user me-1"></i>John Doe
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body>    <!-- Navigation Container -->
+    <div id="header-container"></div>
 
     <!-- Hero Section -->
     <section class="hero-section text-center">
@@ -191,16 +161,15 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="display-3 fw-bold mb-4 floating-animation">
-                        Discover & Host<br>
-                        <span class="text-warning">Amazing Conferences</span>
+                        Khám phá & Tổ chức<br>
+                        <span class="text-warning">Hội nghị Tuyệt vời</span>
                     </h1>
-                    <p class="lead mb-5">Connect with industry leaders, learn cutting-edge skills, and grow your network at world-class conferences and events.</p>
-                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5">
+                    <p class="lead mb-5">Kết nối với lãnh đạo ngành, học hỏi kỹ năng tiên tiến và mở rộng mạng lưới của bạn tại các hội nghị và sự kiện đẳng cấp.</p>                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5">
                         <a href="conferences.html" class="btn btn-light btn-lg px-4 py-3">
-                            <i class="fas fa-search me-2"></i>Explore Conferences
+                            <i class="fas fa-search me-2"></i>Khám phá Hội nghị
                         </a>
                         <a href="admin.html" class="btn btn-outline-light btn-lg px-4 py-3">
-                            <i class="fas fa-plus me-2"></i>Host Your Event
+                            <i class="fas fa-plus me-2"></i>Tổ chức Sự kiện
                         </a>
                     </div>
                 </div>
@@ -216,33 +185,32 @@
     <!-- Trust Indicators -->
     <section class="py-4 bg-light">
         <div class="container">
-            <div class="row text-center">
-                <div class="col-6 col-md-3 mb-3">
+            <div class="row text-center">                <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-users fa-2x text-primary mb-2"></i>
                         <h4 class="stats-counter" data-count="50000">0</h4>
-                        <small class="text-muted">Happy Attendees</small>
+                        <small class="text-muted">Người tham dự hài lòng</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
                         <h4 class="stats-counter" data-count="1500">0</h4>
-                        <small class="text-muted">Events Hosted</small>
+                        <small class="text-muted">Sự kiện đã tổ chức</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-building fa-2x text-info mb-2"></i>
                         <h4 class="stats-counter" data-count="500">0</h4>
-                        <small class="text-muted">Partner Organizations</small>
+                        <small class="text-muted">Tổ chức đối tác</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-star fa-2x text-warning mb-2"></i>
                         <h4 class="stats-counter" data-count="98">0</h4>
-                        <small class="text-muted">% Satisfaction Rate</small>
+                        <small class="text-muted">% Tỷ lệ hài lòng</small>
                     </div>
                 </div>
             </div>
@@ -253,7 +221,7 @@
     <section class="py-5 my-5">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold section-title">Why Choose ConferenceHub?</h2>
+                <h2 class="display-5 fw-bold section-title">Tại sao chọn Trung tâm Hội nghị?</h2>
                 <p class="lead text-muted">Trusted by thousands of professionals worldwide</p>
             </div>
             <div class="row">
@@ -309,7 +277,7 @@
     <section class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold section-title">Featured Conferences</h2>
+                <h2 class="display-5 fw-bold section-title">Hội nghị Nổi bật</h2>
                 <p class="lead text-muted">Don't miss these amazing upcoming events</p>
             </div>
             <div class="row" id="featured-conferences">
@@ -327,7 +295,7 @@
     <section class="py-5 my-5">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold section-title">How It Works</h2>
+                <h2 class="display-5 fw-bold section-title">Cách Thức Hoạt Động</h2>
                 <p class="lead text-muted">Getting started is simple and takes just minutes</p>
             </div>
             <div class="row">
@@ -357,20 +325,19 @@
     <section class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold section-title">What Our Community Says</h2>
-                <p class="lead text-muted">Join thousands of satisfied professionals</p>
+                <h2 class="display-5 fw-bold section-title">Khách Hàng Nói Gì</h2>
+                <p class="lead text-muted">Tham gia cùng hàng nghìn chuyên gia hài lòng</p>
             </div>
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
                             <img src="https://images.unsplash.com/photo-1494790108755-2616b9997c94?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Sarah">
-                            <div>
-                                <h6 class="mb-0">Sarah Johnson</h6>
-                                <small class="text-muted">Product Manager, TechCorp</small>
+                            <div>                                <h6 class="mb-0">Nguyễn Thị Minh</h6>
+                                <small class="text-muted">Product Manager, VNG</small>
                             </div>
                         </div>
-                        <p class="mb-3">"ConferenceHub has transformed how I discover and attend professional events. The networking opportunities are incredible!"</p>
+                        <p class="mb-3">"Trung tâm Hội nghị đã thay đổi cách tôi khám phá và tham dự các sự kiện chuyên nghiệp. Cơ hội kết nối thật sự tuyệt vời!"</p>
                         <div class="text-warning">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -384,12 +351,11 @@
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
                             <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Michael">
-                            <div>
-                                <h6 class="mb-0">Michael Chen</h6>
-                                <small class="text-muted">CTO, StartupXYZ</small>
+                            <div>                                <h6 class="mb-0">Trần Đức Khải</h6>
+                                <small class="text-muted">CTO, TechViet</small>
                             </div>
                         </div>
-                        <p class="mb-3">"As an event organizer, ConferenceHub's tools have made hosting conferences so much easier. The analytics are amazing!"</p>
+                        <p class="mb-3">"Với tư cách là nhà tổ chức sự kiện, công cụ của Trung tâm Hội nghị đã giúp việc tổ chức hội nghị dễ dàng hơn rất nhiều. Các phân tích dữ liệu thật tuyệt vời!"</p>
                         <div class="text-warning">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -403,12 +369,11 @@
                     <div class="testimonial-card">
                         <div class="d-flex align-items-center mb-3">
                             <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Emily">
-                            <div>
-                                <h6 class="mb-0">Emily Rodriguez</h6>
-                                <small class="text-muted">Marketing Director, Agency</small>
+                            <div>                                <h6 class="mb-0">Phạm Thị Hương</h6>
+                                <small class="text-muted">Giám đốc Marketing, Creatio</small>
                             </div>
                         </div>
-                        <p class="mb-3">"The quality of conferences and speakers on this platform is outstanding. I've learned so much and grown my network significantly."</p>
+                        <p class="mb-3">"Chất lượng các hội nghị và diễn giả trên nền tảng này thật xuất sắc. Tôi đã học hỏi được rất nhiều và mở rộng mạng lưới của mình một cách đáng kể."</p>
                         <div class="text-warning">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -426,7 +391,7 @@
     <section class="py-5">
         <div class="container">
             <div class="text-center mb-5">
-                <h3 class="text-muted">Trusted by Leading Organizations</h3>
+                <h3 class="text-muted">Được tin dùng bởi các Tổ chức hàng đầu</h3>
             </div>
             <div class="row align-items-center justify-content-center">
                 <div class="col-6 col-md-2 mb-4 text-center">
@@ -455,107 +420,62 @@
     <section class="cta-section text-center position-relative">
         <div class="container position-relative" style="z-index: 2;">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h2 class="display-4 fw-bold mb-4">Ready to Level Up Your Career?</h2>
-                    <p class="lead mb-5">Join thousands of professionals who are already advancing their careers through ConferenceHub</p>
+                <div class="col-lg-8">                    <h2 class="display-4 fw-bold mb-4">Sẵn sàng Nâng tầm Sự nghiệp?</h2>
+                    <p class="lead mb-5">Hàng ngàn chuyên gia đã thúc đẩy sự nghiệp của họ thông qua Trung tâm Hội nghị</p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                         <a href="conferences.html" class="btn btn-light btn-lg px-5 py-3">
-                            <i class="fas fa-rocket me-2"></i>Find Your Next Conference
+                            <i class="fas fa-rocket me-2"></i>Tìm Hội nghị Tiếp theo
                         </a>
                         <a href="admin.html" class="btn btn-outline-light btn-lg px-5 py-3">
-                            <i class="fas fa-calendar-plus me-2"></i>Host Your Event
+                            <i class="fas fa-calendar-plus me-2"></i>Tổ chức Sự kiện
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-calendar-alt me-2"></i>ConferenceHub</h5>
-                    <p class="text-muted">Connecting professionals worldwide through amazing conferences and events.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-light"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-linkedin fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram fa-lg"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Platform</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="conferences.html" class="text-muted text-decoration-none">Browse Events</a></li>
-                        <li><a href="admin.html" class="text-muted text-decoration-none">Host Event</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Mobile App</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">API</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Support</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">Help Center</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Contact Us</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Live Chat</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Community</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Company</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">About Us</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Careers</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Press</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Legal</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Terms of Service</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Cookie Policy</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">GDPR</a></li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4">
-            <div class="text-center">
-                <p>&copy; 2023 ConferenceHub. All rights reserved. | Making professional development accessible worldwide.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </section>    <!-- Footer Container -->
+    <div id="footer-container"></div>    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
-    <script src="js/home.js"></script>
-    <script>
+    <script src="js/auth.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/home.js"></script>    <script>
         // Enhanced home page functionality
         document.addEventListener('DOMContentLoaded', function() {
-            loadFeaturedConferences();
+            // Gọi hàm từ home.js để tải hội nghị đã được chuẩn hóa
+            if (typeof loadUpcomingConferences === 'function') {
+                loadUpcomingConferences();
+            } else {
+                // Fallback nếu home.js không được load hoặc không có hàm
+                loadFeaturedConferences();
+            }
+            
+            // Animation counter
             animateStats();
         });
 
+        // Fallback function nếu home.js không có sẵn
         function loadFeaturedConferences() {
-            const featuredConferences = getUpcomingConferences(3);
-            const container = document.getElementById('featured-conferences');
-            
-            if (featuredConferences.length > 0) {
-                container.innerHTML = featuredConferences
-                    .map(conference => renderConferenceCard(conference))
-                    .join('');
+            if (typeof getUpcomingConferences === 'function') {
+                const featuredConferences = getUpcomingConferences(3);
+                const container = document.getElementById('featured-conferences');
+                
+                if (featuredConferences && featuredConferences.length > 0) {
+                    container.innerHTML = featuredConferences
+                        .map(conference => renderConferenceCard(conference))
+                        .join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Không có hội nghị sắp diễn ra</h4>
+                            <p class="text-muted">Vui lòng quay lại sau để xem các sự kiện mới</p>
+                        </div>
+                    `;
+                }
             } else {
-                container.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No upcoming conferences</h4>
-                        <p class="text-muted">Check back later for new events!</p>
-                    </div>
-                `;
+                console.error("Không tìm thấy hàm getUpcomingConferences - vui lòng kiểm tra file data.js");
             }
         }
 

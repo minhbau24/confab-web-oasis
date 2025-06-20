@@ -39,7 +39,7 @@ function loadConferenceDetail() {
 }
 
 function updateHeroSection(conference) {
-    const dateFormatted = new Date(conference.date).toLocaleDateString('en-US', {
+    const dateFormatted = new Date(conference.date).toLocaleDateString('vi-VN', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -47,27 +47,27 @@ function updateHeroSection(conference) {
     });
     
     const endDateFormatted = conference.endDate ? 
-        ' - ' + new Date(conference.endDate).toLocaleDateString('en-US', {
+        ' - ' + new Date(conference.endDate).toLocaleDateString('vi-VN', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         }) : '';
 
-    const priceFormatted = conference.price.toLocaleString('en-US', {
+    const priceFormatted = conference.price.toLocaleString('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND',
+        maximumFractionDigits: 0
     });
 
-    // Update hero section content
-    document.getElementById('conference-category').textContent = conference.category;
+    // Update hero section content    document.getElementById('conference-category').textContent = conference.category;
     document.getElementById('conference-title').textContent = conference.title;
     document.getElementById('conference-description').textContent = conference.description;
     document.getElementById('conference-date').textContent = dateFormatted + endDateFormatted;
     document.getElementById('conference-location').textContent = conference.location;
-    document.getElementById('conference-attendees').textContent = `${conference.attendees}/${conference.capacity} attendees`;
+    document.getElementById('conference-attendees').textContent = `${conference.attendees}/${conference.capacity} người tham dự`;
     document.getElementById('conference-price').textContent = priceFormatted;
-    document.getElementById('spots-remaining').textContent = `${conference.capacity - conference.attendees} spots remaining`;
+    document.getElementById('spots-remaining').textContent = `Còn ${conference.capacity - conference.attendees} chỗ trống`;
     
     // Update hero background
     const heroSection = document.getElementById('hero-section');
@@ -92,7 +92,7 @@ function loadSpeakers(conference) {
                     <p class="text-primary mb-2">${speaker.title}</p>
                     <p class="card-text">${speaker.bio}</p>
                     <button class="btn btn-outline-primary btn-sm" onclick="showSpeakerModal('${speaker.name}')">
-                        View More
+                        Xem thêm
                     </button>
                 </div>
             </div>
@@ -103,22 +103,110 @@ function loadSpeakers(conference) {
 }
 
 function loadAgenda(conference) {
-    const agendaContainer = document.getElementById('agenda-day1');
+    const agendaContainer = document.getElementById('agendaAccordion');
     
-    const agendaHtml = conference.schedule.map(item => `
-        <div class="timeline-item">
-            <h6>${item.time}</h6>
-            <h5>${item.title}</h5>
-            ${item.speaker ? `<p class="text-muted">Speaker: ${item.speaker}</p>` : ''}
-        </div>
-    `).join('');
+    // Chuẩn bị dữ liệu cho lịch trình theo ngày
+    let agendaByDay = {};
     
+    // Tính toán số ngày diễn ra hội nghị
+    const startDate = new Date(conference.date);
+    const endDate = conference.endDate ? new Date(conference.endDate) : startDate;
+    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Tạo cấu trúc lịch trình cho mỗi ngày
+    for (let i = 0; i < days; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        const dateKey = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        
+        // Format ngày tháng hiển thị
+        const dateFormatted = currentDate.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        agendaByDay[dateKey] = {
+            date: dateFormatted,
+            items: []
+        };
+    }
+    
+    // Phân chia lịch trình vào các ngày
+    // Nếu không có thông tin ngày cụ thể trong mỗi mục lịch trình, 
+    // giả định tất cả thuộc ngày đầu tiên
+    if (conference.schedule && conference.schedule.length > 0) {
+        conference.schedule.forEach(item => {
+            // Nếu item có trường eventDate, sử dụng nó
+            // Nếu không, sử dụng ngày đầu tiên của hội nghị
+            const itemDate = item.eventDate ? item.eventDate : conference.date;
+            const dateKey = new Date(itemDate).toISOString().split('T')[0];
+            
+            if (agendaByDay[dateKey]) {
+                agendaByDay[dateKey].items.push(item);
+            } else {
+                // Nếu không tìm thấy ngày, đặt vào ngày đầu tiên
+                const firstDayKey = Object.keys(agendaByDay)[0];
+                agendaByDay[firstDayKey].items.push(item);
+            }
+        });
+    }
+    
+    // Tạo HTML cho accordion
+    let agendaHtml = '';
+    let firstDay = true;
+    
+    Object.keys(agendaByDay).forEach((dateKey, index) => {
+        const dayData = agendaByDay[dateKey];
+        const dayId = `day${index + 1}`;
+        
+        // Tạo accordion item cho mỗi ngày
+        agendaHtml += `
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button ${!firstDay ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#${dayId}">
+                        <strong>Ngày ${index + 1} - ${dayData.date}</strong>
+                    </button>
+                </h2>
+                <div id="${dayId}" class="accordion-collapse collapse ${firstDay ? 'show' : ''}" data-bs-parent="#agendaAccordion">
+                    <div class="accordion-body">
+        `;
+        
+        // Thêm các mục lịch trình cho ngày này
+        if (dayData.items && dayData.items.length > 0) {
+            dayData.items.forEach(item => {
+                agendaHtml += `
+                    <div class="timeline-item">
+                        <h6>${item.time}</h6>
+                        <h5>${item.title}</h5>
+                        ${item.speaker ? `<p class="text-muted">Diễn giả: ${item.speaker}</p>` : ''}
+                        ${item.description ? `<p>${item.description}</p>` : ''}
+                    </div>
+                `;
+            });
+        } else {
+            // Nếu không có mục lịch trình nào
+            agendaHtml += `<p class="text-muted">Chưa có thông tin lịch trình cho ngày này.</p>`;
+        }
+        
+        agendaHtml += `
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        firstDay = false;
+    });
+    
+    // Cập nhật nội dung
     agendaContainer.innerHTML = agendaHtml;
 }
 
 function showSpeakerModal(speakerName) {
     // This would show a modal with more detailed speaker information
-    showToast(`More information about ${speakerName} coming soon!`, 'info');
+    showToast(`Thông tin chi tiết về ${speakerName} sẽ có sớm!`, 'info');
 }
 
 function showConferenceNotFound() {
@@ -126,10 +214,10 @@ function showConferenceNotFound() {
         <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
             <div class="text-center">
                 <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                <h2>Conference Not Found</h2>
-                <p class="text-muted mb-4">The conference you're looking for doesn't exist or has been removed.</p>
+                <h2>Không tìm thấy Hội nghị</h2>
+                <p class="text-muted mb-4">Hội nghị bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
                 <a href="conferences.html" class="btn btn-primary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Conferences
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại Danh sách Hội nghị
                 </a>
             </div>
         </div>
@@ -138,13 +226,10 @@ function showConferenceNotFound() {
 
 //Global functions for conference actions
 function joinConference(conferenceId) {
-    const conference = getConferenceById(conference
-
-
-Id);
+    const conference = getConferenceById(conferenceId);
     if (conference) {
         if (conference.attendees < conference.capacity) {
-            showToast(`Successfully registered for ${conference.title}!`);
+            showToast(`Đăng ký thành công cho ${conference.title}!`);
             
             // Update attendee count
             conference.attendees += 1;
@@ -159,7 +244,7 @@ Id);
             // Reload the page to show updated information
             loadConferenceDetail();
         } else {
-            showToast('Sorry, this conference is full!', 'warning');
+            showToast('Rất tiếc, hội nghị này đã đủ người!', 'warning');
         }
     }
 }
@@ -175,10 +260,9 @@ function shareConference(conferenceId) {
                 text: conference.description,
                 url: url
             });
-        } else {
-            // Fallback: copy to clipboard
+        } else {            // Fallback: copy to clipboard
             navigator.clipboard.writeText(url).then(() => {
-                showToast('Conference link copied to clipboard!');
+                showToast('Đã sao chép liên kết hội nghị vào clipboard!');
             }).catch(() => {
                 // Manual fallback
                 const textArea = document.createElement('textarea');
@@ -187,7 +271,7 @@ function shareConference(conferenceId) {
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                showToast('Conference link copied to clipboard!');
+                showToast('Đã sao chép liên kết hội nghị vào clipboard!');
             });
         }
     }

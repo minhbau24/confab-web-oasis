@@ -1,83 +1,53 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConferenceHub - Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Trung tâm Hội nghị - Hồ sơ</title>    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 55px; /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
+        }
+    </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <i class="fas fa-calendar-alt me-2"></i>ConferenceHub
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="conferences.html">Conferences</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="profile.html">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin.html">Admin</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="profile.html">
-                            <i class="fas fa-user me-1"></i>John Doe
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body>    <!-- Navigation Container -->
+    <div id="header-container"></div>
 
     <!-- Profile Content -->
     <div class="container my-5">
-        <div class="row">
-            <!-- Profile Info -->
+        <div class="row">            <!-- Profile Info -->
             <div class="col-lg-4">
                 <div class="card mb-4">
                     <div class="card-body text-center">
                         <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" 
-                             alt="Profile" class="rounded-circle mb-3" width="150" height="150">
-                        <h4 id="user-name">John Doe</h4>
-                        <p class="text-muted" id="user-title">Senior Software Engineer</p>
+                             alt="Hồ sơ" class="rounded-circle mb-3" width="150" height="150">
+                        <h4 id="user-name">Nguyễn Văn A</h4>
+                        <p class="text-muted" id="user-title">Kỹ sư phần mềm cao cấp</p>
                         <p class="text-muted" id="user-location">
-                            <i class="fas fa-map-marker-alt me-1"></i>San Francisco, CA
+                            <i class="fas fa-map-marker-alt me-1"></i>Hà Nội, Việt Nam
                         </p>
-                        <button class="btn btn-primary">Edit Profile</button>
+                        <button class="btn btn-primary">Chỉnh sửa hồ sơ</button>
                     </div>
                 </div>
 
                 <!-- Stats Card -->
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Stats</h5>
+                        <h5 class="card-title">Thống kê</h5>
                         <div class="row text-center">
                             <div class="col-4">
                                 <h4 id="conferences-joined">5</h4>
-                                <small class="text-muted">Conferences</small>
+                                <small class="text-muted">Hội nghị</small>
                             </div>
                             <div class="col-4">
                                 <h4 id="projects-count">3</h4>
-                                <small class="text-muted">Projects</small>
+                                <small class="text-muted">Dự án</small>
                             </div>
                             <div class="col-4">
                                 <h4 id="connections-count">42</h4>
-                                <small class="text-muted">Connections</small>
+                                <small class="text-muted">Kết nối</small>
                             </div>
                         </div>
                     </div>
@@ -85,12 +55,11 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-lg-8">
-                <!-- Joined Conferences -->
+            <div class="col-lg-8">                <!-- Joined Conferences -->
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-calendar-check me-2"></i>Joined Conferences
+                            <i class="fas fa-calendar-check me-2"></i>Hội nghị đã tham gia
                         </h5>
                     </div>
                     <div class="card-body">
@@ -104,7 +73,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-project-diagram me-2"></i>My Projects
+                            <i class="fas fa-project-diagram me-2"></i>Dự án của tôi
                         </h5>
                     </div>
                     <div class="card-body">
@@ -115,18 +84,13 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2023 ConferenceHub. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>    <!-- Footer Container -->
+    <div id="footer-container"></div>    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
     <script src="js/profile.js"></script>
 </body>
 </html>

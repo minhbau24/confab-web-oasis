@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadUpcomingConferences() {
     const upcomingConferences = getUpcomingConferences(3);
-    const container = document.getElementById('upcoming-conferences');
+    const container = document.getElementById('featured-conferences');
     
     if (upcomingConferences.length > 0) {
         container.innerHTML = upcomingConferences
@@ -17,8 +17,8 @@ function loadUpcomingConferences() {
         container.innerHTML = `
             <div class="col-12 text-center py-5">
                 <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">No upcoming conferences</h4>
-                <p class="text-muted">Check back later for new events!</p>
+                <h4 class="text-muted">Không có hội nghị sắp diễn ra</h4>
+                <p class="text-muted">Vui lòng quay lại sau để xem các sự kiện mới</p>
             </div>
         `;
     }

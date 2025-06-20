@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Trung tâm Hội nghị</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 55px; /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
+            background-color: #f8f9fa;
+        }
+        .register-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            position: relative;
+        }
+        .register-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=800&fit=crop') center/cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            z-index: 2;
+            position: relative;
+        }
+        .register-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            padding: 30px;
+            color: white;
+            text-align: center;
+        }
+        .register-form {
+            padding: 30px;
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn-register:hover {
+            background: linear-gradient(135deg, #20c997, #1a9776);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        }
+        .social-register {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+        .facebook {
+            background: #3b5998;
+        }
+        .google {
+            background: #db4437;
+        }
+        .twitter {
+            background: #1da1f2;
+        }
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        .benefits-list {
+            padding-left: 0;
+            list-style-type: none;
+        }
+        .benefits-list li {
+            padding: 5px 0;
+        }
+        .benefits-list li::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .form-select {
+            height: 58px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Container -->
+    <div id="header-container"></div>
+
+    <section class="register-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="register-card">
+                        <div class="register-header">
+                            <h2>Đăng ký Tài khoản</h2>
+                            <p class="mb-0">Tham gia cùng hàng nghìn người dùng khác để khám phá và tổ chức hội nghị</p>
+                        </div>
+                        <div class="register-form">
+                            <div class="row mb-4">
+                                <div class="col-md-7">
+                                    <div class="alert alert-success" role="alert">
+                                        <h5><i class="fas fa-star me-2"></i>Lợi ích khi đăng ký</h5>
+                                        <ul class="benefits-list mt-2 mb-0">
+                                            <li>Truy cập không giới hạn đến tất cả hội nghị</li>
+                                            <li>Nhận thông báo về các sự kiện phù hợp</li>
+                                            <li>Kết nối với diễn giả và người tham dự khác</li>
+                                            <li>Tổ chức hội nghị của bạn</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 d-flex align-items-center justify-content-center">
+                                    <img src="https://images.unsplash.com/photo-1556761175-129418cb2dfe?w=300&h=200&fit=crop" 
+                                         class="img-fluid rounded" alt="Networking" style="max-height: 150px;">
+                                </div>
+                            </div>                            <div id="register-alert" class="alert mb-4" role="alert" style="display: none;"></div>
+                            
+                            <form id="register-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="firstName" placeholder="First name" required>
+                                            <label for="firstName">Tên</label>
+                                            <div class="invalid-feedback" id="firstName-error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="lastName" placeholder="Last name" required>
+                                            <label for="lastName">Họ</label>
+                                            <div class="invalid-feedback" id="lastName-error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                                    <label for="email">Email</label>
+                                    <div class="invalid-feedback" id="email-error"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating position-relative">
+                                            <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                            <label for="password">Mật khẩu</label>
+                                            <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor: pointer;" id="toggle-password">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                            <div class="invalid-feedback" id="password-error"></div>
+                                            <small class="form-text text-muted mt-1">Mật khẩu phải có ít nhất 8 ký tự</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
+                                            <label for="confirmPassword">Xác nhận mật khẩu</label>
+                                            <div class="invalid-feedback" id="confirmPassword-error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="userType" aria-label="User type">
+                                                <option selected value="user">Người tham dự</option>
+                                                <option value="organizer">Nhà tổ chức</option>
+                                                <option value="speaker">Diễn giả</option>
+                                            </select>
+                                            <label for="userType">Bạn là</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="tel" class="form-control" id="phone" placeholder="Phone number">
+                                            <label for="phone">Số điện thoại (không bắt buộc)</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        Tôi đồng ý với <a href="#" class="link-success">Điều khoản sử dụng</a> và <a href="#" class="link-success">Chính sách bảo mật</a>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="newsletter">
+                                    <label class="form-check-label" for="newsletter">
+                                        Tôi muốn nhận thông báo về các hội nghị, sự kiện và cập nhật
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-register w-100 mb-4">
+                                    <i class="fas fa-user-plus me-2"></i>Tạo Tài khoản
+                                </button>
+                            </form>
+
+                            <div class="text-center mb-3">
+                                <p class="text-muted">Hoặc đăng ký với</p>
+                                <div class="social-register">
+                                    <a href="#" class="social-btn facebook">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <a href="#" class="social-btn google">
+                                        <i class="fab fa-google"></i>
+                                    </a>
+                                    <a href="#" class="social-btn twitter">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <div class="text-center">
+                                <p>Đã có tài khoản? <a href="login.html" class="link-success fw-bold">Đăng nhập</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('register-form');
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const userTypeSelect = document.getElementById('userType');
+            const phoneInput = document.getElementById('phone');
+            const agreeTermsCheckbox = document.getElementById('agreeTerms');
+            const newsletterCheckbox = document.getElementById('newsletter');
+            const registerAlert = document.getElementById('register-alert');
+            const togglePassword = document.getElementById('toggle-password');
+            
+            // Toggle password visibility
+            if (togglePassword) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+            
+            // Validation for password match
+            confirmPasswordInput.addEventListener('input', function() {
+                validatePasswordMatch();
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                validatePasswordMatch();
+            });
+            
+            function validatePasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    showInputError(confirmPasswordInput, 'confirmPassword-error', 'Mật khẩu không khớp');
+                } else if (confirmPassword) {
+                    confirmPasswordInput.classList.remove('is-invalid');
+                }
+            }
+            
+            // Handle register form submission
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset UI state
+                resetFormErrors();
+                
+                const firstName = firstNameInput.value.trim();
+                const lastName = lastNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const userType = userTypeSelect.value;
+                const phone = phoneInput.value.trim();
+                const agreeTerms = agreeTermsCheckbox.checked;
+                const newsletter = newsletterCheckbox ? newsletterCheckbox.checked : false;
+                
+                // Validation
+                let isValid = true;
+                
+                if (!firstName) {
+                    showInputError(firstNameInput, 'firstName-error', 'Vui lòng nhập tên');
+                    isValid = false;
+                }
+                
+                if (!lastName) {
+                    showInputError(lastNameInput, 'lastName-error', 'Vui lòng nhập họ');
+                    isValid = false;
+                }
+                
+                if (!email) {
+                    showInputError(emailInput, 'email-error', 'Vui lòng nhập địa chỉ email');
+                    isValid = false;
+                } else if (!isValidEmail(email)) {
+                    showInputError(emailInput, 'email-error', 'Địa chỉ email không hợp lệ');
+                    isValid = false;
+                }
+                
+                if (!password) {
+                    showInputError(passwordInput, 'password-error', 'Vui lòng nhập mật khẩu');
+                    isValid = false;
+                } else if (password.length < 8) {
+                    showInputError(passwordInput, 'password-error', 'Mật khẩu phải có ít nhất 8 ký tự');
+                    isValid = false;
+                }
+                
+                if (!confirmPassword) {
+                    showInputError(confirmPasswordInput, 'confirmPassword-error', 'Vui lòng xác nhận mật khẩu');
+                    isValid = false;
+                } else if (password !== confirmPassword) {
+                    showInputError(confirmPasswordInput, 'confirmPassword-error', 'Mật khẩu không khớp');
+                    isValid = false;
+                }
+                
+                if (!agreeTerms) {
+                    showAlert('warning', 'Bạn phải đồng ý với Điều khoản sử dụng và Chính sách bảo mật để tiếp tục.');
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    // Call register function from auth.js
+                    if (typeof register === 'function') {
+                        register({
+                            firstName,
+                            lastName,
+                            email,
+                            password,
+                            userType,
+                            phone,
+                            newsletter
+                        }).then(result => {
+                            if (result.success) {
+                                showAlert('success', result.message || 'Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+                                
+                                // Redirect after a short delay
+                                setTimeout(() => {
+                                    window.location.href = 'login.html?message=' + encodeURIComponent('Đăng ký thành công! Vui lòng đăng nhập.');
+                                }, 2000);
+                            } else {
+                                showAlert('danger', result.error || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.');
+                            }
+                        }).catch(error => {
+                            console.error('Register error:', error);
+                            showAlert('danger', 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.');
+                        });
+                    } else {
+                        // Fallback if auth.js register function is not available
+                        console.log('Đăng ký với:', {
+                            firstName,
+                            lastName,
+                            email,
+                            password,
+                            userType,
+                            phone,
+                            newsletter
+                        });
+                        showAlert('success', 'Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+                        
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
+                }
+            });
+            
+            // Helper functions
+            function resetFormErrors() {
+                const inputs = registerForm.querySelectorAll('.form-control');
+                inputs.forEach(input => {
+                    input.classList.remove('is-invalid');
+                });
+                registerAlert.style.display = 'none';
+            }
+            
+            function showInputError(inputElement, errorId, message) {
+                inputElement.classList.add('is-invalid');
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                }
+            }
+            
+            function showAlert(type, message) {
+                registerAlert.className = `alert alert-${type}`;
+                registerAlert.textContent = message;
+                registerAlert.style.display = 'block';
+                
+                // Scroll to the alert
+                registerAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+            
+            // Check if there's an error message in URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMessage = urlParams.get('error');
+            if (errorMessage) {
+                showAlert('danger', decodeURIComponent(errorMessage));
+            }
+        });
+    </script>
+</body>
+</html>
