@@ -2,16 +2,16 @@
 /**
  * API cho quản lý người dùng
  */
+// Xử lý CORS và set headers trước tiên
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=UTF-8');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../classes/Database.php';
 require_once '../classes/User.php';
-
-// Xử lý CORS
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
 // Khởi tạo User
 $user = new User();

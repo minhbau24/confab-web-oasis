@@ -2,12 +2,20 @@
 /**
  * Trang đăng nhập
  */
+// Định nghĩa API_ENDPOINT = false để xác định đây là file PHP sẽ được chuyển hướng sang HTML
+// bởi includes/redirect.php
+define('API_ENDPOINT', false);
+
+// Log để debug
+error_log("Login.php executing - " . date('Y-m-d H:i:s'));
+
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
+require_once 'includes/redirect.php';
 
-// Kiểm tra nếu người dùng đã đăng nhập thì chuyển hướng đến trang chủ
+// Kiểm tra nếu người dùng đã đăng nhập thì chuyển hướng đến trang chủ HTML
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: index.html');
     exit;
 }
 
@@ -25,11 +33,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Vui lòng nhập đầy đủ email và mật khẩu!';
     } else {
         // Thực hiện đăng nhập
-        $login_result = login($email, $password, $remember);
-
-        if ($login_result['success']) {
-            // Đăng nhập thành công, chuyển hướng đến trang chủ
-            header('Location: index.php');
+        $login_result = login($email, $password, $remember);        if ($login_result['success']) {
+            // Đăng nhập thành công, chuyển hướng đến trang chủ hoặc trang được yêu cầu
+            $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : 'index.html';
+            
+            // Xử lý mạnh mẽ hơn với đường dẫn để đảm bảo không có đường dẫn tuyệt đối
+            // Loại bỏ protocol và domain nếu có
+            if (preg_match('/^(https?:\/\/|file:\/\/|[A-Za-z]:\\\\)/', $redirect)) {
+                // Lấy phần đường dẫn sau domain nếu có, hoặc chỉ lấy tên file
+                $parts = preg_split('/[\/\\\\]/', $redirect);
+                $redirect = end($parts) ?: 'index.html';
+            }
+            
+            // Đảm bảo không chứa đường dẫn tuyệt đối hay các ký tự không hợp lệ
+            $redirect = preg_replace('/^\/+/', '', $redirect); // Loại bỏ dấu / đầu tiên
+            $redirect = preg_replace('/[^a-zA-Z0-9_\-\.\/]/', '', $redirect); // Chỉ giữ lại ký tự an toàn
+            
+            // Đảm bảo chuyển hướng đến file HTML thay vì PHP
+            if (strrpos($redirect, '.php') === strlen($redirect) - 4) {
+                $redirect = substr($redirect, 0, -4) . '.html';
+            }
+            
+            // Nếu không có phần mở rộng file, thêm .html
+            if (strpos($redirect, '.') === false) {
+                $redirect .= '.html';
+            }
+            
+            // Đảm bảo đây là tên file đơn giản, không phải đường dẫn phức tạp
+            if (strpos($redirect, '/') !== false) {
+                $parts = explode('/', $redirect);
+                $redirect = end($parts);
+            }
+            
+            header('Location: ' . $redirect);
             exit;
         } else {
             // Đăng nhập thất bại
@@ -179,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         
                         <div class="text-center mt-4">
-                            <p>Chưa có tài khoản? <a href="register.php" class="text-primary">Đăng ký ngay</a></p>
+                            <p>Chưa có tài khoản? <a href="register.html" class="text-primary">Đăng ký ngay</a></p>
                         </div>
                     </div>
                 </div>

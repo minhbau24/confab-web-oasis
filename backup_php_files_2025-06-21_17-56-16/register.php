@@ -5,9 +5,9 @@
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 
-// Kiểm tra nếu người dùng đã đăng nhập thì chuyển hướng đến trang chủ
+// Kiểm tra nếu người dùng đã đăng nhập thì chuyển hướng đến trang chủ HTML
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: index.html');
     exit;
 }
 

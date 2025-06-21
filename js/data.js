@@ -373,7 +373,7 @@ const conferences = [
 ];
 
 // Dữ liệu người dùng mẫu
-const currentUser = {
+const sampleUser = {
     id: 1,
     name: "Nguyễn Văn Nam",
     email: "vannam@example.com.vn",
@@ -435,12 +435,14 @@ function getConferenceById(id) {
     return conferences.find(conf => conf.id === parseInt(id));
 }
 
-function getCurrentUser() {
-    return currentUser;
+function getSampleUser() {
+    return sampleUser;
 }
 
 function getUserJoinedConferences() {
-    return conferences.filter(conf => currentUser.joinedConferences.includes(conf.id));
+    // Use auth.js getCurrentUser if available, otherwise fall back to sample data
+    const user = typeof window.getCurrentUser === 'function' ? window.getCurrentUser() : sampleUser;
+    return conferences.filter(conf => user.joinedConferences && user.joinedConferences.includes(conf.id));
 }
 
 function searchConferences(query, category = '', location = '') {

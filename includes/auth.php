@@ -77,9 +77,10 @@ function login($email, $password, $remember = false)
  * @param string $email Email người dùng
  * @param string $password Mật khẩu
  * @param string $phone Số điện thoại (tùy chọn)
+ * @param string $userType Loại người dùng (tùy chọn, mặc định là 'user')
  * @return array Kết quả đăng ký
  */
-function register($firstName, $lastName, $email, $password, $phone = '')
+function register($firstName, $lastName, $email, $password, $phone = '', $userType = 'user')
 {
     try {
         $db = connectDB();
@@ -98,7 +99,17 @@ function register($firstName, $lastName, $email, $password, $phone = '')
 
         // Hash mật khẩu
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $role = 'user'; // Mặc định là người dùng thông thường
+        
+        // Xác định role dựa trên userType
+        $role = 'user'; // Mặc định
+        if ($userType === 'organizer') {
+            $role = 'organizer';
+        } elseif ($userType === 'admin') {
+            // Chỉ cho phép tạo admin nếu đang là admin
+            if (isLoggedIn() && $_SESSION['user_role'] === 'admin') {
+                $role = 'admin';
+            }
+        }
 
         // Thêm người dùng vào database
         $stmt = $db->prepare("
@@ -141,12 +152,12 @@ function logout()
 {
     // Xóa session
     session_unset();
-    session_destroy();
-
+    session_destroy();    
     // Xóa cookie
     setcookie('auth_token', '', time() - 3600, '/', '', false, true);
 
-    redirect(SITE_URL . '/login.php');
+    // Chuyển hướng đến trang login HTML, sử dụng hàm redirect từ config.php để đảm bảo URL hợp lệ
+    redirect('login.html');
 }
 
 /**

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập cơ sở dữ liệu - Trung tâm Hội nghị</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <div class="container py-5">
+        <h1 class="mb-4">Thiết lập cơ sở dữ liệu</h1>
+        
+        <div id="setup-status" class="mb-4">
+            <div class="alert alert-info">
+                <i class="fas fa-spinner fa-spin me-2"></i> Đang chuẩn bị thiết lập cơ sở dữ liệu...
+            </div>
+        </div>
+
+        <div id="setup-actions" class="mt-4" style="display: none;">
+            <button id="btn-setup-db" class="btn btn-primary">
+                <i class="fas fa-database me-2"></i> Thiết lập cơ sở dữ liệu
+            </button>
+            <button id="btn-import-sample" class="btn btn-success ms-2" style="display: none;">
+                <i class="fas fa-file-import me-2"></i> Nhập dữ liệu mẫu
+            </button>            <a href="/confab-web-oasis/" class="btn btn-secondary ms-2">
+                <i class="fas fa-home me-2"></i> Quay lại trang chủ
+            </a>
+        </div>
+        
+        <div id="setup-instructions" class="alert alert-warning mt-4" style="display: none;">
+            <h4>Kiểm tra cấu hình kết nối</h4>
+            <p>Hãy đảm bảo:</p>
+            <ol>
+                <li>Máy chủ XAMPP/MySQL đang chạy</li>
+                <li>Thông tin kết nối trong file <code>includes/config.php</code> là chính xác</li>
+                <li>Người dùng MySQL có đủ quyền để tạo cơ sở dữ liệu và bảng</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/setup-database.js"></script>
+</body>
+</html>

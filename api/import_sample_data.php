@@ -1,23 +1,22 @@
 <?php
 /**
- * Script nhập dữ liệu mẫu từ data.js vào database
+ * API nhập dữ liệu mẫu từ data.js vào database
  */
 require_once '../includes/config.php';
 require_once '../classes/Database.php';
 
-// Header và Content-Type để hiển thị kết quả
-header('Content-Type: text/html; charset=utf-8');
-echo '<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhập dữ liệu mẫu - Trung tâm Hội nghị</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container py-5">
-        <h1 class="mb-4">Nhập dữ liệu mẫu vào database</h1>';
+// Set content type for API responses
+header('Content-Type: application/json');
+
+$result = [
+    'success' => false,
+    'messages' => [],
+    'data' => [
+        'users' => 0,
+        'conferences' => 0,
+        'speakers' => 0
+    ]
+];
 
 try {
     // Kết nối database
@@ -221,18 +220,38 @@ try {
         }
     }
 
-    echo '<div class="alert alert-success">Đã thêm ' . $speakersCount . ' diễn giả vào hệ thống</div>';
-
-    // Thêm lịch trình
-    $schedules = [
-        ['time' => ['08:30', '09:30'], 'title' => 'Đăng ký & Kết nối', 'speaker' => '', 'description' => 'Đón tiếp và cung cấp thẻ hội nghị, tài liệu, thời gian kết nối với các đồng nghiệp'],
-        ['time' => ['09:30', '10:00'], 'title' => 'Khai mạc Hội nghị', 'speaker' => 'Ban Tổ chức', 'description' => 'Phát biểu khai mạc, giới thiệu chương trình và các diễn giả chính'],
-        ['time' => ['10:00', '11:30'], 'title' => 'Keynote: Tương lai của AI trong doanh nghiệp Việt Nam', 'speaker' => 'Nguyễn Thị Minh', 'description' => 'Phân tích xu hướng AI toàn cầu và cơ hội áp dụng tại Việt Nam, các trường hợp thành công điển hình'],
-        ['time' => ['11:30', '13:00'], 'title' => 'Ăn trưa & Kết nối', 'speaker' => '', 'description' => 'Bữa trưa và thời gian giao lưu, kết nối với các đồng nghiệp'],
-        ['time' => ['13:00', '14:30'], 'title' => 'Panel: Chuyển đổi số trong doanh nghiệp Việt', 'speaker' => 'Nhóm chuyên gia', 'description' => 'Thảo luận về thực trạng, thách thức và giải pháp chuyển đổi số cho doanh nghiệp Việt Nam'],
-        ['time' => ['14:30', '15:00'], 'title' => 'Giải lao', 'speaker' => '', 'description' => 'Thời gian nghỉ giải lao, giao lưu với đồng nghiệp'],
-        ['time' => ['15:00', '16:30'], 'title' => 'Workshop: Ứng dụng AI trong marketing', 'speaker' => 'Phạm Thị Hương', 'description' => 'Hướng dẫn thực hành ứng dụng các công cụ AI trong chiến lược marketing hiện đại'],
-        ['time' => ['16:30', '17:00'], 'title' => 'Tổng kết ngày 1', 'speaker' => 'Ban Tổ chức', 'description' => 'Tóm tắt những điểm chính trong ngày và thông báo chương trình ngày tiếp theo']
+    echo '<div class="alert alert-success">Đã thêm ' . $speakersCount . ' diễn giả vào hệ thống</div>';    // Thêm lịch trình theo ngày (lịch trình cho ngày khác nhau)
+    $schedulesByDay = [
+        // Ngày 1
+        1 => [
+            ['time' => ['08:30', '09:30'], 'title' => 'Đăng ký & Kết nối', 'speaker' => '', 'description' => 'Đón tiếp và cung cấp thẻ hội nghị, tài liệu, thời gian kết nối với các đồng nghiệp'],
+            ['time' => ['09:30', '10:00'], 'title' => 'Khai mạc Hội nghị', 'speaker' => 'Ban Tổ chức', 'description' => 'Phát biểu khai mạc, giới thiệu chương trình và các diễn giả chính'],
+            ['time' => ['10:00', '11:30'], 'title' => 'Keynote: Tương lai của AI trong doanh nghiệp Việt Nam', 'speaker' => 'Nguyễn Thị Minh', 'description' => 'Phân tích xu hướng AI toàn cầu và cơ hội áp dụng tại Việt Nam, các trường hợp thành công điển hình'],
+            ['time' => ['11:30', '13:00'], 'title' => 'Ăn trưa & Kết nối', 'speaker' => '', 'description' => 'Bữa trưa và thời gian giao lưu, kết nối với các đồng nghiệp'],
+            ['time' => ['13:00', '14:30'], 'title' => 'Panel: Chuyển đổi số trong doanh nghiệp Việt', 'speaker' => 'Nhóm chuyên gia', 'description' => 'Thảo luận về thực trạng, thách thức và giải pháp chuyển đổi số cho doanh nghiệp Việt Nam'],
+            ['time' => ['14:30', '15:00'], 'title' => 'Giải lao', 'speaker' => '', 'description' => 'Thời gian nghỉ giải lao, giao lưu với đồng nghiệp'],
+            ['time' => ['15:00', '16:30'], 'title' => 'Workshop: Ứng dụng AI trong marketing', 'speaker' => 'Phạm Thị Hương', 'description' => 'Hướng dẫn thực hành ứng dụng các công cụ AI trong chiến lược marketing hiện đại'],
+            ['time' => ['16:30', '17:00'], 'title' => 'Tổng kết ngày 1', 'speaker' => 'Ban Tổ chức', 'description' => 'Tóm tắt những điểm chính trong ngày và thông báo chương trình ngày tiếp theo']
+        ],
+        // Ngày 2
+        2 => [
+            ['time' => ['09:00', '09:30'], 'title' => 'Recap ngày 1 & Giới thiệu ngày 2', 'speaker' => 'Ban Tổ chức', 'description' => 'Tóm tắt nội dung ngày 1 và giới thiệu chương trình ngày 2'],
+            ['time' => ['09:30', '11:00'], 'title' => 'Workshop: Cloud Solutions', 'speaker' => 'Đinh Thu Trang', 'description' => 'Các giải pháp đám mây tiên tiến cho doanh nghiệp vừa và nhỏ'],
+            ['time' => ['11:00', '12:00'], 'title' => 'Keynote: Bảo mật thông tin trong kỷ nguyên số', 'speaker' => 'Lê Văn Bách', 'description' => 'Giải pháp bảo mật thông tin toàn diện cho doanh nghiệp'],
+            ['time' => ['12:00', '13:30'], 'title' => 'Ăn trưa & Networking', 'speaker' => '', 'description' => 'Bữa trưa và cơ hội kết nối với các chuyên gia trong ngành'],
+            ['time' => ['13:30', '15:00'], 'title' => 'Demo: Giải pháp công nghệ mới', 'speaker' => 'Nhiều diễn giả', 'description' => 'Trình diễn các giải pháp công nghệ tiên tiến từ các đối tác'],
+            ['time' => ['15:00', '15:30'], 'title' => 'Giải lao', 'speaker' => '', 'description' => 'Thời gian nghỉ giữa giờ và giao lưu'],
+            ['time' => ['15:30', '17:00'], 'title' => 'Roundtable: Trao đổi kinh nghiệm thực tế', 'speaker' => 'Nhóm chuyên gia', 'description' => 'Chia sẻ kinh nghiệm thực tế trong việc triển khai dự án công nghệ']
+        ],
+        // Ngày 3
+        3 => [
+            ['time' => ['09:00', '09:30'], 'title' => 'Recap ngày 2 & Giới thiệu ngày 3', 'speaker' => 'Ban Tổ chức', 'description' => 'Tổng hợp nội dung ngày 2 và giới thiệu chương trình ngày cuối'],
+            ['time' => ['09:30', '11:00'], 'title' => 'Workshop: Data Analytics', 'speaker' => 'Lê Văn Bách', 'description' => 'Khai thác giá trị từ dữ liệu doanh nghiệp với các công cụ phân tích hiện đại'],
+            ['time' => ['11:00', '12:30'], 'title' => 'Panel: Tương lai của công việc', 'speaker' => 'Nguyễn Thị Minh, Trần Đức Khải', 'description' => 'Thảo luận về xu hướng thị trường lao động và kỹ năng cần thiết trong tương lai'],
+            ['time' => ['12:30', '14:00'], 'title' => 'Ăn trưa', 'speaker' => '', 'description' => 'Bữa trưa ngày cuối cùng của hội nghị'],
+            ['time' => ['14:00', '15:30'], 'title' => 'Startup Showcase', 'speaker' => 'Các công ty khởi nghiệp', 'description' => 'Giới thiệu các startup tiềm năng trong lĩnh vực công nghệ'],
+            ['time' => ['15:30', '16:30'], 'title' => 'Tổng kết & Bế mạc', 'speaker' => 'Ban Tổ chức', 'description' => 'Tổng kết hội nghị và phát biểu bế mạc']
+        ]
     ];
 
     $stmt = $pdo->prepare("
@@ -244,15 +263,23 @@ try {
         // Lấy ngày bắt đầu và kết thúc của hội nghị
         $confDates = $pdo->query("SELECT date, endDate FROM conferences WHERE id = $confId")->fetch(PDO::FETCH_ASSOC);
         $startDate = new DateTime($confDates['date']);
-        $endDate = !empty($confDates['endDate']) ? new DateTime($confDates['endDate']) : $startDate;
-
+        $endDate = !empty($confDates['endDate']) ? new DateTime($confDates['endDate']) : $startDate;        // Tính số ngày của hội nghị
+        $interval = $startDate->diff($endDate);
+        $durationDays = $interval->days + 1; // +1 vì bao gồm cả ngày bắt đầu
+        
+        // Giới hạn tối đa 3 ngày cho lịch trình mẫu
+        $durationDays = min($durationDays, 3);
+        
         // Tạo lịch trình cho từng ngày
         $currentDate = clone $startDate;
-        while ($currentDate <= $endDate) {
+        for ($dayIndex = 1; $dayIndex <= $durationDays; $dayIndex++) {
             $dateStr = $currentDate->format('Y-m-d');
-
+            
+            // Lấy lịch trình phù hợp cho ngày
+            $daySchedules = isset($schedulesByDay[$dayIndex]) ? $schedulesByDay[$dayIndex] : $schedulesByDay[1];
+            
             // Thêm lịch trình cho ngày này
-            foreach ($schedules as $schedule) {
+            foreach ($daySchedules as $schedule) {
                 $stmt->execute([
                     $confId,
                     $dateStr,
@@ -265,6 +292,7 @@ try {
                 $schedulesCount++;
             }
 
+            // Chuyển sang ngày tiếp theo
             $currentDate->modify('+1 day');
         }
     }
@@ -367,23 +395,21 @@ try {
             ]);
             $faqCount++;
         }
-    }
-
-    echo '<div class="alert alert-success">Đã thêm ' . $faqCount . ' FAQ vào hệ thống</div>';
-
-    // Hoàn tất
-    echo '<div class="alert alert-success mt-4"><h4>Hoàn tất!</h4><p>Dữ liệu mẫu đã được nhập thành công!</p></div>';
+    }    $result['messages'][] = 'Đã thêm ' . $faqCount . ' FAQ vào hệ thống';
+    
+    // Update result with counts
+    $result['data']['users'] = $usersCount;
+    $result['data']['conferences'] = $conferencesCount;
+    $result['data']['speakers'] = $speakersCount;
+    
+    $result['messages'][] = 'Hoàn tất! Dữ liệu mẫu đã được nhập thành công!';
+    $result['success'] = true;
 
 } catch (Exception $e) {
-    echo '<div class="alert alert-danger">Lỗi: ' . $e->getMessage() . '</div>';
-} finally {
-    echo '<div class="mt-4">
-        <a href="../index.php" class="btn btn-primary">Quay lại trang chủ</a>
-        <a href="setup_database.php" class="btn btn-secondary ms-2">Thiết lập cơ sở dữ liệu</a>
-    </div>';
+    $result['messages'][] = 'Lỗi: ' . $e->getMessage();
+    $result['success'] = false;
 }
 
-echo '</div>
-</body>
-</html>';
+// Return JSON response
+echo json_encode($result);
 ?>

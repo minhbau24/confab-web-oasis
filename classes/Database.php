@@ -39,11 +39,12 @@ class Database
             self::$instance = new self();
         }
         return self::$instance;
-    }    /**
-         * Lấy kết nối PDO
-         *
-         * @return PDO
-         */
+    }
+      /**
+     * Lấy kết nối PDO
+     *
+     * @return PDO
+     */
     public function getConnection()
     {
         return $this->conn;
@@ -92,13 +93,14 @@ class Database
      *
      * @param string $sql Câu lệnh SQL
      * @param array $params Tham số cho câu lệnh
-     * @return bool Kết quả thực thi
+     * @return bool|int Kết quả thực thi hoặc số dòng bị ảnh hưởng
      */
     public function execute($sql, $params = [])
     {
         try {
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute($params);
+            $stmt->execute($params);
+            return $stmt->rowCount();
         } catch (PDOException $e) {
             error_log("Database execute error: " . $e->getMessage());
             return false;
@@ -109,73 +111,6 @@ class Database
      * Lấy ID của dòng vừa chèn
      *
      * @return int|string ID của dòng vừa chèn
-     */
-    public function lastInsertId()
-    {
-        return $this->conn->lastInsertId();
-    }
-
-    /**
-     * Thực thi truy vấn và trả về tất cả kết quả
-     *
-     * @param string $query Câu truy vấn SQL
-     * @param array $params Tham số truy vấn
-     * @return array Kết quả truy vấn
-     */
-    public function fetchAll($query, $params = [])
-    {
-        try {
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute($params);
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            error_log('Database Error: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Thực thi truy vấn và trả về một kết quả
-     *
-     * @param string $query Câu truy vấn SQL
-     * @param array $params Tham số truy vấn
-     * @return array|false Kết quả truy vấn hoặc false nếu không có
-     */
-    public function fetch($query, $params = [])
-    {
-        try {
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute($params);
-            return $stmt->fetch();
-        } catch (PDOException $e) {
-            error_log('Database Error: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Thực thi truy vấn không trả về dữ liệu (INSERT, UPDATE, DELETE)
-     *
-     * @param string $query Câu truy vấn SQL
-     * @param array $params Tham số truy vấn
-     * @return int Số dòng bị ảnh hưởng
-     */
-    public function execute($query, $params = [])
-    {
-        try {
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute($params);
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            error_log('Database Error: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Lấy ID của dòng vừa chèn
-     *
-     * @return string ID của dòng vừa chèn
      */
     public function lastInsertId()
     {

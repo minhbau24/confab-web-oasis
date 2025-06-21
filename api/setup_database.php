@@ -1,33 +1,24 @@
 <?php
 /**
- * File thiết lập cơ sở dữ liệu
+ * File thiết lập cơ sở dữ liệu - API Logic
  * Chạy file này để tạo các bảng cần thiết cho hệ thống
  */
 
-// Header và Content-Type để hiển thị kết quả
-header('Content-Type: text/html; charset=utf-8');
-echo '<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiết lập cơ sở dữ liệu - Trung tâm Hội nghị</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container py-5">
-        <h1 class="mb-4">Thiết lập cơ sở dữ liệu</h1>';
+// Set content type for API responses
+header('Content-Type: application/json');
 
 require_once dirname(__DIR__) . '/includes/config.php';
 
+$result = [
+    'success' => false,
+    'messages' => [],
+    'data' => null
+];
+
 try {
-    echo '<div class="alert alert-info">Đang kết nối đến cơ sở dữ liệu...</div>';
-
+    $result['messages'][] = 'Đang kết nối đến cơ sở dữ liệu...';
     $conn = connectDB();
-
-    echo '<div class="alert alert-success">Kết nối thành công!</div>';
-
-    // Bật chế độ lỗi
+    $result['messages'][] = 'Kết nối thành công!';    // Bật chế độ lỗi
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Tạo bảng users
@@ -94,15 +85,14 @@ try {
             FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE,
             FOREIGN KEY (speaker_id) REFERENCES speakers(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng conference_schedule (lịch hội nghị)
+    ");    // Tạo bảng conference_schedule (lịch hội nghị)
     $conn->exec("
         CREATE TABLE IF NOT EXISTS conference_schedule (
             id INT AUTO_INCREMENT PRIMARY KEY,
             conference_id INT NOT NULL,
-            event_date DATE NOT NULL,
-            time VARCHAR(50) NOT NULL,
+            eventDate DATE NOT NULL,
+            startTime TIME NOT NULL,
+            endTime TIME NOT NULL,
             title VARCHAR(255) NOT NULL,
             speaker VARCHAR(100),
             description TEXT,
@@ -164,37 +154,22 @@ try {
     ");
 
     // Chèn dữ liệu người dùng mẫu (mật khẩu: password123)
-    $hashedPassword = password_hash('password123', PASSWORD_DEFAULT);
-
-    $conn->exec("
+    $hashedPassword = password_hash('password123', PASSWORD_DEFAULT);    $conn->exec("
         INSERT INTO users (firstName, lastName, email, password, role)
         VALUES 
             ('Admin', 'System', 'admin@example.com', '$hashedPassword', 'admin'),
             ('Nguyễn', 'Tổ Chức', 'organizer@example.com', '$hashedPassword', 'organizer'),
             ('Nguyễn', 'Văn Nam', 'nam@example.com', '$hashedPassword', 'user')
     ");
-    echo '<div class="alert alert-success mt-4"><h4>Thành công!</h4><p>Cấu trúc cơ sở dữ liệu đã được thiết lập thành công.</p></div>';
-
-    // Hiển thị nút nhập dữ liệu mẫu
-    echo '<div class="mt-4">
-        <a href="import_sample_data.php" class="btn btn-primary">Nhập dữ liệu mẫu</a>
-        <a href="../index.php" class="btn btn-secondary ms-2">Quay lại trang chủ</a>
-    </div>';
+    
+    $result['messages'][] = 'Thành công! Cấu trúc cơ sở dữ liệu đã được thiết lập thành công.';
+    $result['success'] = true;
 
 } catch (PDOException $e) {
-    echo '<div class="alert alert-danger">Lỗi khi thiết lập cơ sở dữ liệu: ' . $e->getMessage() . '</div>';
-    echo '<div class="alert alert-warning">
-        <h4>Kiểm tra cấu hình kết nối</h4>
-        <p>Hãy đảm bảo:</p>
-        <ol>
-            <li>Máy chủ XAMPP/MySQL đang chạy</li>
-            <li>Thông tin kết nối trong file <code>includes/config.php</code> là chính xác</li>
-            <li>Người dùng MySQL có đủ quyền để tạo cơ sở dữ liệu và bảng</li>
-        </ol>
-    </div>';
+    $result['messages'][] = 'Lỗi khi thiết lập cơ sở dữ liệu: ' . $e->getMessage();
+    $result['success'] = false;
 }
 
-echo '</div>
-</body>
-</html>';
+// Return JSON response
+echo json_encode($result);
 ?>

@@ -21,9 +21,9 @@
             <div class="col-md-4 mb-4">
                 <h5 class="mb-3">Liên kết nhanh</h5>
                 <ul class="list-unstyled">
-                    <li><a href="index.php" class="text-white">Trang chủ</a></li>
-                    <li><a href="conferences.php" class="text-white">Khám phá Hội nghị</a></li>
-                    <li><a href="conference-manager.php" class="text-white">Tổ chức Hội nghị</a></li>
+                    <li><a href="index.html" class="text-white">Trang chủ</a></li>
+                    <li><a href="conferences.html" class="text-white">Khám phá Hội nghị</a></li>
+                    <li><a href="conference-manager.html" class="text-white">Tổ chức Hội nghị</a></li>
                     <li><a href="#" class="text-white">Về Chúng tôi</a></li>
                     <li><a href="#" class="text-white">Liên hệ</a></li>
                 </ul>

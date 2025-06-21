@@ -22,8 +22,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Thiết lập session
-session_start();
+// Thiết lập session - chỉ start nếu chưa có session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Hàm autoload các class
 spl_autoload_register(function ($class) {
@@ -66,9 +68,57 @@ function sanitize($input)
     return $input;
 }
 
-// Hàm chuyển hướng
+// Hàm chuyển hướng với xử lý URL
 function redirect($url)
 {
+    // Mặc định về trang chủ nếu không có URL
+    if (empty($url)) {
+        $url = 'index.html';
+    }
+    
+    // Xử lý URL để đảm bảo đường dẫn tương đối và định dạng HTML
+    
+    // 1. Loại bỏ đường dẫn tuyệt đối Windows (C:\...)
+    if (preg_match('/^[A-Za-z]:\\\\/', $url) || strpos($url, ':\\') !== false) {
+        // Lấy chỉ tên tệp tin
+        $parts = explode('\\', $url);
+        $url = end($parts);
+    }
+    
+    // 2. Loại bỏ đường dẫn tuyệt đối web (http://, https://)
+    if (strpos($url, '://') !== false) {
+        $parsedUrl = parse_url($url);
+        $path = isset($parsedUrl['path']) ? $parsedUrl['path'] : '';
+        $parts = explode('/', $path);
+        $url = end($parts);
+    }
+    
+    // 3. Loại bỏ đường dẫn tuyệt đối từ gốc (bắt đầu bằng /)
+    if (strpos($url, '/') === 0) {
+        $parts = explode('/', $url);
+        // Lọc các phần tử rỗng
+        $parts = array_filter($parts);
+        $url = end($parts);
+    }
+    
+    // 4. Chuyển đổi .php thành .html
+    if (substr($url, -4) === '.php') {
+        $url = substr($url, 0, -4) . '.html';
+    }
+    
+    // 5. Thêm .html nếu không có phần mở rộng
+    if (strpos($url, '.') === false) {
+        $url .= '.html';
+    }
+    
+    // 6. Kiểm tra cuối cùng để đảm bảo là URL hợp lệ
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+\.html$/', $url)) {
+        $url = 'index.html';
+    }
+    
+    // Logs for debugging
+    error_log("Redirect to: " . $url);
+    
     header("Location: $url");
     exit();
 }

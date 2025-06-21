@@ -2,17 +2,25 @@
 /**
  * API cho hội nghị
  */
-require_once '../includes/config.php';
-require_once '../classes/Database.php';
-require_once '../classes/Conference.php';
+// Define this file as an API endpoint to prevent HTML redirects
+define('API_ENDPOINT', true);
 
-// Xử lý CORS
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+// Tắt hiển thị lỗi để tránh trả về HTML thay vì JSON
+ini_set('display_errors', 0);
+error_reporting(0);
 
-// Khởi tạo Conference
+try {
+    require_once '../includes/config.php';
+    require_once '../classes/Database.php';
+    require_once '../classes/Conference.php';
+    
+    // Xử lý CORS
+    header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json; charset=UTF-8');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
+    // Khởi tạo Conference
 $conference = new Conference();
 
 // Xác định request method
@@ -232,8 +240,14 @@ switch ($method) {
     default:
         echo json_encode([
             'status' => false,
-            'message' => 'Phương thức không được hỗ trợ'
-        ]);
+            'message' => 'Phương thức không được hỗ trợ'        ]);
         break;
+    }
+} catch (Exception $e) {
+    // Bắt tất cả các ngoại lệ và trả về thông báo lỗi dưới dạng JSON
+    echo json_encode([
+        'status' => false,
+        'message' => 'Lỗi server: ' . $e->getMessage()
+    ]);
 }
 ?>

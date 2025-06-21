@@ -49,10 +49,17 @@ function isLoggedIn() {
     return currentUser && currentUser.token;
 }
 
+// Expose isLoggedIn to window for other scripts to use
+window.isLoggedIn = isLoggedIn;
+
 // Hàm lấy thông tin người dùng hiện tại
 function getCurrentUser() {
     return currentUser;
 }
+
+// Expose currentUser and getCurrentUser to window for other scripts to use
+window.authCurrentUser = currentUser; // Direct access to the user object
+window.getCurrentUser = getCurrentUser; // Access through function
 
 // Hàm lấy role của người dùng hiện tại
 function getCurrentUserRole() {
@@ -80,6 +87,38 @@ function hasPermission(requiredRole) {
 // Hàm đăng ký người dùng mới
 async function register(userData) {
     try {
+        // Kiểm tra URL hiện tại trước
+        if (!checkCurrentUrl()) return { success: false, error: 'Invalid URL detected' };
+          // Sử dụng API helper để gọi API an toàn
+        const result = await apiPost('api/register.php', {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            password: userData.password,
+            userType: userData.userType,
+            phone: userData.phone || ''
+        });
+        
+        // Nếu API trả về thành công
+        if (result.success) {
+            console.log('Đăng ký thành công:', result.user);
+            
+            return { 
+                success: true, 
+                message: result.message || 'Đăng ký thành công. Vui lòng đăng nhập với tài khoản mới.',
+                user: result.user
+            };
+        }
+        
+        // Nếu API trả về lỗi
+        return { 
+            success: false, 
+            error: result.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.'
+        };
+    } catch (error) {
+        console.error('Lỗi khi đăng ký:', error);
+        
+        // Fallback nếu API không hoạt động: sử dụng dữ liệu mẫu (chỉ cho môi trường demo)
         // Kiểm tra email đã tồn tại chưa
         const existingUser = users.find(user => user.email === userData.email);
         if (existingUser) {
@@ -96,7 +135,7 @@ async function register(userData) {
             lastName: userData.lastName,
             name: `${userData.firstName} ${userData.lastName}`,
             email: userData.email,
-            password: userData.password, // Trong thực tế, cần mã hóa mật khẩu
+            password: userData.password,
             role: userData.userType === 'organizer' ? USER_ROLES.ORGANIZER : USER_ROLES.USER,
             phone: userData.phone || null,
             createdAt: new Date().toISOString().split('T')[0]
@@ -105,34 +144,92 @@ async function register(userData) {
         // Thêm vào danh sách người dùng
         users.push(newUser);
         
-        // Trong môi trường thực tế, sẽ gọi API để lưu thông tin vào database
-
-        console.log('Đăng ký thành công:', newUser);
+        console.log('Đăng ký thành công (dữ liệu mẫu):', newUser);
         
-        // Trả về kết quả thành công
         return { 
             success: true, 
-            message: 'Đăng ký thành công. Vui lòng đăng nhập với tài khoản mới.',
-            user: { ...newUser, password: undefined } // Không trả về mật khẩu
+            message: 'Đăng ký thành công (chế độ demo). Vui lòng đăng nhập với tài khoản mới.',
+            user: { ...newUser, password: undefined }
         };
-    } catch (error) {
-        console.error('Lỗi khi đăng ký:', error);
-        return { success: false, error: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.' };
     }
 }
 
 // Hàm đăng nhập
 async function login(email, password, rememberMe = false) {
-    // Giả lập API call
     try {
-        // Kiểm tra thông tin đăng nhập
-        const user = users.find(u => u.email === email && u.password === password);
+        // Kiểm tra URL hiện tại trước
+        if (!checkCurrentUrl()) return { success: false, error: 'Invalid URL detected' };
         
-        if (user) {
-            // Tạo token (giả lập)
-            const token = 'jwt-token-' + Math.random().toString(36).substring(2, 15);
+        // Sử dụng API helper để gọi API an toàn
+        const result = await apiPost('api/login.php', {
+            email: email,
+            password: password,
+            rememberMe: rememberMe
+        });
+        
+        // Nếu API trả về thành công
+        if (result.success) {
+            // Tạo token (nếu API không trả về)
+            const token = result.user.token || 'jwt-token-' + Math.random().toString(36).substring(2, 15);
             
             // Lưu thông tin người dùng
+            currentUser = {
+                id: result.user.id,
+                name: result.user.name,
+                email: result.user.email,
+                role: result.user.role,
+                token: token
+            };
+              // Kiểm tra và log thông tin session từ server
+            if (result.debug) {
+                console.log('Server session data:', result.debug);
+            }
+            
+            // Lưu token
+            if (rememberMe) {
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                console.log('User data saved to localStorage');
+            } else {
+                sessionStorage.setItem('authToken', token);
+                sessionStorage.setItem('user', JSON.stringify(currentUser));
+                console.log('User data saved to sessionStorage');
+            }
+            
+            console.log('Đăng nhập thành công:', currentUser);
+            
+            // Thêm debug để kiểm tra nếu có URL chuyển hướng không mong muốn
+            try {
+                const pageUrl = window.location.href;
+                console.log('Current page URL:', pageUrl);
+                
+                // Kiểm tra các trường hợp URL đặc biệt trong document
+                if (document.referrer) {
+                    console.log('Referrer URL:', document.referrer);
+                }
+                
+                // Log ra các meta redirect nếu có
+                const metaTags = document.querySelectorAll('meta[http-equiv="refresh"]');
+                if (metaTags.length > 0) {
+                    console.warn('Found meta refresh tags:', metaTags.length);
+                    metaTags.forEach(tag => {
+                        console.warn('Meta refresh content:', tag.getAttribute('content'));
+                    });
+                }
+            } catch (e) {
+                console.error('Error in login debugging:', e);
+            }
+            return { success: true, user: currentUser };
+        }
+        
+        return { success: false, error: result.message || 'Email hoặc mật khẩu không đúng.' };
+    } catch (error) {
+        console.error('Lỗi khi đăng nhập:', error);
+        
+        // Fallback cho môi trường demo
+        const user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+            const token = 'jwt-token-' + Math.random().toString(36).substring(2, 15);
             currentUser = {
                 id: user.id,
                 name: user.name,
@@ -141,28 +238,18 @@ async function login(email, password, rememberMe = false) {
                 token: token
             };
             
-            // Lưu token vào localStorage nếu chọn "remember me"
             if (rememberMe) {
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('user', JSON.stringify(currentUser));
             } else {
-                // Lưu vào sessionStorage nếu không chọn "remember me"
                 sessionStorage.setItem('authToken', token);
                 sessionStorage.setItem('user', JSON.stringify(currentUser));
             }
-            
-            console.log('Đăng nhập thành công:', currentUser);
-            
-            // Chuyển hướng tới trang chủ
-            window.location.href = 'index.html';
             
             return { success: true, user: currentUser };
         }
         
         return { success: false, error: 'Email hoặc mật khẩu không đúng.' };
-    } catch (error) {
-        console.error('Lỗi khi đăng nhập:', error);
-        return { success: false, error: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.' };
     }
 }
 
@@ -177,14 +264,27 @@ function logout() {
         token: null
     };
     
-    // Xóa token từ localStorage và sessionStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('user');
-    
-    // Chuyển hướng về trang chủ
-    window.location.href = 'index.html';
+    // Call the logout API endpoint for server-side logout
+    fetch('api/logout.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .catch(error => {
+        console.error('Logout API error:', error);
+    })
+    .finally(() => {
+        // Regardless of API success, clear client-side data
+        // Xóa token từ localStorage và sessionStorage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('user');
+        
+        // Chuyển hướng về trang chủ (đảm bảo dùng .html)
+        window.location.href = 'index.html';
+    });
 }
 
 // Kiểm tra quyền truy cập vào trang
@@ -192,7 +292,27 @@ function checkPageAccess(requiredRole) {
     if (!hasPermission(requiredRole)) {
         // Hiển thị thông báo và chuyển hướng đến trang đăng nhập
         alert('Bạn không có quyền truy cập trang này!');
-        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        
+        // Lấy tên file hiện tại thay vì toàn bộ đường dẫn để tránh lỗi đường dẫn tuyệt đối
+        let currentPage = 'index.html';
+        
+        try {
+            const currentPath = window.location.pathname;
+            const filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+            
+            // Nếu tên file có phần mở rộng
+            if (filename.includes('.')) {                // Sử dụng tên file như nó là
+                currentPage = filename;
+            } else if (filename) {
+                // Nếu không có phần mở rộng, thêm .html
+                currentPage = filename + '.html';
+            }
+        } catch (e) {
+            console.error('Lỗi khi xử lý đường dẫn trang:', e);
+        }
+        
+        // Chuyển hướng tới trang đăng nhập với tham số redirect là trang hiện tại
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(currentPage);
     }
 }
 
@@ -243,8 +363,27 @@ function showAuthMessage(message, type = 'info') {
 
 // Tạo URL chuyển hướng sau đăng nhập
 function getRedirectUrl() {
+    // Default to homepage
+    let redirectUrl = 'index.html';
+
+    // Get redirect URL from query parameter if available
     const params = new URLSearchParams(window.location.search);
-    return params.get('redirect') || 'index.html';
+    const redirect = params.get('redirect');
+    
+    if (redirect && redirect.trim()) {
+        // Simple validation - accept only HTML files with basic names
+        const simplifiedRedirect = redirect.replace(/[^a-zA-Z0-9_\-\.]/g, '');
+        
+        // Only accept .html files with valid names
+        if (simplifiedRedirect.endsWith('.html')) {
+            redirectUrl = simplifiedRedirect;
+        }
+        
+        console.log('Redirect parameter:', redirect);
+        console.log('Using redirect URL:', redirectUrl);
+    }
+    
+    return redirectUrl;
 }
 
 // Gọi hàm khởi tạo khi trang được tải

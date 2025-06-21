@@ -2,8 +2,15 @@
 /**
  * Trang chủ - Trung tâm Hội nghị
  */
+// Định nghĩa API_ENDPOINT = false để xác định đây là file PHP sẽ được chuyển hướng sang HTML
+define('API_ENDPOINT', false);
+
+// Log để debug
+error_log("Index.php executing - " . date('Y-m-d H:i:s'));
+
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
+require_once 'includes/redirect.php';
 
 // Kiểm tra trạng thái đăng nhập
 $isLoggedIn = isset($_SESSION['user_id']);

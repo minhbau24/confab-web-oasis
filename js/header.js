@@ -10,24 +10,29 @@ function renderHeader() {
         isUserLoggedIn = isLoggedIn();
         if (isUserLoggedIn && typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
-            userName = user.name || "Người dùng";
-            userRole = user.role || "user";
+            // Handle potentially null user
+            if (user) {
+                userName = user.name || "Người dùng";
+                userRole = user.role || "user";
+            } else {
+                userName = "Người dùng";
+                userRole = "user";
+            }
         }
     }
-    
-    // Menu items sẽ hiển thị dựa trên quyền
+      // Menu items sẽ hiển thị dựa trên quyền
     const adminMenu = userRole === 'admin' ? `
         <li class="nav-item">
-            <a class="nav-link ${isActivePage('admin.html') ? 'active' : ''}" href="admin.html">Quản trị</a>
+            <a class="nav-link ${isActivePage('admin.html') ? 'active' : ''}" href="/confab-web-oasis/admin.html">Quản trị</a>
         </li>` : '';
     
     const organizerMenu = (userRole === 'admin' || userRole === 'organizer') ? `
         <li class="nav-item">
-            <a class="nav-link ${isActivePage('conference-manager.html') ? 'active' : ''}" href="conference-manager.html">Quản lý Hội nghị</a>
+            <a class="nav-link ${isActivePage('conference-manager.html') ? 'active' : ''}" href="/confab-web-oasis/conference-manager.html">Quản lý Hội nghị</a>
         </li>` : '';
 
     const profileMenu = isUserLoggedIn ? `        <li class="nav-item">
-            <a class="nav-link ${isActivePage('profile.html') ? 'active' : ''}" href="profile.html">Hồ sơ</a>
+            <a class="nav-link ${isActivePage('profile.html') ? 'active' : ''}" href="/confab-web-oasis/profile.html">Hồ sơ</a>
         </li>` : '';    
     
     // User menu
@@ -36,27 +41,24 @@ function renderHeader() {
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 <i class="fas fa-user me-1"></i>${userName}
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="profile.html">Hồ sơ</a></li>
+            <ul class="dropdown-menu dropdown-menu-end">                <li><a class="dropdown-item" href="/confab-web-oasis/profile.html">Hồ sơ</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#" onclick="logout()">Đăng xuất</a></li>
             </ul>
         </li>` : `
         <li class="nav-item me-2">
-            <a class="nav-link" href="login.html">
+            <a class="nav-link" href="/confab-web-oasis/login.html">
                 <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="register.html">
+            <a class="nav-link" href="/confab-web-oasis/register.html">
                 <i class="fas fa-user-plus me-1"></i>Đăng ký
             </a>
-        </li>`;
-
-    const header = `
+        </li>`;const header = `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="/confab-web-oasis/">
                 <i class="fas fa-calendar-alt me-2"></i>Trung tâm Hội nghị
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -65,10 +67,9 @@ function renderHeader() {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link ${isActivePage('index.html') ? 'active' : ''}" href="index.html">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${isActivePage('conferences.html') ? 'active' : ''}" href="conferences.html">Danh sách Hội nghị</a>
+                        <a class="nav-link ${isActivePage('index.html') ? 'active' : ''}" href="/confab-web-oasis/">Trang chủ</a>
+                    </li>                    <li class="nav-item">
+                        <a class="nav-link ${isActivePage('conferences.html') ? 'active' : ''}" href="/confab-web-oasis/conferences.html">Danh sách Hội nghị</a>
                     </li>
                     ${organizerMenu}
                     ${profileMenu}
@@ -91,11 +92,19 @@ function renderHeader() {
 
 // Xác định trang hiện tại có active không
 function isActivePage(pagePath) {
-    // Lấy tên file của URL hiện tại
+    // Lấy đường dẫn hiện tại
     const currentPath = window.location.pathname;
-    const currentFile = currentPath.split('/').pop();
+    const currentFile = currentPath.split('/').pop() || 'index.html'; // Mặc định là index.html nếu không có file
     
+    // So sánh tên file
     return currentFile === pagePath;
+}
+
+// Hàm tạo URL tương đối từ gốc của ứng dụng
+function getBaseUrl(path) {
+    // Xác định đường dẫn gốc của ứng dụng
+    const basePath = '/confab-web-oasis/';
+    return basePath + path;
 }
 
 // Thêm hàm để kiểm tra quyền người dùng (sẽ triển khai sau)
@@ -143,9 +152,8 @@ function addLoginModal() {
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
                     </form>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <p class="mb-0">Chưa có tài khoản? <a href="register.html" class="fw-bold">Đăng ký ngay</a></p>
+                </div>                <div class="modal-footer justify-content-center">
+                    <p class="mb-0">Chưa có tài khoản? <a href="/confab-web-oasis/register.html" class="fw-bold">Đăng ký ngay</a></p>
                 </div>
             </div>
         </div>

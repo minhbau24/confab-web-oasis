@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Không tìm thấy trang | Trung tâm Hội nghị</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 55px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .error-section {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        .error-container {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .error-icon {
+            font-size: 6rem;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        .error-code {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Error Section -->
+    <section class="error-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="error-container">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="error-code">404</div>
+                        <h1 class="mb-4">Không tìm thấy trang</h1>
+                        <p class="lead mb-5">Trang bạn đang tìm kiếm có thể đã bị xóa, đổi tên hoặc tạm thời không truy cập được.</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/confab-web-oasis/" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-home me-2"></i>Về trang chủ
+                            </a>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại trang trước
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/confab-web-oasis/js/header.js"></script>
+    <script src="/confab-web-oasis/js/footer.js"></script>
+</body>
+</html>

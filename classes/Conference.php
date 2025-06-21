@@ -196,37 +196,32 @@ class Conference
      * @return array Danh sách hội nghị
      */
     /**
-     * Lấy các diễn giả của hội nghị
-     *
+     * Lấy lịch trình của một hội nghị theo ID
+     * 
      * @param int $conferenceId ID của hội nghị
-     * @return array Danh sách diễn giả
-     */
-    public function getConferenceSpeakers($conferenceId)
-    {
-        return $this->db->fetchAll("
-            SELECT * FROM conference_speakers
-            WHERE conference_id = ?
-            ORDER BY id ASC
-        ", [$conferenceId]);
-    }
-
-    /**
-     * Lấy lịch trình của hội nghị
-     *
-     * @param int $conferenceId ID của hội nghị
-     * @return array Lịch trình hội nghị
+     * @return array|false Danh sách lịch trình hoặc false nếu không có
      */
     public function getConferenceSchedule($conferenceId)
     {
         return $this->db->fetchAll("
-            SELECT 
-                id, conference_id, eventDate, 
-                TIME_FORMAT(startTime, '%H:%i') as startTime, 
-                TIME_FORMAT(endTime, '%H:%i') as endTime, 
-                title, speaker, description
-            FROM conference_schedule
-            WHERE conference_id = ?
+            SELECT * FROM conference_schedule 
+            WHERE conference_id = ? 
             ORDER BY eventDate ASC, startTime ASC
+        ", [$conferenceId]);
+    }
+
+    /**
+     * Lấy danh sách diễn giả của một hội nghị theo ID
+     * 
+     * @param int $conferenceId ID của hội nghị
+     * @return array|false Danh sách diễn giả hoặc false nếu không có
+     */
+    public function getConferenceSpeakers($conferenceId)
+    {
+        return $this->db->fetchAll("
+            SELECT * FROM conference_speakers 
+            WHERE conference_id = ? 
+            ORDER BY name ASC
         ", [$conferenceId]);
     }
 
