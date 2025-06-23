@@ -61,6 +61,12 @@ function getCurrentUser() {
 window.authCurrentUser = currentUser; // Direct access to the user object
 window.getCurrentUser = getCurrentUser; // Access through function
 
+// Hàm cập nhật lại global user sau mỗi lần thay đổi
+function updateGlobalUser() {
+    window.authCurrentUser = currentUser;
+    window.getCurrentUser = getCurrentUser;
+}
+
 // Hàm lấy role của người dùng hiện tại
 function getCurrentUserRole() {
     return currentUser ? currentUser.role : USER_ROLES.GUEST;
@@ -219,6 +225,9 @@ async function login(email, password, rememberMe = false) {
             } catch (e) {
                 console.error('Error in login debugging:', e);
             }
+            
+            updateGlobalUser(); // Cập nhật global user sau khi đăng nhập thành công
+            
             return { success: true, user: currentUser };
         }
         
@@ -245,6 +254,8 @@ async function login(email, password, rememberMe = false) {
                 sessionStorage.setItem('authToken', token);
                 sessionStorage.setItem('user', JSON.stringify(currentUser));
             }
+            
+            updateGlobalUser(); // Cập nhật global user sau khi đăng nhập thành công (demo)
             
             return { success: true, user: currentUser };
         }
@@ -281,6 +292,8 @@ function logout() {
         localStorage.removeItem('user');
         sessionStorage.removeItem('authToken');
         sessionStorage.removeItem('user');
+        
+        updateGlobalUser(); // Cập nhật global user sau khi đăng xuất
         
         // Chuyển hướng về trang chủ (đảm bảo dùng .html)
         window.location.href = 'index.html';
@@ -326,11 +339,14 @@ function initAuth() {
         try {
             currentUser = JSON.parse(user);
             currentUser.token = token;
+            updateGlobalUser(); // Đảm bảo cập nhật global
             console.log('Đã khôi phục phiên đăng nhập:', currentUser.name);
         } catch (error) {
             console.error('Lỗi khi phân tích thông tin người dùng:', error);
             logout(); // Đăng xuất nếu có lỗi
         }
+    } else {
+        updateGlobalUser(); // Đảm bảo cập nhật global khi không có user
     }
 }
 

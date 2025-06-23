@@ -23,7 +23,7 @@ class Conference
      * @param string $status Trạng thái hội nghị
      * @return array Danh sách hội nghị
      */
-    public function getAllConferences($limit = null, $offset = 0, $status = 'published')
+    public function getAllConferences($limit = null, $offset = 0, $status = null)
     {
         $sql = "SELECT 
                     c.*,
@@ -33,19 +33,20 @@ class Conference
                     v.name as venue_name,
                     v.city as venue_city,
                     u1.firstName as created_by_name,
-                    u1.lastName as created_by_lastname
-                FROM conferences c
+                    u1.lastName as created_by_lastname                
+                    FROM conferences c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN venues v ON c.venue_id = v.id
                 LEFT JOIN users u1 ON c.created_by = u1.id
-                WHERE c.deleted_at IS NULL";
-        
+                WHERE 1=1";
+
         $params = [];
 
-        if (!empty($status)) {
-            $sql .= " AND c.status = ?";
-            $params[] = $status;
-        }
+        // Không lọc status nữa
+        // if (!empty($status)) {
+        //     $sql .= " AND c.status = ?";
+        //     $params[] = $status;
+        // }
 
         $sql .= " ORDER BY c.start_date DESC";
 
@@ -56,35 +57,94 @@ class Conference
         }
 
         $conferences = $this->db->fetchAll($sql, $params);
-        
+
         // Xử lý JSON fields
         return $this->processConferencesData($conferences);
-    }
-
-    /**
-     * Lấy hội nghị theo ID
-     *
-     * @param int $id ID của hội nghị
-     * @return array|false Thông tin hội nghị hoặc false nếu không tìm thấy
-     */
+    }    /**
+         * Lấy hội nghị theo ID
+         *
+         * @param int $id ID của hội nghị
+         * @return array|false Thông tin hội nghị hoặc false nếu không tìm thấy
+         */
     public function getConferenceById($id)
     {
-        return $this->db->fetch("
-            SELECT * FROM conferences 
-            WHERE id = ?
-        ", [$id]);
+        $sql = "SELECT 
+                    c.*,
+                    cat.name as category_name,
+                    cat.slug as category_slug,
+                    cat.color as category_color,
+                    v.name as venue_name,
+                    v.address as venue_address,
+                    v.city as venue_city,
+                    v.state as venue_state,
+                    v.country as venue_country,
+                    v.postal_code as venue_postal_code,
+                    v.description as venue_description,
+                    v.contact_name as venue_contact_name,
+                    v.contact_phone as venue_contact_phone,
+                    v.contact_email as venue_contact_email,
+                    v.website as venue_website,
+                    v.capacity as venue_capacity,
+                    v.parking_info as venue_parking_info,
+                    v.transport_info as venue_transport_info,
+                    v.accessibility as venue_accessibility,
+                    v.amenities as venue_amenities,
+                    v.floor_plan_image as venue_floor_plan_image,
+                    v.images as venue_images,
+                    creator.firstName as creator_first_name,
+                    creator.lastName as creator_last_name,
+                    creator.email as creator_email,
+                    creator.profile_image as creator_profile_image                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN venues v ON c.venue_id = v.id
+                LEFT JOIN users creator ON c.created_by = creator.id
+                WHERE c.id = ?";
+
+        $conference = $this->db->fetch($sql, [$id]);
+        if ($conference) {
+            // Xử lý các trường JSON
+            $jsonFields = [
+                'metadata',
+                'tags',
+                'features',
+                'organizer_info',
+                'pricing',
+                'registration_form_fields',
+                'sponsors',
+                'seo',
+                'venue_amenities',
+                'venue_images',
+                'social_links'
+            ];
+
+            $conference = $this->db->decodeJsonFields($conference, $jsonFields);
+
+            // Xử lý JSON fields và trả về dữ liệu đã xử lý
+            $processed = $this->processConferencesData([$conference]);
+            return !empty($processed) ? $processed[0] : false;
+        }
+
+        return false;
     }    /**
          * Đếm tổng số hội nghị
          * 
+         * @param string $status Trạng thái hội nghị
          * @return int Tổng số hội nghị
          */
-    public function countAllConferences()
+    public function countAllConferences($status = null)
     {
-        $result = $this->db->fetch("SELECT COUNT(*) as total FROM conferences");
-        return $result['total'];
-    }
+        $sql = "SELECT COUNT(*) as total FROM conferences c WHERE 1=1";
+        $params = [];
 
-    /**
+        // Không lọc status nữa
+        // if (!empty($status)) {
+        //     $sql .= " AND c.status = ?";
+        //     $params[] = $status;
+        // }
+
+        $result = $this->db->fetch($sql, $params);
+        return $result['total'];
+    }/**
      * Lọc hội nghị theo các điều kiện
      * 
      * @param string $searchTerm Từ khóa tìm kiếm
@@ -96,13 +156,26 @@ class Conference
      */
     public function filterConferences($searchTerm = '', $category = '', $dateFilter = '', $limit = null, $offset = 0)
     {
-        $sql = "SELECT * FROM conferences WHERE 1=1";
+        $sql = "SELECT 
+                    c.*,
+                    cat.name as category_name,
+                    cat.slug as category_slug,
+                    cat.color as category_color,
+                    v.name as venue_name,
+                    v.city as venue_city,
+                    u1.firstName as created_by_name,
+                    u1.lastName as created_by_lastname                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN venues v ON c.venue_id = v.id
+                LEFT JOIN users u1 ON c.created_by = u1.id
+                WHERE 1=1";
         $params = [];
 
         // Tìm kiếm theo từ khóa
         if (!empty($searchTerm)) {
-            $sql .= " AND (title LIKE ? OR description LIKE ? OR location LIKE ?)";
+            $sql .= " AND (c.title LIKE ? OR c.description LIKE ? OR c.location LIKE ? OR c.short_description LIKE ?)";
             $searchParam = '%' . $searchTerm . '%';
+            $params[] = $searchParam;
             $params[] = $searchParam;
             $params[] = $searchParam;
             $params[] = $searchParam;
@@ -110,7 +183,7 @@ class Conference
 
         // Lọc theo danh mục
         if (!empty($category)) {
-            $sql .= " AND category LIKE ?";
+            $sql .= " AND cat.name LIKE ?";
             $params[] = '%' . $category . '%';
         }
 
@@ -119,32 +192,32 @@ class Conference
             $today = date('Y-m-d');
             switch ($dateFilter) {
                 case 'upcoming':
-                    $sql .= " AND date >= ?";
+                    $sql .= " AND c.start_date >= ?";
                     $params[] = $today;
                     break;
                 case 'thisMonth':
                     $startMonth = date('Y-m-01');
                     $endMonth = date('Y-m-t');
-                    $sql .= " AND date BETWEEN ? AND ?";
+                    $sql .= " AND c.start_date BETWEEN ? AND ?";
                     $params[] = $startMonth;
                     $params[] = $endMonth;
                     break;
                 case 'thisYear':
                     $startYear = date('Y-01-01');
                     $endYear = date('Y-12-31');
-                    $sql .= " AND date BETWEEN ? AND ?";
+                    $sql .= " AND c.start_date BETWEEN ? AND ?";
                     $params[] = $startYear;
                     $params[] = $endYear;
                     break;
                 case 'past':
-                    $sql .= " AND date < ?";
+                    $sql .= " AND c.start_date < ?";
                     $params[] = $today;
                     break;
             }
         }
 
         // Sắp xếp theo ngày mới nhất
-        $sql .= " ORDER BY date DESC";
+        $sql .= " ORDER BY c.start_date DESC";
 
         // Giới hạn số lượng
         if ($limit !== null) {
@@ -153,26 +226,31 @@ class Conference
             $params[] = $limit;
         }
 
-        return $this->db->fetchAll($sql, $params);
-    }
+        $conferences = $this->db->fetchAll($sql, $params);
 
-    /**
-     * Đếm số hội nghị theo bộ lọc
-     * 
-     * @param string $searchTerm Từ khóa tìm kiếm
-     * @param string $category Danh mục
-     * @param string $dateFilter Bộ lọc thời gian
-     * @return int Số lượng hội nghị
-     */
+        // Xử lý JSON fields
+        return $this->processConferencesData($conferences);
+    }    /**
+         * Đếm số hội nghị theo bộ lọc
+         * 
+         * @param string $searchTerm Từ khóa tìm kiếm
+         * @param string $category Danh mục
+         * @param string $dateFilter Bộ lọc thời gian
+         * @return int Số lượng hội nghị
+         */
     public function countFilteredConferences($searchTerm = '', $category = '', $dateFilter = '')
     {
-        $sql = "SELECT COUNT(*) as total FROM conferences WHERE 1=1";
+        $sql = "SELECT COUNT(*) as total 
+                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                WHERE 1=1";
         $params = [];
 
         // Tìm kiếm theo từ khóa
         if (!empty($searchTerm)) {
-            $sql .= " AND (title LIKE ? OR description LIKE ? OR location LIKE ?)";
+            $sql .= " AND (c.title LIKE ? OR c.description LIKE ? OR c.location LIKE ? OR c.short_description LIKE ?)";
             $searchParam = '%' . $searchTerm . '%';
+            $params[] = $searchParam;
             $params[] = $searchParam;
             $params[] = $searchParam;
             $params[] = $searchParam;
@@ -180,7 +258,7 @@ class Conference
 
         // Lọc theo danh mục
         if (!empty($category)) {
-            $sql .= " AND category LIKE ?";
+            $sql .= " AND cat.name LIKE ?";
             $params[] = '%' . $category . '%';
         }
 
@@ -189,25 +267,25 @@ class Conference
             $today = date('Y-m-d');
             switch ($dateFilter) {
                 case 'upcoming':
-                    $sql .= " AND date >= ?";
+                    $sql .= " AND c.start_date >= ?";
                     $params[] = $today;
                     break;
                 case 'thisMonth':
                     $startMonth = date('Y-m-01');
                     $endMonth = date('Y-m-t');
-                    $sql .= " AND date BETWEEN ? AND ?";
+                    $sql .= " AND c.start_date BETWEEN ? AND ?";
                     $params[] = $startMonth;
                     $params[] = $endMonth;
                     break;
                 case 'thisYear':
                     $startYear = date('Y-01-01');
                     $endYear = date('Y-12-31');
-                    $sql .= " AND date BETWEEN ? AND ?";
+                    $sql .= " AND c.start_date BETWEEN ? AND ?";
                     $params[] = $startYear;
                     $params[] = $endYear;
                     break;
                 case 'past':
-                    $sql .= " AND date < ?";
+                    $sql .= " AND c.start_date < ?";
                     $params[] = $today;
                     break;
             }
@@ -222,23 +300,27 @@ class Conference
      *
      * @param int $limit Số lượng tối đa
      * @return array Danh sách hội nghị
-     */
-    /**
-     * Lấy lịch trình của một hội nghị theo ID
-     * 
-     * @param int $conferenceId ID của hội nghị
-     * @return array|false Danh sách lịch trình hoặc false nếu không có
-     */
+     */    /**
+          * Lấy lịch trình của một hội nghị theo ID
+          * 
+          * @param int $conferenceId ID của hội nghị
+          * @return array|false Danh sách lịch trình hoặc false nếu không có
+          */
     public function getConferenceSchedule($conferenceId)
     {
         return $this->db->fetchAll("
-            SELECT * FROM conference_schedule 
-            WHERE conference_id = ? 
-            ORDER BY eventDate ASC, startTime ASC
+            SELECT 
+                ss.*,
+                s.name as speaker_name,
+                s.title as speaker_title,
+                s.company as speaker_company,
+                s.image as speaker_image
+            FROM schedule_sessions ss
+            LEFT JOIN speakers s ON ss.speaker_id = s.id
+            WHERE ss.conference_id = ? 
+            ORDER BY ss.session_date ASC, ss.start_time ASC
         ", [$conferenceId]);
-    }
-
-    /**
+    }/**
      * Lấy danh sách diễn giả của một hội nghị theo ID
      * 
      * @param int $conferenceId ID của hội nghị
@@ -246,41 +328,68 @@ class Conference
      */
     public function getConferenceSpeakers($conferenceId)
     {
-        return $this->db->fetchAll("
-            SELECT * FROM conference_speakers 
-            WHERE conference_id = ? 
-            ORDER BY name ASC
+        $speakers = $this->db->fetchAll("
+            SELECT 
+                s.id,
+                s.name,
+                s.title,
+                s.company,
+                s.bio,
+                s.short_bio,
+                s.image,
+                s.email,
+                s.website,
+                s.linkedin,
+                s.twitter,
+                s.github,
+                s.youtube,
+                s.specialties,
+                s.topics,
+                cs.role,
+                cs.talk_title,
+                cs.talk_description,
+                cs.talk_duration,
+                cs.status as speaker_status
+            FROM conference_speakers cs
+            LEFT JOIN speakers s ON cs.speaker_id = s.id
+            WHERE cs.conference_id = ? 
+            AND cs.status = 'confirmed'
+            ORDER BY 
+                CASE cs.role 
+                    WHEN 'keynote' THEN 1 
+                    WHEN 'speaker' THEN 2 
+                    WHEN 'panelist' THEN 3 
+                    ELSE 4 
+                END, 
+                s.name ASC
         ", [$conferenceId]);
+
+        // Xử lý dữ liệu diễn giả
+        return $this->processSpeakersData($speakers);
     }
 
     /**
-     * Lấy mục tiêu của hội nghị
-     *
+     * Lấy thông tin mục tiêu của hội nghị
+     * 
      * @param int $conferenceId ID của hội nghị
      * @return array Danh sách mục tiêu
      */
     public function getConferenceObjectives($conferenceId)
     {
-        return $this->db->fetchAll("
-            SELECT * FROM conference_objectives
-            WHERE conference_id = ?
-            ORDER BY order_num ASC
-        ", [$conferenceId]);
+        $sql = "SELECT * FROM conference_objectives WHERE conference_id = ? ORDER BY display_order";
+        return $this->db->fetchAll($sql, [$conferenceId]);
     }
 
     /**
-     * Lấy đối tượng tham dự của hội nghị
-     *
+     * Lấy thông tin đối tượng tham dự của hội nghị
+     * 
      * @param int $conferenceId ID của hội nghị
-     * @return array Danh sách đối tượng
+     * @return array Danh sách đối tượng tham dự
      */
     public function getConferenceAudience($conferenceId)
     {
-        return $this->db->fetchAll("
-            SELECT * FROM conference_audience
-            WHERE conference_id = ?
-            ORDER BY order_num ASC
-        ", [$conferenceId]);
+        $sql = "SELECT * FROM conference_audience WHERE conference_id = ? ORDER BY display_order";
+        return $this->db->fetchAll($sql, [$conferenceId]);
     }
 
     /**
@@ -442,26 +551,39 @@ class Conference
         return $this->db->fetchAll("
             SELECT id, title, date, image
             FROM conferences
-            WHERE category LIKE ? AND id != ? AND status = 'active'
+            WHERE category LIKE ? AND id != ?
             ORDER BY date DESC
             LIMIT ?
         ", ['%' . $category . '%', $conferenceId, $limit]);
-    }
-
-    /**
-     * Lấy hội nghị sắp tới
-     *
-     * @param int $limit Số lượng tối đa
-     * @return array Danh sách hội nghị
-     */
-    public function getUpcomingConferences($limit = 3)
+    }    /**
+         * Lấy hội nghị sắp tới
+         *
+         * @param int $limit Số lượng tối đa
+         * @return array Danh sách hội nghị
+         */
+    public function getUpcomingConferences($limit = 10)
     {
-        return $this->db->fetchAll("
-            SELECT * FROM conferences 
-            WHERE date >= CURDATE() 
-            ORDER BY date ASC 
-            LIMIT ?
-        ", [$limit]);
+        $sql = "SELECT 
+                    c.*,
+                    cat.name as category_name,
+                    cat.slug as category_slug,
+                    cat.color as category_color,
+                    v.name as venue_name,
+                    v.city as venue_city,
+                    u1.firstName as created_by_name,
+                    u1.lastName as created_by_lastname                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN venues v ON c.venue_id = v.id
+                LEFT JOIN users u1 ON c.created_by = u1.id
+                WHERE 1=1
+                AND c.start_date >= CURDATE()
+                ORDER BY c.start_date ASC
+                LIMIT ?";
+
+        $conferences = $this->db->fetchAll($sql, [$limit]);
+
+        // Xử lý JSON fields
+        return $this->processConferencesData($conferences);
     }
 
     /**
@@ -581,40 +703,62 @@ class Conference
             error_log('Error deleting conference: ' . $e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * Tìm kiếm hội nghị
-     *
-     * @param string $query Từ khóa tìm kiếm
-     * @param string $category Danh mục (tùy chọn)
-     * @param string $location Địa điểm (tùy chọn)
-     * @return array Kết quả tìm kiếm
-     */
-    public function searchConferences($query, $category = '', $location = '')
+    }    /**
+         * Tìm kiếm hội nghị
+         * 
+         * @param string $query Từ khóa tìm kiếm
+         * @param string $category Danh mục
+         * @param string $location Địa điểm
+         * @param int $limit Số lượng kết quả
+         * @return array Danh sách hội nghị tìm được
+         */
+    public function searchConferences($query = '', $category = '', $location = '', $limit = 20)
     {
+        $sql = "SELECT 
+                    c.*,
+                    cat.name as category_name,
+                    cat.slug as category_slug,
+                    cat.color as category_color,
+                    v.name as venue_name,
+                    v.city as venue_city,
+                    u1.firstName as created_by_name,
+                    u1.lastName as created_by_lastname
+                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id                LEFT JOIN venues v ON c.venue_id = v.id
+                LEFT JOIN users u1 ON c.created_by = u1.id
+                WHERE 1=1";
+
         $params = [];
-        $sql = "SELECT * FROM conferences WHERE 1=1";
 
+        // Tìm kiếm theo từ khóa
         if (!empty($query)) {
-            $sql .= " AND (title LIKE ? OR description LIKE ?)";
-            $params[] = "%$query%";
-            $params[] = "%$query%";
+            $sql .= " AND (c.title LIKE ? OR c.description LIKE ? OR c.short_description LIKE ?)";
+            $searchParam = '%' . $query . '%';
+            $params[] = $searchParam;
+            $params[] = $searchParam;
+            $params[] = $searchParam;
         }
 
+        // Lọc theo danh mục
         if (!empty($category)) {
-            $sql .= " AND category = ?";
-            $params[] = $category;
+            $sql .= " AND cat.name LIKE ?";
+            $params[] = '%' . $category . '%';
         }
 
+        // Lọc theo địa điểm
         if (!empty($location)) {
-            $sql .= " AND location LIKE ?";
-            $params[] = "%$location%";
+            $sql .= " AND (c.location LIKE ? OR v.city LIKE ?)";
+            $params[] = '%' . $location . '%';
+            $params[] = '%' . $location . '%';
         }
 
-        $sql .= " ORDER BY date ASC";
+        $sql .= " ORDER BY c.start_date DESC LIMIT ?";
+        $params[] = $limit;
 
-        return $this->db->fetchAll($sql, $params);
+        $conferences = $this->db->fetchAll($sql, $params);
+
+        // Xử lý JSON fields
+        return $this->processConferencesData($conferences);
     }
 
     /**
@@ -700,14 +844,12 @@ class Conference
         ");
 
         return $result ? intval($result['total']) : 0;
-    }
-
-    /**
-     * Lấy danh sách hội nghị theo người tạo
-     *
-     * @param int $userId ID người dùng
-     * @return array Danh sách hội nghị
-     */
+    }    /**
+         * Lấy danh sách hội nghị theo người tạo
+         *
+         * @param int $userId ID người dùng
+         * @return array Danh sách hội nghị
+         */
     public function getConferencesByUserId($userId)
     {
         return $this->db->fetchAll("
@@ -715,6 +857,177 @@ class Conference
             WHERE created_by = ? 
             ORDER BY date DESC
         ", [$userId]);
+    }
+
+    /**
+     * Xử lý dữ liệu hội nghị trả về từ database
+     * Chuyển đổi JSON fields và chuẩn hóa dữ liệu
+     *
+     * @param array $conferences Danh sách hội nghị từ database
+     * @return array Dữ liệu đã được xử lý
+     */
+    private function processConferencesData($conferences)
+    {
+        if (empty($conferences)) {
+            return [];
+        }
+
+        $processedConferences = [];
+
+        foreach ($conferences as $conference) {
+            // Chuẩn hóa dữ liệu
+            $processed = [
+                'id' => intval($conference['id']),
+                'title' => $conference['title'],
+                'slug' => $conference['slug'],
+                'description' => $conference['short_description'] ?: $conference['description'],
+                'full_description' => $conference['description'],
+                'date' => $conference['start_date'], // Alias for compatibility
+                'start_date' => $conference['start_date'],
+                'end_date' => $conference['end_date'],
+                'location' => $conference['location'] ?: 'Chưa xác định',
+                'venue' => $conference['venue_name'] ?? 'Chưa xác định',
+                'venue_city' => $conference['venue_city'] ?? '',
+                'category' => $conference['category_name'] ?? 'Chưa phân loại',
+                'category_id' => intval($conference['category_id'] ?? 0),
+                'category_slug' => $conference['category_slug'] ?? '',
+                'category_color' => $conference['category_color'] ?? '#007bff',
+                'price' => floatval($conference['price'] ?? 0),
+                'currency' => $conference['currency'] ?? 'VND',
+                'capacity' => intval($conference['capacity'] ?? 0),
+                'current_attendees' => intval($conference['current_attendees'] ?? 0),
+                'attendees' => intval($conference['current_attendees'] ?? 0), // Alias for compatibility
+                'status' => $conference['status'] ?? 'draft',
+                'type' => $conference['type'] ?? 'in_person',
+                'format' => $conference['format'] ?? 'conference',
+                'featured' => boolval($conference['featured'] ?? false),
+                'image' => $conference['banner_image'] ?: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop',
+                'created_by' => intval($conference['created_by'] ?? 0),
+                'created_by_name' => trim(($conference['created_by_name'] ?? '') . ' ' . ($conference['created_by_lastname'] ?? '')),
+                'created_at' => $conference['created_at'],
+                'updated_at' => $conference['updated_at']
+            ];
+
+            // Xử lý JSON fields nếu có
+            if (isset($conference['tags']) && !empty($conference['tags'])) {
+                $processed['tags'] = is_string($conference['tags']) ?
+                    json_decode($conference['tags'], true) : $conference['tags'];
+            }
+
+            if (isset($conference['requirements']) && !empty($conference['requirements'])) {
+                $processed['requirements'] = is_string($conference['requirements']) ?
+                    json_decode($conference['requirements'], true) : $conference['requirements'];
+            }
+
+            if (isset($conference['social_links']) && !empty($conference['social_links'])) {
+                $processed['social_links'] = is_string($conference['social_links']) ?
+                    json_decode($conference['social_links'], true) : $conference['social_links'];
+            }
+
+            $processedConferences[] = $processed;
+        }
+
+        return $processedConferences;
+    }
+
+    /**
+     * Xử lý dữ liệu của một hội nghị đơn lẻ
+     * 
+     * @param array $conference Dữ liệu hội nghị cần xử lý
+     * @return array Dữ liệu hội nghị sau khi xử lý
+     */
+    private function processConferenceData($conference)
+    {
+        if (empty($conference))
+            return [];
+
+        // Xử lý ngày tháng theo định dạng chuẩn
+        if (isset($conference['start_date'])) {
+            $conference['start_date_formatted'] = date('d/m/Y', strtotime($conference['start_date']));
+        }
+
+        if (isset($conference['end_date'])) {
+            $conference['end_date_formatted'] = date('d/m/Y', strtotime($conference['end_date']));
+        }
+
+        // Xử lý giá tiền định dạng chuẩn
+        if (isset($conference['price'])) {
+            $conference['price_formatted'] = number_format($conference['price'], 0, ',', '.') . ' ₫';
+        }
+
+        // Tính số chỗ trống
+        if (isset($conference['capacity']) && isset($conference['current_attendees'])) {
+            $conference['available_spots'] = max(0, $conference['capacity'] - $conference['current_attendees']);
+        }
+
+        // Kết hợp thông tin venue thành một đối tượng
+        $venueFields = array_filter(array_keys($conference), function ($key) {
+            return strpos($key, 'venue_') === 0;
+        });
+
+        if (!empty($venueFields)) {
+            $venue = [];
+            foreach ($venueFields as $field) {
+                $newKey = substr($field, 6); // Loại bỏ prefix 'venue_'
+                $venue[$newKey] = $conference[$field];
+            }
+            $conference['venue'] = $venue;
+        }
+
+        // Kết hợp thông tin creator thành một đối tượng
+        $creatorFields = array_filter(array_keys($conference), function ($key) {
+            return strpos($key, 'creator_') === 0;
+        });
+
+        if (!empty($creatorFields)) {
+            $creator = [];
+            foreach ($creatorFields as $field) {
+                $newKey = substr($field, 8); // Loại bỏ prefix 'creator_'
+                $creator[$newKey] = $conference[$field];
+            }
+            $conference['creator'] = $creator;
+        }
+
+        return $conference;
+    }
+
+    /**
+     * Xử lý dữ liệu diễn giả sau khi lấy từ database
+     * 
+     * @param array $speakers Danh sách diễn giả
+     * @return array Danh sách diễn giả đã được xử lý
+     */
+    private function processSpeakersData($speakers)
+    {
+        if (empty($speakers))
+            return [];
+
+        $result = [];
+        foreach ($speakers as $speaker) {
+            // Xử lý đường dẫn hình ảnh
+            if (!empty($speaker['image']) && strpos($speaker['image'], 'http') !== 0) {
+                // Nếu không phải URL đầy đủ thì thêm đường dẫn gốc
+                if (strpos($speaker['image'], '/') === 0) {
+                    // Nếu bắt đầu bằng / thì đường dẫn từ gốc
+                    $speaker['image'] = 'http://' . $_SERVER['HTTP_HOST'] . $speaker['image'];
+                } else {
+                    // Ngược lại thêm vào thư mục gốc
+                    $speaker['image'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $speaker['image'];
+                }
+            }
+
+            // Xử lý các trường JSON
+            $jsonFields = ['expertise', 'specialties', 'topics', 'social_links'];
+            foreach ($jsonFields as $field) {
+                if (isset($speaker[$field]) && is_string($speaker[$field])) {
+                    $speaker[$field] = json_decode($speaker[$field], true);
+                }
+            }
+
+            $result[] = $speaker;
+        }
+
+        return $result;
     }
 }
 ?>

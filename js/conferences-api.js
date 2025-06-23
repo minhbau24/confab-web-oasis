@@ -4,10 +4,11 @@ let allConferences = [];
 let filteredConferences = [];
 let userRegisteredConferences = []; // Danh sách conference IDs mà user đã đăng ký
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeConferencesPage();
-    setupEventListeners();
-});
+// XÓA đoạn này để tránh chạy initializeConferencesPage() quá sớm
+// document.addEventListener('DOMContentLoaded', function() {
+//     initializeConferencesPage();
+//     setupEventListeners();
+// });
 
 async function initializeConferencesPage() {
     try {
@@ -109,17 +110,20 @@ function filterConferences() {
 
     // Apply filters
     filteredConferences = allConferences.filter(conference => {
-        // Search query filter
+        // Search query filter (search in title, description, location, venue)
         const matchesSearch = searchQuery === '' || 
                              conference.title.toLowerCase().includes(searchQuery) || 
-                             conference.description.toLowerCase().includes(searchQuery) ||
-                             conference.location.toLowerCase().includes(searchQuery);
+                             (conference.description || '').toLowerCase().includes(searchQuery) ||
+                             conference.location.toLowerCase().includes(searchQuery) ||
+                             (conference.venue || '').toLowerCase().includes(searchQuery);
         
         // Category filter
         const matchesCategory = category === '' || conference.category === category;
         
-        // Location filter
-        const matchesLocation = location === '' || conference.location.includes(location);
+        // Location filter (check both location and venue city)
+        const matchesLocation = location === '' || 
+                               conference.location.includes(location) ||
+                               (conference.venue || '').includes(location);
         
         return matchesSearch && matchesCategory && matchesLocation;
     });
@@ -137,19 +141,26 @@ function renderConferences() {
             const progress = Math.min(100, Math.round((conference.attendees / conference.capacity) * 100));
             
             // Format date
-            const date = new Date(conference.date);
+            const date = new Date(conference.start_date || conference.date);
             const formattedDate = date.toLocaleDateString('vi-VN', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
-            });            // Đảm bảo luôn có hình ảnh cho hội nghị
+            });
+            
+            // Format price
+            const formattedPrice = conference.price > 0 
+                ? `${conference.price.toLocaleString('vi-VN')} ${conference.currency}` 
+                : 'Miễn phí';
+            
+            // Use image from database or fallback
             const imageUrl = conference.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop';
             
-            // Kiểm tra xem user đã đăng ký hội nghị này chưa
+            // Check if user is registered
             const user = getCurrentUser();
             const isRegistered = checkIfUserRegistered(conference.id, user);
             
-            // Tạo nút đăng ký dựa trên trạng thái
+            // Create register button based on status
             const registerButton = isRegistered ? 
                 `<button class="btn btn-secondary register-btn" data-id="${conference.id}" disabled title="Bạn đã đăng ký tham dự hội nghị này">
                     <i class="fas fa-check me-1"></i>Đã đăng ký
@@ -158,20 +169,33 @@ function renderConferences() {
                     <i class="fas fa-check-circle me-1"></i>Đăng ký
                 </button>`;
             
+            // Status badge
+            const statusBadge = conference.status === 'published' ? '' : 
+                `<span class="badge bg-warning text-dark mb-2">${conference.status}</span>`;
+            
             return `
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card conference-card shadow-sm h-100">
                         <img src="${imageUrl}" class="card-img-top" alt="${conference.title}" style="height: 200px; object-fit: cover;">
                         <div class="card-body d-flex flex-column">
-                            <span class="badge bg-primary mb-2 align-self-start">${conference.category}</span>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge mb-2 align-self-start" style="background-color: ${conference.category_color}">${conference.category}</span>
+                                ${statusBadge}
+                            </div>
                             <h5 class="card-title">${conference.title}</h5>
-                            <p class="card-text">${conference.description.substring(0, 100)}...</p>
+                            <p class="card-text">${(conference.description || '').substring(0, 100)}${conference.description && conference.description.length > 100 ? '...' : ''}</p>
                             <div class="mt-auto">
                                 <div class="mb-2">
                                     <i class="fas fa-map-marker-alt text-danger me-2"></i>${conference.location}
                                 </div>
                                 <div class="mb-2">
                                     <i class="fas fa-calendar-alt text-primary me-2"></i>${formattedDate}
+                                </div>
+                                <div class="mb-2">
+                                    <i class="fas fa-building text-info me-2"></i>${conference.venue}
+                                </div>
+                                <div class="mb-2">
+                                    <i class="fas fa-tag text-success me-2"></i>${formattedPrice}
                                 </div>
                                 <div class="mb-3">
                                     <p class="mb-1 small">Số người tham dự: ${conference.attendees}/${conference.capacity}</p>
@@ -197,7 +221,8 @@ function renderConferences() {
                 </div>
             `;
         }).join('');
-          // Add event listeners for register buttons
+        
+        // Add event listeners for register buttons
         document.querySelectorAll('.register-btn').forEach(button => {
             button.addEventListener('click', function() {
                 // Không cho phép đăng ký nếu nút đã disabled
@@ -486,3 +511,7 @@ function checkIfUserRegistered(conferenceId, user) {
 }
 
 // Function đã được xóa vì không cần localStorage nữa, sử dụng database
+
+// Đảm bảo các hàm vẫn export ra global nếu cần
+window.initializeConferencesPage = initializeConferencesPage;
+window.setupEventListeners = setupEventListeners;

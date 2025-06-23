@@ -40,9 +40,9 @@ switch ($method) {
                     'status' => true,
                     'data' => $scheduleData
                 ]);
-            } else {
-                // Kiểm tra và trả về dữ liệu mẫu
-                echo json_encode([                    'status' => true,
+            } else {            // Kiểm tra và trả về dữ liệu mẫu
+                echo json_encode([
+                    'status' => true,
                     'message' => 'Using fallback schedule data for conference ID: ' . $conferenceId,
                     'data' => [
                         [

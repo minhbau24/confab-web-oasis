@@ -140,5 +140,40 @@ class Database
     {
         $this->conn->rollBack();
     }
+
+    /**
+     * Giải mã các trường JSON trong kết quả truy vấn
+     * 
+     * @param array $data Dữ liệu cần xử lý
+     * @param array $jsonFields Danh sách các trường JSON
+     * @return array Dữ liệu sau khi xử lý
+     */
+    public function decodeJsonFields($data, $jsonFields = [])
+    {
+        if (empty($data) || empty($jsonFields)) {
+            return $data;
+        }
+        
+        // Xử lý một mảng kết quả
+        if (isset($data[0]) && is_array($data[0])) {
+            foreach ($data as &$row) {
+                foreach ($jsonFields as $field) {
+                    if (isset($row[$field]) && is_string($row[$field])) {
+                        $row[$field] = json_decode($row[$field], true);
+                    }
+                }
+            }
+            return $data;
+        }
+        
+        // Xử lý một dòng kết quả
+        foreach ($jsonFields as $field) {
+            if (isset($data[$field]) && is_string($data[$field])) {
+                $data[$field] = json_decode($data[$field], true);
+            }
+        }
+        
+        return $data;
+    }
 }
 ?>

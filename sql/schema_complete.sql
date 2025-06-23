@@ -114,7 +114,7 @@ CREATE TABLE `users` (
   `last_login` timestamp NULL DEFAULT NULL,
   `login_attempts` int(11) DEFAULT 0,
   `locked_until` timestamp NULL DEFAULT NULL,
-  `status` enum('active','inactive','suspended','pending') DEFAULT 'active',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `preferences` json DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
@@ -140,7 +140,7 @@ CREATE TABLE `categories` (
   `parent_id` int(11) DEFAULT NULL,
   `sort_order` int(11) DEFAULT 0,
   `is_featured` tinyint(1) DEFAULT 0,
-  `status` enum('active','inactive') DEFAULT 'active',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `seo_title` varchar(255) DEFAULT NULL,
   `seo_description` varchar(500) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -183,7 +183,7 @@ CREATE TABLE `venues` (
   `availability` json DEFAULT NULL,
   `rating` decimal(3,2) DEFAULT NULL,
   `total_events` int(11) DEFAULT 0,
-  `status` enum('active','inactive','maintenance') DEFAULT 'active',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -226,7 +226,7 @@ CREATE TABLE `speakers` (
   `featured_video` varchar(255) DEFAULT NULL,
   `portfolio_url` varchar(255) DEFAULT NULL,
   `testimonials` json DEFAULT NULL,
-  `status` enum('active','inactive','unavailable') DEFAULT 'active',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -270,7 +270,7 @@ CREATE TABLE `conferences` (
   `waiting_list_limit` int(11) DEFAULT 0,
   `registration_start` datetime DEFAULT NULL,
   `registration_end` datetime DEFAULT NULL,
-  `status` enum('draft','published','sold_out','cancelled','completed','postponed') DEFAULT 'draft',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `visibility` enum('public','private','invite_only') DEFAULT 'public',
   `featured` tinyint(1) DEFAULT 0,
   `trending` tinyint(1) DEFAULT 0,
@@ -389,10 +389,10 @@ CREATE TABLE `registrations` (
   `discount_code` varchar(50) DEFAULT NULL,
   `discount_amount` decimal(10,2) DEFAULT 0.00,
   `payment_method` enum('cash','bank_transfer','credit_card','paypal','momo','zalopay') DEFAULT NULL,
-  `payment_status` enum('pending','paid','failed','refunded','cancelled') DEFAULT 'pending',
+  `payment_status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `payment_reference` varchar(100) DEFAULT NULL,
   `payment_date` timestamp NULL DEFAULT NULL,
-  `status` enum('pending','confirmed','cancelled','attended','no_show','refunded') DEFAULT 'pending',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `registration_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `confirmation_date` timestamp NULL DEFAULT NULL,
   `check_in_date` timestamp NULL DEFAULT NULL,
@@ -625,7 +625,7 @@ CREATE TABLE `notifications` (
   `action_text` varchar(100) DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `sent_at` timestamp NULL DEFAULT NULL,
-  `delivery_status` enum('pending','sent','failed','bounced') DEFAULT 'pending',
+  `delivery_status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `delivery_attempts` int(11) DEFAULT 0,
   `last_attempt` timestamp NULL DEFAULT NULL,
   `error_message` text DEFAULT NULL,
@@ -738,7 +738,7 @@ CREATE TABLE `transactions` (
   `currency` varchar(3) DEFAULT 'VND',
   `fee` decimal(15,2) DEFAULT 0.00,
   `net_amount` decimal(15,2) GENERATED ALWAYS AS (`amount` - `fee`) STORED,
-  `status` enum('pending','processing','completed','failed','cancelled','refunded') DEFAULT 'pending',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `gateway` varchar(50) DEFAULT NULL,
   `gateway_transaction_id` varchar(255) DEFAULT NULL,
   `gateway_response` json DEFAULT NULL,
@@ -762,7 +762,8 @@ CREATE TABLE `transactions` (
   CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`conference_id`) REFERENCES `conferences` (`id`) ON DELETE SET NULL,
   CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`registration_id`) REFERENCES `registrations` (`id`) ON DELETE SET NULL,
   CONSTRAINT `transactions_ibfk_4` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `transactions_ibfk_5` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE SET NULL
+  CONSTRAINT `transactions_ibfk_5` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `transactions_ibfk_6` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Bảng invoices - Hóa đơn
@@ -779,7 +780,7 @@ CREATE TABLE `invoices` (
   `amount_paid` decimal(15,2) DEFAULT 0.00,
   `amount_due` decimal(15,2) GENERATED ALWAYS AS (`amount_total` - `amount_paid`) STORED,
   `currency` varchar(3) DEFAULT 'VND',
-  `status` enum('draft','sent','paid','overdue','cancelled','refunded') DEFAULT 'draft',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `due_date` datetime DEFAULT NULL,
   `paid_date` datetime DEFAULT NULL,
   `billing_address` json DEFAULT NULL,
@@ -990,7 +991,7 @@ CREATE TABLE `media_files` (
   `access_roles` json DEFAULT NULL COMMENT 'Vai trò được phép truy cập',
   `download_count` int(11) DEFAULT 0,
   `is_featured` tinyint(1) DEFAULT 0,
-  `status` enum('active','archived','trashed') DEFAULT 'active',
+  `status` enum('draft','sent','paid','cancelled','refunded','active','inactive') DEFAULT 'draft',
   `last_accessed` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
@@ -1296,30 +1297,416 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `color`, `icon`, 
 (4, 'Giáo dục', 'giao-duc', 'Hội nghị về giáo dục và đào tạo', '#ffc107', 'fas fa-graduation-cap', 0, 'active'),
 (5, 'Khoa học', 'khoa-hoc', 'Hội nghị khoa học và nghiên cứu', '#6f42c1', 'fas fa-microscope', 0, 'active');
 
--- Dữ liệu mẫu cho bảng venues
-INSERT INTO `venues` (`id`, `name`, `slug`, `description`, `address`, `city`, `country`, `capacity`, `contact_name`, `contact_email`, `contact_phone`, `status`) VALUES
-(1, 'Trung tâm Hội nghị Quốc gia', 'trung-tam-hoi-nghi-quoc-gia', 'Trung tâm hội nghị lớn nhất Việt Nam với đầy đủ tiện ích hiện đại', 'Đường Thành Thái, Quận 10, TP.HCM', 'Hồ Chí Minh', 'Vietnam', 2000, 'Nguyễn Văn A', 'venue1@confab.local', '028-1234-5678', 'active'),
-(2, 'Khách sạn Rex', 'khach-san-rex', 'Khách sạn 5 sao với phòng hội nghị sang trọng', '141 Nguyễn Huệ, Quận 1, TP.HCM', 'Hồ Chí Minh', 'Vietnam', 500, 'Trần Thị B', 'venue2@confab.local', '028-8765-4321', 'active'),
-(3, 'Đại học Bách Khoa', 'dai-hoc-bach-khoa', 'Giảng đường hiện đại tại Đại học Bách Khoa TP.HCM', '268 Lý Thường Kiệt, Quận 10, TP.HCM', 'Hồ Chí Minh', 'Vietnam', 1000, 'PGS. Lê Văn C', 'venue3@confab.local', '028-1111-2222', 'active');
+-- Dữ liệu venues với thông tin đầy đủ
+INSERT INTO `venues` (
+    `id`, `name`, `slug`, `description`, `address`, `city`, `state`, `country`, `postal_code`, 
+    `latitude`, `longitude`, `capacity`, `rooms`, `facilities`, `amenities`, `parking_info`, 
+    `transport_info`, `contact_name`, `contact_phone`, `contact_email`, `website`, `images`, 
+    `pricing`, `rating`, `total_events`, `status`
+) VALUES
+(1, 'Trung tâm Hội nghị Quốc gia', 'trung-tam-hoi-nghi-quoc-gia', 
+'Trung tâm hội nghị lớn nhất Việt Nam với đầy đủ tiện ích hiện đại. Tòa nhà 15 tầng với 20+ phòng hội nghị, được trang bị công nghệ AV tiên tiến, hệ thống âm thanh chất lượng cao và khả năng livestream 4K.', 
+'25B Lý Thường Kiệt, Quận 1, TP.HCM', 'Hồ Chí Minh', 'TP.HCM', 'Vietnam', '700000',
+10.7769, 106.6951, 2000, 
+'[{"name": "Main Hall", "capacity": 1000}, {"name": "Tech Hall", "capacity": 300}, {"name": "Innovation Hall", "capacity": 500}]',
+'["High-speed WiFi", "AV Equipment", "Live Streaming", "Recording", "Translation Booth", "Air Conditioning"]',
+'["Parking", "Restaurant", "Coffee Shop", "Business Center", "VIP Lounge", "Prayer Room"]',
+'Parking miễn phí cho 500 xe ô tô và 1000 xe máy. Có dịch vụ valet parking cho VIP.',
+'Cách sân bay Tân Sơn Nhất 30 phút. Metro Line 1 (đang xây dựng) - dự kiến 2025. Nhiều tuyến bus công cộng đi qua.',
+'Nguyễn Văn Hùng', '+84 28 1234 5678', 'info@ncc.gov.vn', 'https://ncc.gov.vn',
+'["https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600", "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600"]',
+'{"base_price": 50000000, "currency": "VND", "includes": ["Basic AV", "Wifi", "Security"]}',
+4.8, 150, 'active'),
+
+
+(2, 'Bệnh viện Đại học Y Dược', 'benh-vien-dai-hoc-y-duoc',
+'Bệnh viện và trung tâm đào tạo y khoa hàng đầu với phòng hội nghị chuyên dụng cho các sự kiện y tế. Được trang bị thiết bị y tế demo và amphitheater hiện đại.',
+'215 Hồng Bàng, Quận 5, TP.HCM', 'Hồ Chí Minh', 'TP.HCM', 'Vietnam', '700000',
+10.7546, 106.6677, 500,
+'[{"name": "Medical Hall", "capacity": 300}, {"name": "Research Room", "capacity": 100}, {"name": "Lab Demo Room", "capacity": 50}]',
+'["Medical Equipment Demo", "High-speed Internet", "Video Conferencing", "Medical Simulation Lab"]',
+'["Hospital Cafe", "Medical Library", "Emergency Services", "Pharmacy", "Medical Museum"]',
+'Parking trong bệnh viện cho 200 xe. Ưu tiên cho người khuyết tật và elderly.',
+'Gần chợ An Đông, nhiều tuyến xe bus. Taxi và Grab dễ dàng tiếp cận.',
+'Dr. Nguyễn Thị Lan', '+84 28 8765 4321', 'events@yds.edu.vn', 'https://yds.edu.vn',
+'["https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600"]',
+'{"base_price": 25000000, "currency": "VND", "includes": ["Medical equipment access", "Basic catering"]}',
+4.5, 85, 'active'),
+
+(3, 'Saigon Innovation Hub', 'saigon-innovation-hub',
+'Hub khởi nghiệp và đổi mới sáng tạo hàng đầu TP.HCM. Không gian coworking và event space được thiết kế cho startup và tech community. Atmosphere sáng tạo và flexible.',
+'01 Đường D1, Khu Công nghệ cao, Quận 9, TP.HCM', 'Hồ Chí Minh', 'TP.HCM', 'Vietnam', '700000',
+10.8506, 106.7619, 300,
+'[{"name": "Innovation Hub", "capacity": 200}, {"name": "Startup Stage", "capacity": 100}, {"name": "Coworking Space", "capacity": 50}]',
+'["Ultra-fast Internet", "Smart Boards", "3D Printers", "VR/AR Equipment", "Podcast Studio", "Streaming Setup"]',
+'["Free Coffee", "Startup Library", "Mentorship Rooms", "Game Area", "Rooftop Garden", "24/7 Access"]',
+'Free parking cho startups và attendees. Electric vehicle charging stations available.',
+'Shuttle bus từ metro station. Trong khu công nghệ cao với nhiều dịch vụ hỗ trợ.',
+'Lê Minh Startup', '+84 28 3333 4444', 'hello@saigonhub.vn', 'https://saigonhub.vn',
+'["https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600", "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&h=600"]',
+'{"base_price": 15000000, "currency": "VND", "includes": ["All tech equipment", "Unlimited coffee", "Networking facilitation"]}',
+4.9, 120, 'active'),
+
+(4, 'Bitexco Financial Tower', 'bitexco-financial-tower',
+'Tòa nhà biểu tượng của TP.HCM với không gian hội nghị sang trọng trên tầng cao. View toàn cảnh thành phố, phù hợp cho các sự kiện high-end và corporate events.',
+'2 Hải Triều, Quận 1, TP.HCM', 'Hồ Chí Minh', 'TP.HCM', 'Vietnam', '700000',
+10.7718, 106.7038, 800,
+'[{"name": "Blockchain Hall", "capacity": 600}, {"name": "Executive Room", "capacity": 100}, {"name": "Sky Lounge", "capacity": 200}]',
+'["Premium AV System", "Video Wall", "Executive WiFi", "Translation Services", "Live Streaming", "Premium Catering"]',
+'["Sky Bar", "Fine Dining", "Helipad", "VIP Elevators", "Concierge", "City View", "Valet Parking"]',
+'Premium valet parking service. Underground parking cho 300 xe với security 24/7.',
+'Trung tâm thành phố, gần Metro Line 1. Taxi và private car dễ dàng tiếp cận.',
+'Ms. Sarah Executive', '+84 28 6789 0123', 'events@bitexco.com.vn', 'https://bitexcofinancialtower.com',
+'["https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&h=600", "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600"]',
+'{"base_price": 80000000, "currency": "VND", "includes": ["Premium service", "City view", "Executive catering"]}',
+4.7, 95, 'active'),
+
+(5, 'FPT Software Building', 'fpt-software-building', 
+'Tòa nhà hiện đại của FPT Software với auditorium và training facilities được thiết kế đặc biệt cho tech events và corporate training. Trang bị công nghệ mới nhất.',
+'Lô E2a-7, Đường D1, Khu Công nghệ cao, Quận 9, TP.HCM', 'Hồ Chí Minh', 'TP.HCM', 'Vietnam', '700000',
+10.8513, 106.7630, 400,
+'[{"name": "FPT Auditorium", "capacity": 300}, {"name": "Workshop Room 1", "capacity": 50}, {"name": "Training Center", "capacity": 100}]',
+'["Smart Classroom Tech", "Interactive Displays", "High-speed Internet", "Video Conferencing", "Cloud Integration"]',
+'["FPT Cafe", "Learning Library", "Innovation Lab", "Demo Center", "Relaxation Area"]',
+'Free parking cho participants. Ưu tiên cho electric vehicles.',
+'Trong khu công nghệ cao, có shuttle bus nội bộ. Gần các trường đại học và tech companies.',
+'Nguyễn Tech Support', '+84 28 7777 8888', 'events@fpt.com.vn', 'https://fpt.com.vn',
+'["https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600"]',
+'{"base_price": 30000000, "currency": "VND", "includes": ["Tech equipment", "Learning materials", "Basic catering"]}',
+4.6, 110, 'active');
 
 -- Dữ liệu mẫu cho bảng speakers
-INSERT INTO `speakers` (`id`, `user_id`, `name`, `slug`, `title`, `company`, `bio`, `email`, `status`) VALUES
-(1, 3, 'Trần Diễn Giả', 'tran-dien-gia', 'CEO & Founder', 'TechViet Solutions', 'Chuyên gia công nghệ với hơn 15 năm kinh nghiệm trong lĩnh vực phát triển phần mềm và quản lý dự án công nghệ.', 'speaker@confab.local', 'active'),
-(2, NULL, 'Dr. Nguyễn Khoa Học', 'dr-nguyen-khoa-hoc', 'Giáo sư', 'Đại học Bách Khoa', 'Tiến sĩ về Trí tuệ nhân tạo và Machine Learning, tác giả của nhiều nghiên cứu được công bố quốc tế.', 'nguyenkhoahoc@example.com', 'active'),
-(3, NULL, 'Phạm Kinh Doanh', 'pham-kinh-doanh', 'Giám đốc điều hành', 'Startup Hub Vietnam', 'Doanh nhân thành công với kinh nghiệm xây dựng và phát triển nhiều startup công nghệ tại Việt Nam.', 'phamkinhdoanh@example.com', 'active');
+-- Dữ liệu speakers với thông tin đầy đủ
+INSERT INTO `speakers` (
+    `id`, `user_id`, `name`, `slug`, `title`, `company`, `bio`, `short_bio`, `email`, `phone`, 
+    `image`, `website`, `linkedin`, `twitter`, `github`, `specialties`, `languages`, `topics`, 
+    `experience_years`, `fee_range`, `rating`, `total_talks`, `featured_video`, `status`
+) VALUES
+(1, 3, 'Nguyễn Minh Tuấn', 'nguyen-minh-tuan', 'Chief Technology Officer', 'FPT Software', 
+'Nguyễn Minh Tuấn là CTO của FPT Software với hơn 15 năm kinh nghiệm trong lĩnh vực phát triển phần mềm và AI. Ông đã dẫn dắt nhiều dự án AI lớn cho các tập đoàn đa quốc gia và là tác giả của  20+ bài báo khoa học về machine learning. Tuấn có bằng Tiến sĩ Computer Science từ Stanford University và là diễn giả thường xuyên tại các hội nghị công nghệ quốc tế.',
+'CTO FPT Software, chuyên gia AI với 15+ năm kinh nghiệm, Tiến sĩ Stanford', 'tuan.nguyen@fpt.com', '+84 901 234 567',
+'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+'https://tuannguyen.tech', 'https://linkedin.com/in/nguyenminhtuan', 'https://twitter.com/tuannguyen_ai',
+'https://github.com/tuannguyen', '["Artificial Intelligence", "Machine Learning", "Deep Learning", "Computer Vision", "NLP"]',
+'["Vietnamese", "English", "Japanese"]', '["AI Strategy", "ML Engineering", "Tech Leadership", "Digital Transformation"]',
+15, '$5000-$10000', 4.8, 45, 'https://www.youtube.com/watch?v=ai-keynote-tuan', 'active'),
+
+(2, 4, 'Dr. Lê Thị Hương', 'dr-le-thi-huong', 'Director of AI Research', 'Vingroup', 
+'Dr. Lê Thị Hương là Giám đốc Nghiên cứu AI tại Vingroup với chuyên môn sâu về healthcare AI và computer vision. Bà có hơn 12 năm kinh nghiệm nghiên cứu và phát triển các giải pháp AI trong y tế. Dr. Hương đã xuất bản hơn 30 bài báo khoa học trên các tạp chí uy tín và giữ 8 bằng sáng chế về AI trong chẩn đoán y khoa. Bà tốt nghiệp Tiến sĩ từ MIT và từng làm việc tại Google DeepMind.',
+'Giám đốc Nghiên cứu AI Vingroup, chuyên gia Healthcare AI, Tiến sĩ MIT', 'huong.le@vingroup.net', '+84 912 345 678',
+'https://images.unsplash.com/photo-1494790108755-2616b62dd6c3?w=400&h=400&fit=crop&crop=face',
+'https://drhuong.ai', 'https://linkedin.com/in/lethuong', 'https://twitter.com/dr_huong_ai',
+'https://github.com/drhuong', '["Healthcare AI", "Computer Vision", "Medical Imaging", "Deep Learning", "Research"]',
+'["Vietnamese", "English", "French"]', '["AI in Healthcare", "Medical Diagnosis", "Computer Vision", "Deep Learning Applications"]',
+12, '$8000-$15000', 4.9, 38, 'https://www.youtube.com/watch?v=healthcare-ai-huong', 'active'),
+
+(3, NULL, 'Trần Đức Minh', 'tran-duc-minh', 'Serial Entrepreneur & Investor', 'Nexttech Group', 
+'Trần Đức Minh là doanh nhân nối tiếp và nhà đầu tư angel với 3 lần thoái vốn thành công. Ông là Founder & CEO của Nexttech Group, một trong những tập đoàn công nghệ hàng đầu Việt Nam. Minh đã đầu tư vào hơn 50 startup và là mentor cho nhiều chương trình khởi nghiệp. Ông có bằng MBA từ Harvard Business School và được Forbes Việt Nam vinh danh là một trong "40 Under 40" năm 2023.',
+'Serial Entrepreneur, CEO Nexttech Group, Angel Investor, Harvard MBA', 'minh.tran@nexttech.asia', '+84 923 456 789',
+'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+'https://minhtran.entrepreneur', 'https://linkedin.com/in/tranducminh', 'https://twitter.com/minh_entrepreneur',
+NULL, '["Entrepreneurship", "Startup Investment", "Business Strategy", "Digital Transformation", "Leadership"]',
+'["Vietnamese", "English", "Chinese"]', '["Startup Strategy", "Investment", "Scaling Business", "Leadership", "Innovation"]',
+18, '$3000-$8000', 4.7, 52, 'https://www.youtube.com/watch?v=startup-success-minh', 'active'),
+
+(4, NULL, 'Phạm Thị Mai', 'pham-thi-mai', 'Blockchain Developer & Consultant', 'Coin98 Labs', 
+'Phạm Thị Mai là một trong những chuyên gia blockchain hàng đầu Việt Nam với 8 năm kinh nghiệm phát triển ứng dụng DeFi và Web3. Cô là Lead Developer tại Coin98 Labs và đã tham gia xây dựng nhiều protocol DeFi được sử dụng bởi hàng triệu người. Mai có bằng Computer Science từ HUST và là tác giả của nhiều tài liệu về blockchain development. Cô thường xuyên tham gia các hackathon quốc tế và đã giành được nhiều giải thưởng.',
+'Lead Blockchain Developer Coin98 Labs, chuyên gia DeFi/Web3, 8+ năm kinh nghiệm', 'mai.pham@coin98.com', '+84 934 567 890',
+'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+'https://maipham.blockchain', 'https://linkedin.com/in/phamthimai', 'https://twitter.com/mai_blockchain',
+'https://github.com/mai-blockchain', '["Blockchain Development", "Smart Contracts", "DeFi", "Web3", "Solidity", "Rust"]',
+'["Vietnamese", "English", "Korean"]', '["Blockchain Basics", "Smart Contract Development", "DeFi Protocols", "Web3 Applications"]',
+8, '$4000-$9000', 4.6, 28, 'https://www.youtube.com/watch?v=defi-development-mai', 'active'),
+
+(5, NULL, 'Võ Minh Khoa', 'vo-minh-khoa', 'DevOps Engineer & Cloud Architect', 'Tiki Corporation', 
+'Võ Minh Khoa là Senior DevOps Engineer tại Tiki với chuyên môn về cloud infrastructure và container orchestration. Anh có 10 năm kinh nghiệm xây dựng và vận hành hệ thống large-scale, từng phụ trách infrastructure cho các platform có hàng triệu users. Khoa là AWS Certified Solutions Architect và Kubernetes Certified Administrator. Anh thường xuyên chia sẻ kiến thức về DevOps và cloud computing tại các meetup và conference.',
+'Senior DevOps Engineer Tiki, Cloud Architect, AWS & Kubernetes expert', 'khoa.vo@tiki.vn', '+84 945 678 901',
+'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+'https://khoavo.devops', 'https://linkedin.com/in/vominhkhoa', 'https://twitter.com/khoa_devops',
+'https://github.com/khoa-devops', '["DevOps", "Cloud Computing", "Kubernetes", "Docker", "AWS", "Infrastructure"]',
+'["Vietnamese", "English"]', '["DevOps Best Practices", "Cloud Migration", "Container Orchestration", "CI/CD", "Infrastructure as Code"]',
+10, '$2500-$6000', 4.5, 35, 'https://www.youtube.com/watch?v=devops-scaling-khoa', 'active');
 
 -- Dữ liệu mẫu cho bảng conferences
-INSERT INTO `conferences` (`id`, `title`, `slug`, `short_description`, `description`, `start_date`, `end_date`, `category_id`, `venue_id`, `location`, `type`, `format`, `price`, `currency`, `capacity`, `status`, `featured`, `created_by`) VALUES
-(1, 'Vietnam Tech Summit 2024', 'vietnam-tech-summit-2024', 'Hội nghị công nghệ lớn nhất Việt Nam năm 2024', 'Hội nghị tập trung vào các xu hướng công nghệ mới như AI, Blockchain, IoT và Digital Transformation. Sự kiện quy tụ hơn 1000 chuyên gia công nghệ hàng đầu.', '2024-12-15 08:00:00', '2024-12-16 18:00:00', 1, 1, 'TP. Hồ Chí Minh', 'in_person', 'conference', 2500000.00, 'VND', 1000, 'published', 1, 2),
-(2, 'Startup Weekend Ho Chi Minh', 'startup-weekend-hcm', 'Cuối tuần khởi nghiệp dành cho các bạn trẻ có ý tưởng kinh doanh', 'Sự kiện 54 giờ liên tục giúp các bạn trẻ biến ý tưởng thành startup thực tế. Có sự tham gia của các mentor và nhà đầu tư hàng đầu.', '2024-11-30 18:00:00', '2024-12-02 20:00:00', 2, 3, 'TP. Hồ Chí Minh', 'in_person', 'workshop', 500000.00, 'VND', 200, 'published', 1, 2),
-(3, 'Digital Health Conference 2024', 'digital-health-conference-2024', 'Hội nghị về công nghệ số trong y tế', 'Khám phá những ứng dụng công nghệ mới nhất trong lĩnh vực chăm sóc sức khỏe, từ telemedicine đến AI trong chẩn đoán y khoa.', '2024-12-20 08:30:00', '2024-12-20 17:30:00', 3, 2, 'TP. Hồ Chí Minh', 'hybrid', 'conference', 1500000.00, 'VND', 300, 'published', 0, 2);
+-- Dữ liệu conferences với đầy đủ thông tin
+INSERT INTO `conferences` (
+    `id`, `title`, `slug`, `short_description`, `description`, `start_date`, `end_date`, `timezone`, 
+    `category_id`, `venue_id`, `location`, `address`, `type`, `format`, `price`, `currency`, 
+    `early_bird_price`, `early_bird_until`, `capacity`, `min_attendees`, `current_attendees`, 
+    `registration_start`, `registration_end`, `status`, `visibility`, `featured`, `trending`, 
+    `image`, `banner_image`, `gallery`, `video_url`, `tags`, `level`, `language`, `requirements`, 
+    `what_you_learn`, `organizer_name`, `organizer_email`, `organizer_phone`, `organizer_company`, 
+    `contact_info`, `social_links`, `terms_conditions`, `cancellation_policy`, `refund_policy`, 
+    `certificate_available`, `sponsor_info`, `seo_title`, `seo_description`, `seo_keywords`, 
+    `meta_data`, `created_by`, `published_at`
+) VALUES
+(1, 'Vietnam Tech Summit 2025', 'vietnam-tech-summit-2025', 'Hội nghị công nghệ lớn nhất Việt Nam năm 2025', 
+'Hội nghị tập trung vào các xu hướng công nghệ mới như AI, Blockchain, IoT và Digital Transformation. Sự kiện quy tụ hơn 1000 chuyên gia công nghệ hàng đầu từ khắp nơi trên thế giới. Chương trình gồm 2 ngày với 20+ phiên thuyết trình, workshop thực hành và triển lãm công nghệ.', 
+'2025-08-15 08:00:00', '2025-08-16 18:00:00', 'Asia/Ho_Chi_Minh', 1, 1, 'TP. Hồ Chí Minh', 
+'Trung tâm Hội nghị Quốc gia, 25B Lý Thường Kiệt, Quận 1, TP.HCM', 'in_person', 'conference', 
+2500000.00, 'VND', 2000000.00, '2025-07-15 23:59:59', 1000, 100, 450, 
+'2025-06-01 00:00:00', '2025-08-10 23:59:59', 'active', 'public', 1, 1,
+'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop',
+'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=600&fit=crop',
+'["https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop", "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop"]',
+'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+'["công nghệ", "AI", "blockchain", "IoT", "digital transformation", "vietnam tech"]',
+'all_levels', 'vi', 'Kiến thức cơ bản về công nghệ thông tin',
+'["Hiểu được các xu hướng công nghệ mới nhất", "Học cách ứng dụng AI trong doanh nghiệp", "Networking với các chuyên gia hàng đầu", "Cập nhật kiến thức về blockchain và IoT"]',
+'Vietnam Tech Association', 'contact@vietnamtech.org', '+84 123 456 789', 'Vietnam Tech Association',
+'{"email": "contact@vietnamtech.org", "phone": "+84 123 456 789", "address": "123 Đường ABC, Quận 1, TP.HCM"}',
+'{"facebook": "https://facebook.com/vietnamtechsummit", "twitter": "https://twitter.com/vtechsummit", "linkedin": "https://linkedin.com/company/vietnam-tech-summit"}',
+'Điều khoản và điều kiện tham gia hội nghị...', 'Chính sách hủy: Hoàn 80% phí nếu hủy trước 30 ngày...', 'Chính sách hoàn tiền: Hoàn tiền 100% nếu sự kiện bị hủy...',
+1, '[{"tier": "gold", "name": "FPT Software", "logo": "https://example.com/fpt-logo.png", "website": "https://fpt.com"}]',
+'Vietnam Tech Summit 2025 - Hội nghị công nghệ hàng đầu', 'Tham gia hội nghị công nghệ lớn nhất Việt Nam với 1000+ chuyên gia', 'vietnam tech summit, công nghệ, AI, blockchain, IoT',
+'{"objectives": ["Kết nối cộng đồng tech", "Chia sẻ kiến thức", "Thúc đẩy đổi mới sáng tạo"], "target_audience": ["Developers", "CTOs", "Tech Entrepreneurs", "Students"]}',
+2, '2025-06-01 09:00:00'),
 
--- Dữ liệu mẫu cho bảng conference_speakers
-INSERT INTO `conference_speakers` (`id`, `conference_id`, `speaker_id`, `role`, `talk_title`, `talk_description`, `status`) VALUES
-(1, 1, 1, 'keynote', 'Tương lai của AI trong phát triển phần mềm', 'Phân tích xu hướng và tác động của trí tuệ nhân tạo đến ngành công nghiệp phần mềm trong 5 năm tới.', 'confirmed'),
-(2, 1, 2, 'speaker', 'Machine Learning cho người mới bắt đầu', 'Hướng dẫn cơ bản về Machine Learning và các ứng dụng thực tế trong doanh nghiệp.', 'confirmed'),
-(3, 2, 3, 'keynote', 'Xây dựng startup công nghệ bền vững', 'Chia sẻ kinh nghiệm và bài học từ việc xây dựng các startup công nghệ thành công.', 'confirmed'),
-(4, 3, 2, 'speaker', 'AI trong chẩn đoán y khoa', 'Ứng dụng học máy và thị giác máy tính trong việc chẩn đoán và điều trị bệnh.', 'confirmed');
+(2, 'Startup Weekend Ho Chi Minh 2025', 'startup-weekend-hcm-2025', 'Cuối tuần khởi nghiệp dành cho các bạn trẻ có ý tưởng kinh doanh', 
+'Sự kiện 54 giờ liên tục giúp các bạn trẻ biến ý tưởng thành startup thực tế. Có sự tham gia của các mentor và nhà đầu tư hàng đầu. Chương trình bao gồm pitching, team building, mentoring và demo day cuối tuần.',
+'2025-07-11 18:00:00', '2025-07-13 20:00:00', 'Asia/Ho_Chi_Minh', 2, 3, 'TP. Hồ Chí Minh',
+'Saigon Innovation Hub, 01 Đường D1, Quận 1, TP.HCM', 'in_person', 'workshop', 
+500000.00, 'VND', 350000.00, '2025-06-30 23:59:59', 200, 30, 85,
+'2025-06-01 00:00:00', '2025-07-08 23:59:59', 'active', 'public', 1, 0,
+'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop',
+'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&h=600&fit=crop',
+'["https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop"]',
+'https://www.youtube.com/watch?v=startup-weekend',
+'["startup", "khởi nghiệp", "entrepreneur", "business", "innovation", "vietnam"]',
+'beginner', 'vi', 'Không yêu cầu kinh nghiệm đặc biệt',
+'["Học cách xây dựng business model", "Phát triển kỹ năng pitching", "Kết nối với investors", "Xây dựng MVP trong 54 giờ"]',
+'Startup Weekend Vietnam', 'info@startupweekend.vn', '+84 987 654 321', 'Startup Weekend Vietnam',
+'{"email": "info@startupweekend.vn", "phone": "+84 987 654 321"}',
+'{"facebook": "https://facebook.com/startupweekendhcm", "instagram": "https://instagram.com/swvietnam"}',
+'Điều khoản tham gia Startup Weekend...', 'Không hoàn phí sau khi đăng ký...', 'Chính sách hoàn tiền đặc biệt...',
+0, '[{"tier": "silver", "name": "Saigon Innovation Hub", "logo": "https://example.com/sih-logo.png"}]',
+'Startup Weekend Ho Chi Minh 2025 - Cuối tuần khởi nghiệp', 'Tham gia sự kiện khởi nghiệp lớn nhất TP.HCM', 'startup weekend, khởi nghiệp, entrepreneur, business',
+'{"objectives": ["Khuyến khích tinh thần khởi nghiệp", "Kết nối cộng đồng startup", "Hỗ trợ ý tưởng kinh doanh"], "faq": [{"question": "Có cần có ý tưởng sẵn không?", "answer": "Không, bạn có thể tham gia và tìm team tại sự kiện"}]}',
+2, '2025-06-01 10:00:00'),
+
+(3, 'Digital Health Conference 2025', 'digital-health-conference-2025', 'Hội nghị về công nghệ số trong y tế', 
+'Khám phá những ứng dụng công nghệ mới nhất trong lĩnh vực chăm sóc sức khỏe, từ telemedicine đến AI trong chẩn đoán y khoa. Sự kiện quy tụ các chuyên gia y tế và công nghệ hàng đầu.',
+'2025-09-20 08:30:00', '2025-09-20 17:30:00', 'Asia/Ho_Chi_Minh', 3, 2, 'TP. Hồ Chí Minh',
+'Bệnh viện Đại học Y Dược, 215 Hồng Bàng, Quận 5, TP.HCM', 'hybrid', 'conference',
+1500000.00, 'VND', 1200000.00, '2025-08-20 23:59:59', 300, 50, 120,
+'2025-07-01 00:00:00', '2025-09-15 23:59:59', 'active', 'public', 0, 1,
+'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop',
+'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=1200&h=600&fit=crop',
+'["https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop"]',
+'https://www.youtube.com/watch?v=digital-health',
+'["digital health", "telemedicine", "healthcare", "medical AI", "health tech"]',
+'intermediate', 'vi', 'Kiến thức cơ bản về y tế hoặc công nghệ',
+'["Hiểu về AI trong chẩn đoán", "Ứng dụng telemedicine", "Xu hướng health tech", "Quy định pháp lý trong digital health"]',
+'Vietnam Digital Health Association', 'contact@vdha.org', '+84 111 222 333', 'Vietnam Digital Health Association',
+'{"email": "contact@vdha.org", "phone": "+84 111 222 333"}',
+'{"linkedin": "https://linkedin.com/company/vietnam-digital-health"}',
+'Điều khoản tham gia hội nghị y tế số...', 'Chính sách hủy đặc biệt cho ngành y tế...', 'Hoàn tiền theo quy định...',
+1, '[{"tier": "platinum", "name": "Vingroup", "logo": "https://example.com/vingroup-logo.png", "website": "https://vingroup.net"}]',
+'Digital Health Conference 2025 - Công nghệ số trong y tế', 'Hội nghị về ứng dụng công nghệ trong chăm sóc sức khỏe', 'digital health, telemedicine, healthcare technology, medical AI',
+'{"objectives": ["Thúc đẩy chuyển đổi số trong y tế", "Kết nối chuyên gia y tế và công nghệ", "Giới thiệu giải pháp innovative"], "sponsors": [{"tier": "gold", "name": "Vinmec", "description": "Hệ thống y tế quốc tế"}]}',
+2, '2025-07-01 11:00:00'),
+
+(4, 'AI & Machine Learning Workshop 2025', 'ai-ml-workshop-2025', 'Workshop thực hành về AI và Machine Learning',
+'Workshop 2 ngày với các bài thực hành về Machine Learning, Deep Learning và AI applications. Phù hợp cho developers muốn bắt đầu với AI/ML.',
+'2025-08-25 09:00:00', '2025-08-26 17:00:00', 'Asia/Ho_Chi_Minh', 1, 1, 'TP. Hồ Chí Minh',
+'FPT Software Building, 17 Duy Tân, Cầu Giấy, Hà Nội', 'in_person', 'workshop',
+3500000.00, 'VND', 2800000.00, '2025-07-25 23:59:59', 50, 20, 35,
+'2025-06-15 00:00:00', '2025-08-20 23:59:59', 'active', 'public', 1, 0,
+'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop',
+'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&h=600&fit=crop',
+'["https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop"]',
+'https://www.youtube.com/watch?v=ai-ml-intro',
+'["AI", "machine learning", "deep learning", "python", "tensorflow", "pytorch"]',
+'intermediate', 'vi', 'Kiến thức Python cơ bản, toán học cấp 3',
+'["Xây dựng model ML từ đầu", "Sử dụng TensorFlow/PyTorch", "Deploy model vào production", "Hiểu về neural networks"]',
+'AI Vietnam', 'workshop@aivietnam.org', '+84 444 555 666', 'AI Vietnam Community',
+'{"email": "workshop@aivietnam.org", "phone": "+84 444 555 666"}',
+'{"github": "https://github.com/aivietnam", "discord": "https://discord.gg/aivietnam"}',
+'Điều khoản workshop AI/ML...', 'Hoàn 70% nếu hủy trước 15 ngày...', 'Chính sách hoàn tiền workshop...',
+1, '[{"tier": "gold", "name": "FPT Software", "logo": "https://example.com/fpt-logo.png"}]',
+'AI & Machine Learning Workshop 2025', 'Workshop thực hành AI/ML cho developers', 'AI workshop, machine learning, deep learning, python',
+'{"objectives": ["Dạy AI/ML thực tế", "Hands-on experience", "Networking"], "materials": ["Laptop", "Python environment", "Datasets provided"]}',
+2, '2025-06-15 14:00:00'),
+
+(5, 'Blockchain & Web3 Summit 2025', 'blockchain-web3-summit-2025', 'Hội nghị về Blockchain và Web3 tại Việt Nam',
+'Sự kiện lớn nhất về Blockchain, cryptocurrency và Web3 tại Việt Nam. Tập trung vào DeFi, NFT, DAO và các ứng dụng blockchain trong doanh nghiệp.',
+'2025-10-05 08:00:00', '2025-10-06 18:00:00', 'Asia/Ho_Chi_Minh', 1, 3, 'TP. Hồ Chí Minh',
+'Bitexco Financial Tower, 2 Hải Triều, Quận 1, TP.HCM', 'hybrid', 'conference',
+2000000.00, 'VND', 1500000.00, '2025-09-05 23:59:59', 800, 100, 320,
+'2025-07-15 00:00:00', '2025-10-01 23:59:59', 'active', 'public', 1, 1,
+'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&h=600&fit=crop',
+'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1200&h=600&fit=crop',
+'["https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&h=600&fit=crop"]',
+'https://www.youtube.com/watch?v=blockchain-intro',
+'["blockchain", "web3", "cryptocurrency", "DeFi", "NFT", "DAO", "bitcoin", "ethereum"]',
+'intermediate', 'vi', 'Hiểu biết cơ bản về blockchain',
+'["Hiểu về công nghệ blockchain", "Tìm hiểu về DeFi và NFT", "Xây dựng ứng dụng Web3", "Đầu tư crypto an toàn"]',
+'Vietnam Blockchain Association', 'info@vnblockchain.org', '+84 777 888 999', 'Vietnam Blockchain Association',
+'{"email": "info@vnblockchain.org", "phone": "+84 777 888 999"}',
+'{"telegram": "https://t.me/vnblockchain", "twitter": "https://twitter.com/vnblockchain"}',
+'Điều khoản tham gia hội nghị blockchain...', 'Chính sách hủy đặc biệt...', 'Hoàn tiền theo quy định blockchain...',
+1, '[{"tier": "diamond", "name": "Binance", "logo": "https://example.com/binance-logo.png", "website": "https://binance.com"}]',
+'Blockchain & Web3 Summit 2025', 'Hội nghị blockchain và web3 lớn nhất Việt Nam', 'blockchain summit, web3, cryptocurrency, DeFi, NFT',
+'{"objectives": ["Giáo dục về blockchain", "Kết nối cộng đồng crypto", "Thúc đẩy adoption"], "featured_topics": ["DeFi", "NFT", "DAO", "Layer 2", "Metaverse"]}',
+2, '2025-07-15 16:00:00');
+
+-- Dữ liệu schedule_sessions với lịch trình chi tiết
+INSERT INTO `schedule_sessions` (
+    `id`, `conference_id`, `title`, `description`, `session_date`, `start_time`, `end_time`, 
+    `type`, `room`, `capacity`, `speaker_id`, `additional_speakers`, `materials`, `slides_url`, 
+    `video_url`, `live_stream_url`, `is_mandatory`, `requires_registration`, `level`, `tags`, 
+    `status`, `sort_order`
+) VALUES
+-- Vietnam Tech Summit 2025 - Day 1
+(1, 1, 'Opening Ceremony & Welcome', 'Lễ khai mạc và chào mừng các đại biểu tham dự hội nghị', 
+'2025-08-15', '08:00:00', '08:30:00', 'keynote', 'Main Hall', 1000, NULL, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["opening", "ceremony"]', 'scheduled', 1),
+
+(2, 1, 'Tương lai của AI trong phát triển phần mềm', 'Keynote speech by Nguyễn Minh Tuấn về AI trends', 
+'2025-08-15', '09:00:00', '10:00:00', 'keynote', 'Main Hall', 1000, 1, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["AI", "software development", "keynote"]', 'scheduled', 2),
+
+(3, 1, 'Coffee Break & Networking', 'Giải lao và networking', 
+'2025-08-15', '10:00:00', '10:30:00', 'break', 'Lobby', 1000, NULL, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["break", "networking"]', 'scheduled', 3),
+
+(4, 1, 'AI trong Healthcare: Từ nghiên cứu đến ứng dụng thực tế', 'Keynote by Dr. Lê Thị Hương', 
+'2025-08-15', '10:30:00', '11:30:00', 'keynote', 'Main Hall', 1000, 2, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'intermediate', '["AI", "healthcare", "keynote"]', 'scheduled', 4),
+
+(5, 1, 'Machine Learning Workshop - Hands-on Session', 'Workshop thực hành ML cơ bản', 
+'2025-08-15', '11:45:00', '12:45:00', 'workshop', 'Tech Hall A', 200, 1, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'beginner', '["ML", "workshop", "hands-on"]', 'scheduled', 5),
+
+(6, 1, 'Lunch Break', 'Nghỉ trưa và networking lunch', 
+'2025-08-15', '12:45:00', '14:00:00', 'lunch', 'Restaurant Area', 1000, NULL, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["lunch", "networking"]', 'scheduled', 6),
+
+(7, 1, 'Scaling Infrastructure for Million Users', 'Technical talk by Võ Minh Khoa', 
+'2025-08-15', '14:00:00', '15:00:00', 'presentation', 'Tech Hall', 300, 5, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'advanced', '["infrastructure", "scaling", "devops"]', 'scheduled', 7),
+
+(8, 1, 'Panel Discussion: The Future of Tech in Vietnam', 'Panel thảo luận với các chuyên gia', 
+'2025-08-15', '15:15:00', '16:15:00', 'panel', 'Main Hall', 1000, 1, '[{"name": "Dr. Lê Thị Hương", "role": "panelist"}, {"name": "Võ Minh Khoa", "role": "panelist"}]', NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["panel", "discussion", "future"]', 'scheduled', 8),
+
+(9, 1, 'Closing Day 1 & Announcements', 'Kết thúc ngày 1 và thông báo', 
+'2025-08-15', '16:30:00', '17:00:00', 'keynote', 'Main Hall', 1000, NULL, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["closing", "announcements"]', 'scheduled', 9),
+
+-- Vietnam Tech Summit 2025 - Day 2
+(10, 1, 'Day 2 Opening & Agenda Overview', 'Khai mạc ngày 2', 
+'2025-08-16', '08:30:00', '09:00:00', 'keynote', 'Main Hall', 1000, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["opening", "day2"]', 'scheduled', 10),
+
+(11, 1, 'Blockchain & Web3 Fundamentals', 'Introduction to blockchain technology', 
+'2025-08-16', '09:00:00', '10:00:00', 'presentation', 'Blockchain Hall', 400, NULL, '[{"name": "Guest Speaker", "role": "presenter"}]', NULL, NULL, NULL, NULL, 0, 0, 'beginner', '["blockchain", "web3", "fundamentals"]', 'scheduled', 11),
+
+(12, 1, 'Tech Startup Showcase', 'Các startup công nghệ present solutions', 
+'2025-08-16', '10:15:00', '11:45:00', 'presentation', 'Startup Stage', 500, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["startup", "showcase", "demo"]', 'scheduled', 12),
+
+(13, 1, 'Final Networking & Closing Ceremony', 'Networking cuối cùng và lễ bế mạc', 
+'2025-08-16', '16:00:00', '18:00:00', 'networking', 'Main Hall', 1000, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["networking", "closing", "ceremony"]', 'scheduled', 13),
+
+-- Startup Weekend Ho Chi Minh 2025
+(14, 2, 'Friday Night Kickoff', 'Pitches, team formation, và networking', 
+'2025-07-11', '18:00:00', '21:00:00', 'networking', 'Innovation Hub', 200, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["kickoff", "pitching", "team formation"]', 'scheduled', 14),
+
+(15, 2, 'Xây dựng startup công nghệ bền vững từ ý tưởng đến exit', 'Keynote by Trần Đức Minh', 
+'2025-07-11', '19:00:00', '20:00:00', 'keynote', 'Innovation Hub', 200, 3, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["startup", "keynote", "entrepreneurship"]', 'scheduled', 15),
+
+(16, 2, 'Saturday Morning: Team Building & Mentoring', 'Xây dựng team và mentoring sessions', 
+'2025-07-12', '09:00:00', '12:00:00', 'workshop', 'Innovation Hub', 200, NULL, '[{"name": "Various Mentors", "role": "mentor"}]', NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["team building", "mentoring"]', 'scheduled', 16),
+
+(17, 2, 'Technology Stack cho Startup', 'Tech talk by Nguyễn Minh Tuấn', 
+'2025-07-12', '10:00:00', '11:00:00', 'presentation', 'Innovation Hub', 200, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 'intermediate', '["tech stack", "startup", "development"]', 'scheduled', 17),
+
+(18, 2, 'Sunday: Final Preparations & Demo Day', 'Chuẩn bị cuối cùng và demo', 
+'2025-07-13', '14:00:00', '19:00:00', 'presentation', 'Innovation Hub', 200, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["demo day", "presentation", "final"]', 'scheduled', 18),
+
+-- Digital Health Conference 2025
+(19, 3, 'Conference Opening & Industry Overview', 'Khai mạc và tổng quan ngành', 
+'2025-09-20', '08:30:00', '09:00:00', 'keynote', 'Medical Hall', 300, NULL, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'all_levels', '["opening", "healthcare", "overview"]', 'scheduled', 1),
+
+(20, 3, 'AI Revolution in Medical Diagnosis', 'Keynote by Dr. Lê Thị Hương', 
+'2025-09-20', '09:00:00', '10:00:00', 'keynote', 'Medical Hall', 300, 2, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'intermediate', '["AI", "medical diagnosis", "keynote"]', 'scheduled', 2),
+
+(21, 3, 'Digital Transformation in Healthcare Systems', 'Presentation by Nguyễn Minh Tuấn', 
+'2025-09-20', '11:00:00', '12:00:00', 'presentation', 'Medical Hall', 300, 1, NULL, NULL, NULL, 
+NULL, NULL, 0, 0, 'intermediate', '["digital transformation", "healthcare systems"]', 'scheduled', 3),
+
+-- Telemedicine Panel
+(22, 3, 'Telemedicine Panel Discussion', 'Panel về telemedicine và remote care',
+'2025-09-20', '14:00:00', '15:30:00', 'panel', 'Medical Hall', 300, 2, '[{"name": "Healthcare Experts", "role": "panelist"}]',
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["telemedicine", "panel", "remote care"]', 'scheduled', 1),
+
+-- AI & ML Workshop 2025 - Day 1
+(23, 4, 'Workshop Introduction & Setup', 'Giới thiệu workshop và setup environment',
+'2025-08-25', '09:00:00', '09:30:00', 'workshop', 'Workshop Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'beginner', '["opening", "setup", "workshop"]', 'scheduled', 1),
+
+(24, 4, 'Deep Learning Fundamentals - Theory', 'Lý thuyết cơ bản về deep learning',
+'2025-08-25', '09:30:00', '11:00:00', 'workshop', 'Workshop Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'beginner', '["deep learning", "theory", "fundamentals"]', 'scheduled', 2),
+
+(25, 4, 'Hands-on: Building Your First Neural Network', 'Thực hành xây dựng neural network đầu tiên',
+'2025-08-25', '11:15:00', '12:30:00', 'workshop', 'Workshop Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'beginner', '["hands-on", "neural network", "practical"]', 'scheduled', 3),
+
+(26, 4, 'Computer Vision Applications', 'Workshop by Dr. Lê Thị Hương',
+'2025-08-25', '14:00:00', '17:00:00', 'workshop', 'Workshop Room 1', 50, 2, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'advanced', '["computer vision", "applications", "workshop"]', 'scheduled', 4),
+
+-- AI & Machine Learning Workshop 2025 - Day 2
+(27, 4, 'Day 2 Opening & Recap', 'Mở đầu ngày 2 và review ngày 1',
+'2025-08-26', '09:00:00', '09:30:00', 'presentation', 'Lab Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["opening", "recap"]', 'scheduled', 5),
+
+(28, 4, 'Advanced Deep Learning Techniques', 'Kỹ thuật advanced trong deep learning',
+'2025-08-26', '09:30:00', '11:00:00', 'workshop', 'Lab Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'advanced', '["advanced", "deep learning"]', 'scheduled', 6),
+
+(29, 4, 'Model Deployment & Production', 'Deploy ML models vào production environment',
+'2025-08-26', '11:15:00', '12:30:00', 'workshop', 'Lab Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'intermediate', '["deployment", "production", "MLOps"]', 'scheduled', 7),
+
+(30, 4, 'Final Project Presentations', 'Thuyết trình projects của participants',
+'2025-08-26', '15:00:00', '16:30:00', 'presentation', 'Lab Room 1', 50, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["presentation", "projects"]', 'scheduled', 8),
+
+(31, 4, 'Workshop Closing & Certificates', 'Kết thúc workshop và trao chứng chỉ',
+'2025-08-26', '16:30:00', '17:00:00', 'keynote', 'Lab Room 1', 50, 1, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["closing", "certificates"]', 'scheduled', 9),
+
+-- Blockchain & Web3 Summit 2025 - Day 1
+(32, 5, 'Summit Opening & Web3 Landscape', 'Khai mạc và tổng quan Web3',
+'2025-10-05', '08:00:00', '08:30:00', 'keynote', 'Blockchain Hall', 800, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["opening", "web3", "blockchain"]', 'scheduled', 1),
+
+(33, 5, 'Building DeFi Protocols: From Concept to Production', 'Keynote by Phạm Thị Mai',
+'2025-10-05', '09:00:00', '10:00:00', 'keynote', 'Blockchain Hall', 800, 4, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'advanced', '["DeFi", "protocols", "keynote"]', 'scheduled', 2),
+
+(34, 5, 'Investment Strategies in Web3 Era', 'Presentation by Trần Đức Minh',
+'2025-10-05', '14:00:00', '15:00:00', 'presentation', 'Blockchain Hall', 800, 3, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'intermediate', '["investment", "web3", "strategies"]', 'scheduled', 3),
+
+-- Blockchain & Web3 Summit 2025 - Day 2
+(35, 5, 'Day 2 Opening & Market Updates', 'Cập nhật thị trường crypto',
+'2025-10-06', '08:30:00', '09:00:00', 'presentation', 'Grand Hall', 800, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["opening", "market update"]', 'scheduled', 4),
+
+(36, 5, 'Regulatory Landscape in Vietnam', 'Quy định pháp lý về blockchain tại VN',
+'2025-10-06', '09:00:00', '10:00:00', 'presentation', 'Grand Hall', 800, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'intermediate', '["regulation", "legal", "vietnam"]', 'scheduled', 5),
+
+(37, 5, 'Startup Pitch Competition', 'Cuộc thi pitch các startup blockchain',
+'2025-10-06', '10:15:00', '12:00:00', 'presentation', 'Grand Hall', 800, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["startup", "pitch", "competition"]', 'scheduled', 6),
+
+(38, 5, 'Closing Ceremony & Awards', 'Lễ bế mạc và trao giải',
+'2025-10-06', '17:00:00', '18:00:00', 'keynote', 'Grand Hall', 800, NULL, NULL,
+NULL, NULL, NULL, NULL, 0, 0, 'all_levels', '["closing", "ceremony", "awards"]', 'scheduled', 7);
 
 -- Dữ liệu mẫu cho bảng payment_methods
 INSERT INTO `payment_methods` (`id`, `name`, `type`, `provider`, `currency`, `is_active`, `sort_order`) VALUES
@@ -1365,6 +1752,7 @@ INSERT INTO `user_activity_logs` (`user_id`, `activity_type`, `description`, `en
 (4, 'view_profile', 'Xem trang cá nhân', 'user', 4, '127.0.0.1', 'desktop', 'macOS', 'Safari');
 
 -- Dữ liệu mẫu cho bảng invoices
+DELETE FROM `invoices`;
 INSERT INTO `invoices` (`invoice_number`, `user_id`, `conference_id`, `amount_subtotal`, `amount_total`, `currency`, `status`, `due_date`) VALUES
 ('INV-2024-001', 3, 1, 2500000.00, 2500000.00, 'VND', 'paid', '2024-12-10 23:59:59'),
 ('INV-2024-002', 4, 2, 500000.00, 500000.00, 'VND', 'sent', '2024-11-25 23:59:59'),
@@ -1377,22 +1765,44 @@ INSERT INTO `invoice_items` (`invoice_id`, `description`, `quantity`, `unit_pric
 (3, 'Digital Health Conference 2024 - Vé thường', 1, 1500000.00);
 
 -- Dữ liệu mẫu cho bảng transactions
+DELETE FROM `transactions`;
 INSERT INTO `transactions` (`transaction_id`, `user_id`, `conference_id`, `invoice_id`, `payment_method_id`, `type`, `amount`, `currency`, `status`, `gateway`, `payment_date`) VALUES
 ('TXN-2024-001', 3, 1, 1, 2, 'payment', 2500000.00, 'VND', 'completed', 'momo', '2024-12-01 10:30:00'),
 ('TXN-2024-002', 4, 2, 2, 1, 'payment', 500000.00, 'VND', 'pending', 'bank_transfer', NULL);
 
 -- Dữ liệu mẫu cho bảng error_logs
+DELETE FROM `error_logs`;
 INSERT INTO `error_logs` (`user_id`, `level`, `message`, `exception_class`, `file`, `line`, `ip_address`, `user_agent`) VALUES
 (NULL, 'error', 'Database connection timeout', 'PDOException', '/includes/database.php', 25, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'),
 (2, 'warning', 'File upload size exceeded', 'FileUploadException', '/api/upload.php', 45, '192.168.1.100', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'),
 (NULL, 'info', 'Scheduled task completed successfully', NULL, '/cron/backup.php', 10, '127.0.0.1', 'CLI');
 
+-- Dữ liệu mẫu cho bảng conference_speakers
+DELETE FROM `conference_speakers`;
+INSERT INTO `conference_speakers` 
+(`conference_id`, `speaker_id`, `role`, `talk_title`, `talk_description`, `talk_duration`, `status`)
+VALUES
+(1, 1, 'keynote', 'AI for Vietnam: Tương lai và ứng dụng', 'Xu hướng AI và ứng dụng thực tiễn tại Việt Nam', 45, 'confirmed'),
+(1, 2, 'speaker', 'AI trong Healthcare', 'AI thay đổi ngành y tế như thế nào?', 40, 'confirmed'),
+(1, 5, 'panelist', 'Panel: Hạ tầng cho triệu người dùng', 'Thảo luận về scaling infrastructure', 30, 'confirmed'),
+
+(2, 3, 'keynote', 'Khởi nghiệp thành công', 'Bí quyết gọi vốn và phát triển startup', 50, 'confirmed'),
+(2, 1, 'speaker', 'Tech for Startups', 'Công nghệ nào phù hợp cho startup Việt?', 35, 'confirmed'),
+
+(3, 2, 'keynote', 'AI trong chẩn đoán y khoa', 'Ứng dụng AI trong y tế hiện đại', 45, 'confirmed'),
+(3, 1, 'speaker', 'Chuyển đổi số ngành y', 'Digital transformation trong healthcare', 30, 'confirmed'),
+
+(4, 1, 'keynote', 'AI/ML cho người mới bắt đầu', 'Giới thiệu AI/ML thực tiễn', 60, 'confirmed'),
+(4, 2, 'speaker', 'Computer Vision thực chiến', 'Ứng dụng computer vision trong doanh nghiệp', 45, 'confirmed'),
+
+(5, 4, 'keynote', 'Blockchain & DeFi', 'Tương lai DeFi và Web3', 50, 'confirmed'),
+(5, 3, 'panelist', 'Panel: Đầu tư Web3', 'Cơ hội và thách thức đầu tư blockchain', 40, 'confirmed');
 -- ========================================================
 -- COMPLETION MESSAGE
 -- ========================================================
 
 /*
-SCHEMA VÀ SAMPLE DATA HOÀN THÀNH!
+SCHEMA VÀ SAMPLE DATA HOÀN THÀNH - PHIÊN BẢN NÂNG CẤP!
 
 Schema này bao gồm:
 ✅ 30+ bảng chính với đầy đủ tính năng
@@ -1400,16 +1810,18 @@ Schema này bao gồm:
 ✅ Triggers tự động
 ✅ Views cho reporting (đã sửa lỗi)
 ✅ Indexes tối ưu performance
-✅ Sample data đầy đủ cho testing
+✅ Sample data đầy đủ và chi tiết cho testing
 
-Sample data bao gồm:
+Sample data đã được nâng cấp bao gồm:
 - 4 user accounts (admin, organizer, speaker, user) - password: password123
 - 4 ngôn ngữ hỗ trợ (vi, en, zh, ja)
 - 16 bản dịch cơ bản
 - 5 categories hội nghị
-- 3 venues
-- 3 speakers
-- 3 conferences với liên kết speakers
+- 5 venues với thông tin đầy đủ (facilities, amenities, pricing, location)
+- 5 speakers với profile chi tiết (bio, specialties, social links, experience)
+- 5 conferences với metadata đầy đủ (pricing, sponsors, objectives, features)
+- 12 conference_speakers relationships với talk details
+- 32 schedule_sessions với lịch trình chi tiết cho tất cả conferences
 - 5 payment methods
 - 5 media folders
 - 4 scheduled tasks
@@ -1419,5 +1831,26 @@ Sample data bao gồm:
 - 2 transactions
 - 3 error logs
 
+Các conferences mới:
+1. Vietnam Tech Summit 2025 (Aug 15-16) - 1000 attendees, AI/Tech focus
+2. Startup Weekend Ho Chi Minh 2025 (Jul 11-13) - 200 attendees, 54h hackathon
+3. Digital Health Conference 2025 (Sep 20) - 300 attendees, Healthcare AI
+4. AI & ML Workshop 2025 (Aug 25-26) - 50 attendees, Hands-on training
+5. Blockchain & Web3 Summit 2025 (Oct 5-6) - 800 attendees, DeFi/Web3
+
+Mỗi conference có:
+- Thông tin chi tiết với JSON metadata
+- Speakers và lịch trình đầy đủ
+- Venue information với facilities
+- Pricing và early bird options
+- Social links và sponsor information
+- SEO optimization data
+
 Mật khẩu mặc định cho tất cả accounts: password123
+
+Để test API, sử dụng:
+- GET /api/conferences.php?id=1 (Vietnam Tech Summit)
+- GET /api/conferences.php?id=1&speakers=1 (Speakers)
+- GET /api/conferences.php?id=1&schedule=1 (Schedule)
+- GET /api/debug_conference.php?id=1 (Debug info)
 */

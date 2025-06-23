@@ -41,6 +41,13 @@
         .nav-pills .nav-link {
             border-radius: 25px;
             margin-bottom: 5px;
+            text-align: left; /* Căn trái nội dung */
+            justify-content: flex-start !important; /* Đảm bảo icon và text sát trái */
+            display: flex;
+            align-items: center;
+        }
+        .nav-pills .nav-link i {
+            margin-right: 8px;
         }
         .nav-pills .nav-link.active {
             background: linear-gradient(135deg, #007bff, #0056b3);
@@ -123,8 +130,8 @@
                             <h1 class="mb-0" id="conference-title">TechCrunch Disrupt 2024</h1>
                             <p class="text-muted mb-0">Bảng Điều khiển Quản lý Hội nghị</p>
                         </div>
-                        <div>
-                            <button class="btn btn-success action-btn me-2" data-bs-toggle="modal" data-bs-target="#editConferenceModal">
+                        <div class="d-flex gap-2"> <!-- Thêm d-flex và gap-2 để nút nằm ngang và cách nhau -->
+                            <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#editConferenceModal">
                                 <i class="fas fa-edit me-1"></i>Chỉnh sửa Hội nghị
                             </button>
                             <button class="btn btn-warning action-btn" onclick="toggleConferenceStatus()">
@@ -865,58 +872,32 @@
                     <form id="editConferenceForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="editTitle" class="form-label">Tên Hội nghị</label>
-                                <input type="text" class="form-control" id="editTitle" required>
+                                <label class="form-label">Tên hội nghị</label>
+                                <input type="text" class="form-control" id="conference-name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="editCategory" class="form-label">Danh mục</label>
-                                <select class="form-select" id="editCategory" required>
-                                    <option value="">Chọn danh mục</option>
-                                    <option value="Technology">Công nghệ</option>
-                                    <option value="Design">Thiết kế</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Business">Kinh doanh</option>
-                                </select>
+                                <label class="form-label">Ngày tổ chức</label>
+                                <input type="date" class="form-control" id="conference-date" required>
                             </div>
-                        </div>                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="editDate" class="form-label">Ngày bắt đầu</label>
-                                <input type="date" class="form-control" id="editDate" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="editEndDate" class="form-label">Ngày kết thúc</label>
-                                <input type="date" class="form-control" id="editEndDate">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="conference-description" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="editLocation" class="form-label">Địa điểm</label>
-                                <input type="text" class="form-control" id="editLocation" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="editPrice" class="form-label">Giá vé (VND)</label>
-                                <input type="number" class="form-control" id="editPrice" step="0.01" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="editCapacity" class="form-label">Sức chứa</label>
-                                <input type="number" class="form-control" id="editCapacity" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="editStatus" class="form-label">Trạng thái</label>
-                                <select class="form-select" id="editStatus" required>
-                                    <option value="active">Đang hoạt động</option>
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" id="conference-status">
+                                    <option value="active">Đang diễn ra</option>
                                     <option value="archived">Đã lưu trữ</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editDescription" class="form-label">Mô tả</label>
-                            <textarea class="form-control" id="editDescription" rows="3" required></textarea>
-                        </div>
                     </form>
-                </div>                <div class="modal-footer">
+                </div>
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                     <button type="button" class="btn btn-primary" onclick="saveConferenceChanges()">Lưu thay đổi</button>
                 </div>
@@ -1319,5 +1300,72 @@
     <script src="js/footer.js"></script>
     <script src="js/conference-admin.js"></script>
     <script src="js/conference-admin-extended.js"></script>
+    <script>
+// Lấy thông tin hội nghị (giả định id = 1, bạn có thể sửa lại lấy id động nếu cần)
+function fetchConferenceInfo() {
+    fetch('api/conference_by_id.php?id=1')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                document.getElementById('conference-name').value = data.conference.name || '';
+                document.getElementById('conference-date').value = data.conference.date || '';
+                document.getElementById('conference-description').value = data.conference.description || '';
+                document.getElementById('conference-status').value = data.conference.status || 'active';
+            }
+        });
+}
+
+// Khi mở modal chỉnh sửa, load dữ liệu
+const editModal = document.getElementById('editConferenceModal');
+editModal.addEventListener('show.bs.modal', fetchConferenceInfo);
+
+// Lưu thay đổi hội nghị
+function saveConferenceChanges() {
+    const name = document.getElementById('conference-name').value;
+    const date = document.getElementById('conference-date').value;
+    const description = document.getElementById('conference-description').value;
+    const status = document.getElementById('conference-status').value;
+    fetch('api/update_conference.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: 1, name, date, description, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            alert('Cập nhật thành công!');
+            location.reload();
+        } else {
+            alert('Có lỗi khi cập nhật hội nghị!');
+        }
+    });
+}
+
+// Lưu trữ/khôi phục hội nghị
+function toggleConferenceStatus() {
+    fetch('api/conference_by_id.php?id=1')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                const currentStatus = data.conference.status;
+                const newStatus = currentStatus === 'archived' ? 'active' : 'archived';
+                fetch('api/update_conference.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: 1, status: newStatus })
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result && result.success) {
+                        alert('Đã cập nhật trạng thái hội nghị!');
+                        location.reload();
+                    } else {
+                        alert('Có lỗi khi cập nhật trạng thái!');
+                    }
+                });
+            }
+        });
+}
+</script>
 </body>
 </html>
