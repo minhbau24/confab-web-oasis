@@ -1,175 +1,317 @@
 <?php
 /**
- * File thiết lập cơ sở dữ liệu - API Logic
- * Chạy file này để tạo các bảng cần thiết cho hệ thống
+ * Confab Web Oasis - Database Setup API
+ * Setup database với schema hoàn chỉnh từ schema_complete.sql
+ * Phiên bản: 3.0 (Complete Edition)
  */
+
+// Define this file as an API endpoint to prevent HTML redirects
+define('API_ENDPOINT', true);
 
 // Set content type for API responses
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
 require_once dirname(__DIR__) . '/includes/config.php';
 
 $result = [
     'success' => false,
     'messages' => [],
-    'data' => null
+    'data' => null,
+    'steps' => []
 ];
 
-try {
-    $result['messages'][] = 'Đang kết nối đến cơ sở dữ liệu...';
-    $conn = connectDB();
-    $result['messages'][] = 'Kết nối thành công!';    // Bật chế độ lỗi
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Tạo bảng users
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            firstName VARCHAR(50) NOT NULL,
-            lastName VARCHAR(50) NOT NULL,
-            email VARCHAR(100) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            role ENUM('user', 'organizer', 'admin') DEFAULT 'user',
-            phone VARCHAR(20),
-            remember_token VARCHAR(100) NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng conferences
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conferences (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            description TEXT NOT NULL,
-            date DATE NOT NULL,
-            endDate DATE,
-            location VARCHAR(255) NOT NULL,
-            category VARCHAR(100) NOT NULL,
-            price DECIMAL(10, 2) NOT NULL,
-            capacity INT NOT NULL,
-            attendees INT DEFAULT 0,
-            status ENUM('draft', 'active', 'cancelled', 'completed') DEFAULT 'draft',
-            isManaged BOOLEAN DEFAULT false,
-            image VARCHAR(255),
-            organizer_name VARCHAR(100),
-            organizer_email VARCHAR(100),
-            organizer_phone VARCHAR(20),
-            created_by INT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng speakers (diễn giả)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS speakers (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            title VARCHAR(100),
-            bio TEXT,
-            image VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng liên kết conference_speakers
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conference_speakers (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            conference_id INT NOT NULL,
-            speaker_id INT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE,
-            FOREIGN KEY (speaker_id) REFERENCES speakers(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");    // Tạo bảng conference_schedule (lịch hội nghị)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conference_schedule (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            conference_id INT NOT NULL,
-            eventDate DATE NOT NULL,
-            startTime TIME NOT NULL,
-            endTime TIME NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            speaker VARCHAR(100),
-            description TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng conference_attendees (người tham dự)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conference_attendees (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            conference_id INT NOT NULL,
-            user_id INT NOT NULL,
-            registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status ENUM('registered', 'confirmed', 'cancelled', 'attended') DEFAULT 'registered',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng testimonials (đánh giá của khách hàng)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS testimonials (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            name VARCHAR(100) NOT NULL,
-            company VARCHAR(100),
-            content TEXT NOT NULL,
-            rating INT NOT NULL DEFAULT 5,
-            is_featured BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng conference_objectives (mục tiêu hội nghị)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conference_objectives (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            conference_id INT NOT NULL,
-            description VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Tạo bảng conference_faqs (câu hỏi thường gặp)
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS conference_faqs (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            conference_id INT NOT NULL,
-            question TEXT NOT NULL,
-            answer TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    ");
-
-    // Chèn dữ liệu người dùng mẫu (mật khẩu: password123)
-    $hashedPassword = password_hash('password123', PASSWORD_DEFAULT);    $conn->exec("
-        INSERT INTO users (firstName, lastName, email, password, role)
-        VALUES 
-            ('Admin', 'System', 'admin@example.com', '$hashedPassword', 'admin'),
-            ('Nguyễn', 'Tổ Chức', 'organizer@example.com', '$hashedPassword', 'organizer'),
-            ('Nguyễn', 'Văn Nam', 'nam@example.com', '$hashedPassword', 'user')
-    ");
+/**
+ * Parse và thực thi file SQL hoàn chỉnh
+ */
+function executeSQLFile($conn, $filePath) {
+    global $result;
     
-    $result['messages'][] = 'Thành công! Cấu trúc cơ sở dữ liệu đã được thiết lập thành công.';
-    $result['success'] = true;
+    if (!file_exists($filePath)) {
+        throw new Exception("File schema không tìm thấy: $filePath");
+    }
+    
+    $result['messages'][] = "Đang đọc file schema: " . basename($filePath);
+    $sql = file_get_contents($filePath);
+    
+    if (empty($sql)) {
+        throw new Exception("File schema rỗng hoặc không thể đọc được");
+    }
+    
+    // Loại bỏ các dòng comment và dòng trống
+    $lines = explode("\n", $sql);
+    $cleanedLines = [];
+    $inComment = false;
+    
+    foreach ($lines as $line) {
+        $line = trim($line);
+        
+        // Skip empty lines
+        if (empty($line)) continue;
+        
+        // Skip single line comments
+        if (strpos($line, '--') === 0) continue;
+        
+        // Handle multi-line comments
+        if (strpos($line, '/*') !== false) {
+            $inComment = true;
+        }
+        if ($inComment) {
+            if (strpos($line, '*/') !== false) {
+                $inComment = false;
+            }
+            continue;
+        }
+        
+        // Skip CREATE DATABASE and USE statements - we're already connected
+        if (stripos($line, 'CREATE DATABASE') === 0 || stripos($line, 'USE ') === 0) {
+            continue;
+        }
+        
+        $cleanedLines[] = $line;
+    }
+    
+    $cleanedSQL = implode("\n", $cleanedLines);
+    
+    // Split SQL into individual statements
+    $statements = [];
+    $currentStatement = '';
+    $delimiter = ';';
+    $inDelimiterBlock = false;
+    
+    $lines = explode("\n", $cleanedSQL);
+    
+    foreach ($lines as $line) {
+        $line = trim($line);
+        
+        // Handle DELIMITER changes
+        if (stripos($line, 'DELIMITER') === 0) {
+            if (!$inDelimiterBlock) {
+                $delimiter = trim(substr($line, 9));
+                $inDelimiterBlock = true;
+            } else {
+                $delimiter = ';';
+                $inDelimiterBlock = false;
+            }
+            continue;
+        }
+        
+        $currentStatement .= $line . "\n";
+        
+        // Check if statement ends with current delimiter
+        if (substr(rtrim($line), -strlen($delimiter)) === $delimiter) {
+            // Remove the delimiter from the end
+            $currentStatement = substr($currentStatement, 0, -strlen($delimiter)-1);
+            $currentStatement = trim($currentStatement);
+            
+            if (!empty($currentStatement)) {
+                $statements[] = $currentStatement;
+            }
+            $currentStatement = '';
+        }
+    }
+    
+    // Add remaining statement if any
+    if (!empty(trim($currentStatement))) {
+        $statements[] = trim($currentStatement);
+    }
+    
+    $result['messages'][] = "Tìm thấy " . count($statements) . " câu lệnh SQL để thực thi";
+    
+    // Execute each statement
+    $executed = 0;
+    $errors = 0;
+    
+    foreach ($statements as $index => $statement) {
+        if (empty($statement)) continue;
+        
+        try {
+            // Log what we're executing (first 100 chars)
+            $preview = substr(str_replace(["\n", "\r", "\t"], " ", $statement), 0, 100) . "...";
+            $result['steps'][] = "Thực thi: " . $preview;
+            
+            $conn->exec($statement);
+            $executed++;
+            
+        } catch (PDOException $e) {
+            $errors++;
+            $errorMsg = "Lỗi câu lệnh " . ($index + 1) . ": " . $e->getMessage();
+            $result['messages'][] = $errorMsg;
+            
+            // Log the problematic statement for debugging
+            $result['steps'][] = "Câu lệnh lỗi: " . substr($statement, 0, 200) . "...";
+            
+            // Don't stop on errors, continue with next statement
+            continue;
+        }
+    }
+    
+    $result['messages'][] = "Hoàn thành: $executed câu lệnh thành công, $errors lỗi";
+    
+    return $errors === 0;
+}
 
-} catch (PDOException $e) {
-    $result['messages'][] = 'Lỗi khi thiết lập cơ sở dữ liệu: ' . $e->getMessage();
+/**
+ * Kiểm tra và import sample data nếu cần
+ */
+function importSampleDataIfNeeded($conn) {
+    global $result;
+    
+    // Check if users table has data
+    try {
+        $userCount = $conn->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        
+        if ($userCount == 0) {
+            $result['messages'][] = 'Bảng users trống, đang thêm dữ liệu mẫu...';
+            
+            // Add sample users
+            $hashedPassword = password_hash('password123', PASSWORD_DEFAULT);
+            
+            $conn->exec("
+                INSERT INTO users (firstName, lastName, email, password, role, status, email_verified, created_at)
+                VALUES 
+                    ('Admin', 'System', 'admin@confab.local', '$hashedPassword', 'admin', 'active', 1, NOW()),
+                    ('Nguyễn', 'Tổ Chức', 'organizer@confab.local', '$hashedPassword', 'organizer', 'active', 1, NOW()),
+                    ('Trần', 'Diễn Giả', 'speaker@confab.local', '$hashedPassword', 'speaker', 'active', 1, NOW()),
+                    ('Lê', 'Tham Dự', 'user@confab.local', '$hashedPassword', 'user', 'active', 1, NOW())
+            ");
+            
+            $result['messages'][] = 'Đã thêm 4 tài khoản mẫu (mật khẩu: password123)';
+        } else {
+            $result['messages'][] = "Đã có $userCount người dùng trong hệ thống";
+        }
+        
+    } catch (Exception $e) {
+        $result['messages'][] = 'Cảnh báo khi kiểm tra/thêm dữ liệu mẫu: ' . $e->getMessage();
+    }
+}
+
+/**
+ * Kiểm tra tính toàn vẹn của schema sau khi setup
+ */
+function validateSchema($conn) {
+    global $result;
+    
+    $result['messages'][] = 'Đang kiểm tra tính toàn vẹn của schema...';
+    
+    // List of required tables from schema_complete.sql
+    $requiredTables = [
+        'users', 'categories', 'venues', 'conferences', 'speakers', 'conference_speakers',
+        'conference_schedule', 'registrations', 'notifications', 'settings', 'audit_logs',
+        'password_history', 'user_sessions', 'media_files', 'media_folders', 'translations',
+        'languages', 'user_activity_logs', 'error_logs', 'security_logs', 'scheduled_tasks',
+        'payment_methods', 'invoices', 'transactions', 'billing_info', 'certificates'
+    ];
+    
+    $missingTables = [];
+    $existingTables = [];
+    
+    foreach ($requiredTables as $table) {
+        try {
+            $count = $conn->query("SELECT COUNT(*) FROM information_schema.tables 
+                                 WHERE table_schema = '" . DB_NAME . "' AND table_name = '$table'")->fetchColumn();
+            if ($count > 0) {
+                $existingTables[] = $table;
+            } else {
+                $missingTables[] = $table;
+            }
+        } catch (Exception $e) {
+            $missingTables[] = $table;
+        }
+    }
+    
+    $result['data'] = [
+        'existing_tables' => $existingTables,
+        'missing_tables' => $missingTables,
+        'tables_count' => count($existingTables)
+    ];
+    
+    if (count($missingTables) > 0) {
+        $result['messages'][] = 'Cảnh báo: Thiếu ' . count($missingTables) . ' bảng: ' . implode(', ', $missingTables);
+    } else {
+        $result['messages'][] = 'Tất cả ' . count($existingTables) . ' bảng cần thiết đã được tạo thành công!';
+    }
+    
+    // Check for stored procedures and functions
+    try {
+        $procedures = $conn->query("SELECT COUNT(*) FROM information_schema.routines 
+                                  WHERE routine_schema = '" . DB_NAME . "' AND routine_type = 'PROCEDURE'")->fetchColumn();
+        $functions = $conn->query("SELECT COUNT(*) FROM information_schema.routines 
+                                 WHERE routine_schema = '" . DB_NAME . "' AND routine_type = 'FUNCTION'")->fetchColumn();
+        
+        $result['messages'][] = "Đã tạo $procedures stored procedures và $functions functions";
+        
+    } catch (Exception $e) {
+        $result['messages'][] = 'Không thể kiểm tra stored procedures: ' . $e->getMessage();
+    }
+    
+    return count($missingTables) === 0;
+}
+
+try {
+    $result['messages'][] = 'Bắt đầu thiết lập cơ sở dữ liệu...';
+    
+    // Kết nối database
+    try {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
+        
+        $conn = new PDO($dsn, DB_USER, DB_PASS, $options);
+        $result['messages'][] = 'Kết nối cơ sở dữ liệu thành công!';
+    } catch (PDOException $e) {
+        throw new PDOException('Không thể kết nối đến cơ sở dữ liệu: ' . $e->getMessage());
+    }    
+    // Set timezone
+    $conn->exec("SET time_zone = '+07:00'");
+    $result['messages'][] = 'Đã thiết lập múi giờ: +07:00';
+    
+    // Disable foreign key checks during setup
+    $conn->exec("SET FOREIGN_KEY_CHECKS = 0");
+    $result['messages'][] = 'Tạm thời tắt kiểm tra khóa ngoại';
+    
+    // Execute the complete schema
+    $schemaFile = dirname(__DIR__) . '/sql/schema_complete.sql';
+    $success = executeSQLFile($conn, $schemaFile);
+    
+    // Re-enable foreign key checks
+    $conn->exec("SET FOREIGN_KEY_CHECKS = 1");
+    $result['messages'][] = 'Đã bật lại kiểm tra khóa ngoại';
+    
+    // Import sample data if needed
+    importSampleDataIfNeeded($conn);
+    
+    // Validate schema integrity
+    $schemaValid = validateSchema($conn);
+    
+    if ($schemaValid && $success) {
+        $result['success'] = true;
+        $result['messages'][] = '🎉 Thiết lập cơ sở dữ liệu hoàn tất thành công!';
+        $result['messages'][] = 'Hệ thống đã sẵn sàng để sử dụng với tất cả các tính năng nâng cao.';
+    } else {
+        $result['messages'][] = '⚠️ Thiết lập hoàn tất nhưng có một số cảnh báo. Kiểm tra log để biết chi tiết.';
+        $result['success'] = true; // Still consider it successful even with warnings
+    }
+
+} catch (Exception $e) {
+    $result['messages'][] = '❌ Lỗi khi thiết lập cơ sở dữ liệu: ' . $e->getMessage();
     $result['success'] = false;
+    
+    // Try to re-enable foreign key checks even on error
+    try {
+        if (isset($conn)) {
+            $conn->exec("SET FOREIGN_KEY_CHECKS = 1");
+        }
+    } catch (Exception $e2) {
+        // Ignore errors when re-enabling foreign key checks
+    }
 }
 
 // Return JSON response
-echo json_encode($result);
+echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 ?>

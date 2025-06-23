@@ -1,25 +1,30 @@
-
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <!-- Path sanitizer script - runs first to catch and fix bad URLs -->
     <script src="js/path-sanitizer.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trung tâm Hội nghị - Khám phá & Tổ chức Hội nghị Tuyệt vời</title>
+    <title>Confab Web Oasis - Khám phá & Tổ chức Hội nghị Tuyệt vời</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"><style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
         body {
-            padding-top: 55px; /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
+            padding-top: 55px;
+            /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
         }
+
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 120px 0;
             position: relative;
             overflow: hidden;
-            margin-top: -70px; /* Bù trừ padding-top của body để hero section tiếp nối với navbar */
+            margin-top: -70px;
+            /* Bù trừ padding-top của body để hero section tiếp nối với navbar */
         }
+
         .hero-section::before {
             content: '';
             position: absolute;
@@ -31,20 +36,24 @@
             opacity: 0.1;
             z-index: 1;
         }
+
         .hero-content {
             position: relative;
             z-index: 2;
         }
+
         .conference-card {
             transition: all 0.3s ease;
             border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
         }
+
         .conference-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
+
         .feature-icon {
             width: 80px;
             height: 80px;
@@ -56,29 +65,34 @@
             margin: 0 auto 20px;
             transition: transform 0.3s ease;
         }
+
         .feature-icon:hover {
             transform: scale(1.1);
         }
+
         .stats-counter {
             font-size: 3rem;
             font-weight: 700;
             color: #007bff;
             margin-bottom: 10px;
         }
+
         .testimonial-card {
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: none;
             height: 100%;
         }
+
         .testimonial-avatar {
             width: 60px;
             height: 60px;
             border-radius: 50%;
             border: 3px solid #007bff;
         }
+
         .step-number {
             width: 50px;
             height: 50px;
@@ -92,12 +106,14 @@
             font-size: 1.2rem;
             margin: 0 auto 20px;
         }
+
         .cta-section {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
             padding: 80px 0;
             position: relative;
         }
+
         .cta-section::before {
             content: '';
             position: absolute;
@@ -108,29 +124,43 @@
             background: url('https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1200&h=600&fit=crop') center/cover;
             opacity: 0.1;
         }
+
         .brand-logo {
             filter: grayscale(100%);
             opacity: 0.6;
             transition: all 0.3s ease;
         }
+
         .brand-logo:hover {
             filter: grayscale(0%);
             opacity: 1;
         }
+
         .floating-animation {
             animation: float 6s ease-in-out infinite;
         }
+
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
+
         .section-title {
             position: relative;
             display: inline-block;
             padding-bottom: 15px;
             margin-bottom: 50px;
         }
+
         .section-title::after {
             content: '';
             position: absolute;
@@ -141,20 +171,23 @@
             height: 3px;
             background: linear-gradient(135deg, #007bff, #0056b3);
         }
+
         .trust-badge {
             background: white;
             border-radius: 15px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
+
         .trust-badge:hover {
             transform: translateY(-5px);
         }
     </style>
 </head>
-<body>    <!-- Navigation Container -->
+
+<body> <!-- Navigation Container -->
     <div id="header-container"></div>
 
     <!-- Hero Section -->
@@ -166,7 +199,9 @@
                         Khám phá & Tổ chức<br>
                         <span class="text-warning">Hội nghị Tuyệt vời</span>
                     </h1>
-                    <p class="lead mb-5">Kết nối với lãnh đạo ngành, học hỏi kỹ năng tiên tiến và mở rộng mạng lưới của bạn tại các hội nghị và sự kiện đẳng cấp.</p>                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5">
+                    <p class="lead mb-5">Kết nối với lãnh đạo ngành, học hỏi kỹ năng tiên tiến và mở rộng mạng lưới của
+                        bạn tại các hội nghị và sự kiện đẳng cấp.</p>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5">
                         <a href="/confab-web-oasis/conferences.html" class="btn btn-light btn-lg px-4 py-3">
                             <i class="fas fa-search me-2"></i>Khám phá Hội nghị
                         </a>
@@ -177,7 +212,9 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop" class="img-fluid rounded-3 shadow-lg floating-animation" alt="Conference" style="animation-delay: -3s;">
+                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop"
+                            class="img-fluid rounded-3 shadow-lg floating-animation" alt="Conference"
+                            style="animation-delay: -3s;">
                     </div>
                 </div>
             </div>
@@ -187,32 +224,33 @@
     <!-- Trust Indicators -->
     <section class="py-4 bg-light">
         <div class="container">
-            <div class="row text-center">                <div class="col-6 col-md-3 mb-3">
+            <div class="row text-center">
+                <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                        <h4 class="stats-counter" data-count="50000">0</h4>
-                        <small class="text-muted">Người tham dự hài lòng</small>
+                        <h4 id="attendees-count" class="stats-counter">0</h4>
+                        <small class="text-muted">Người tham dự</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
                         <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
-                        <h4 class="stats-counter" data-count="1500">0</h4>
-                        <small class="text-muted">Sự kiện đã tổ chức</small>
+                        <h4 id="conferences-count" class="stats-counter">0</h4>
+                        <small class="text-muted">Hội nghị</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
-                        <i class="fas fa-building fa-2x text-info mb-2"></i>
-                        <h4 class="stats-counter" data-count="500">0</h4>
-                        <small class="text-muted">Tổ chức đối tác</small>
+                        <i class="fas fa-microphone fa-2x text-info mb-2"></i>
+                        <h4 id="speakers-count" class="stats-counter">0</h4>
+                        <small class="text-muted">Diễn giả</small>
                     </div>
                 </div>
                 <div class="col-6 col-md-3 mb-3">
                     <div class="trust-badge">
-                        <i class="fas fa-star fa-2x text-warning mb-2"></i>
-                        <h4 class="stats-counter" data-count="98">0</h4>
-                        <small class="text-muted">% Tỷ lệ hài lòng</small>
+                        <i class="fas fa-map-marker-alt fa-2x text-warning mb-2"></i>
+                        <h4 id="locations-count" class="stats-counter">0</h4>
+                        <small class="text-muted">Địa điểm</small>
                     </div>
                 </div>
             </div>
@@ -232,21 +270,24 @@
                         <i class="fas fa-shield-alt fa-2x text-white"></i>
                     </div>
                     <h4>Secure & Reliable</h4>
-                    <p class="text-muted">Enterprise-grade security with 99.9% uptime guarantee. Your data and payments are always protected.</p>
+                    <p class="text-muted">Enterprise-grade security with 99.9% uptime guarantee. Your data and payments
+                        are always protected.</p>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="feature-icon">
                         <i class="fas fa-globe fa-2x text-white"></i>
                     </div>
                     <h4>Global Reach</h4>
-                    <p class="text-muted">Connect with professionals from around the world. Access events in 50+ countries and multiple languages.</p>
+                    <p class="text-muted">Connect with professionals from around the world. Access events in 50+
+                        countries and multiple languages.</p>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="feature-icon">
                         <i class="fas fa-headset fa-2x text-white"></i>
                     </div>
                     <h4>24/7 Support</h4>
-                    <p class="text-muted">Our dedicated support team is always ready to help you succeed, whether you're attending or hosting.</p>
+                    <p class="text-muted">Our dedicated support team is always ready to help you succeed, whether you're
+                        attending or hosting.</p>
                 </div>
             </div>
             <div class="row">
@@ -255,21 +296,24 @@
                         <i class="fas fa-mobile-alt fa-2x text-white"></i>
                     </div>
                     <h4>Mobile Optimized</h4>
-                    <p class="text-muted">Access everything on the go with our responsive platform that works perfectly on all devices.</p>
+                    <p class="text-muted">Access everything on the go with our responsive platform that works perfectly
+                        on all devices.</p>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="feature-icon">
                         <i class="fas fa-chart-line fa-2x text-white"></i>
                     </div>
                     <h4>Powerful Analytics</h4>
-                    <p class="text-muted">Get detailed insights and analytics to measure success and improve your events continuously.</p>
+                    <p class="text-muted">Get detailed insights and analytics to measure success and improve your events
+                        continuously.</p>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="feature-icon">
                         <i class="fas fa-network-wired fa-2x text-white"></i>
                     </div>
                     <h4>Smart Networking</h4>
-                    <p class="text-muted">AI-powered attendee matching helps you connect with the right people at every event.</p>
+                    <p class="text-muted">AI-powered attendee matching helps you connect with the right people at every
+                        event.</p>
                 </div>
             </div>
         </div>
@@ -286,8 +330,8 @@
                 <!-- Conferences will be loaded here by JavaScript -->
             </div>
             <div class="text-center mt-5">
-                <a href="/confab-web-oasis/conferences.html" class="btn btn-primary btn-lg px-5 py-3">
-                    <i class="fas fa-calendar me-2"></i>View All Conferences
+                <a href="conferences.html" class="btn btn-primary btn-lg px-5 py-3">
+                    <i class="fas fa-calendar me-2"></i>Xem tất cả Hội nghị
                 </a>
             </div>
         </div>
@@ -304,24 +348,26 @@
                 <div class="col-md-4 mb-4 text-center">
                     <div class="step-number">1</div>
                     <h4>Browse & Discover</h4>
-                    <p class="text-muted">Explore thousands of conferences across different industries and locations. Filter by your interests and schedule.</p>
+                    <p class="text-muted">Explore thousands of conferences across different industries and locations.
+                        Filter by your interests and schedule.</p>
                     <i class="fas fa-search fa-3x text-primary mt-3"></i>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="step-number">2</div>
                     <h4>Register & Connect</h4>
-                    <p class="text-muted">Secure your spot with easy registration. Connect with other attendees and build your network before the event.</p>
+                    <p class="text-muted">Secure your spot with easy registration. Connect with other attendees and
+                        build your network before the event.</p>
                     <i class="fas fa-users fa-3x text-success mt-3"></i>
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="step-number">3</div>
                     <h4>Attend & Grow</h4>
-                    <p class="text-muted">Join live or virtual sessions, participate in Q&As, and take your career to the next level with new insights.</p>
+                    <p class="text-muted">Join live or virtual sessions, participate in Q&As, and take your career to
+                        the next level with new insights.</p>
                     <i class="fas fa-rocket fa-3x text-warning mt-3"></i>
                 </div>
             </div>
-        </div>
-    </section>
+        </div>    </section>
 
     <!-- Testimonials -->
     <section class="py-5 bg-light">
@@ -330,61 +376,8 @@
                 <h2 class="display-5 fw-bold section-title">Khách Hàng Nói Gì</h2>
                 <p class="lead text-muted">Tham gia cùng hàng nghìn chuyên gia hài lòng</p>
             </div>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://images.unsplash.com/photo-1494790108755-2616b9997c94?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Sarah">
-                            <div>                                <h6 class="mb-0">Nguyễn Thị Minh</h6>
-                                <small class="text-muted">Product Manager, VNG</small>
-                            </div>
-                        </div>
-                        <p class="mb-3">"Trung tâm Hội nghị đã thay đổi cách tôi khám phá và tham dự các sự kiện chuyên nghiệp. Cơ hội kết nối thật sự tuyệt vời!"</p>
-                        <div class="text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Michael">
-                            <div>                                <h6 class="mb-0">Trần Đức Khải</h6>
-                                <small class="text-muted">CTO, TechViet</small>
-                            </div>
-                        </div>
-                        <p class="mb-3">"Với tư cách là nhà tổ chức sự kiện, công cụ của Trung tâm Hội nghị đã giúp việc tổ chức hội nghị dễ dàng hơn rất nhiều. Các phân tích dữ liệu thật tuyệt vời!"</p>
-                        <div class="text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face" class="testimonial-avatar me-3" alt="Emily">
-                            <div>                                <h6 class="mb-0">Phạm Thị Hương</h6>
-                                <small class="text-muted">Giám đốc Marketing, Creatio</small>
-                            </div>
-                        </div>
-                        <p class="mb-3">"Chất lượng các hội nghị và diễn giả trên nền tảng này thật xuất sắc. Tôi đã học hỏi được rất nhiều và mở rộng mạng lưới của mình một cách đáng kể."</p>
-                        <div class="text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="row" id="testimonials-container">
+                <!-- Testimonials will be loaded here by JavaScript -->
             </div>
         </div>
     </section>
@@ -394,35 +387,49 @@
         <div class="container">
             <div class="text-center mb-5">
                 <h3 class="text-muted">Được tin dùng bởi các Tổ chức hàng đầu</h3>
-            </div>            <div class="row align-items-center justify-content-center">
+            </div>
+            <div class="row align-items-center justify-content-center">
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-primary text-white rounded" style="height:60px;display:flex;align-items:center;justify-content:center;">TechCorp</div>
+                    <div class="p-3 bg-primary text-white rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;">TechCorp
+                    </div>
                 </div>
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-success text-white rounded" style="height:60px;display:flex;align-items:center;justify-content:center;">StartupXYZ</div>
+                    <div class="p-3 bg-success text-white rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;">StartupXYZ
+                    </div>
                 </div>
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-danger text-white rounded" style="height:60px;display:flex;align-items:center;justify-content:center;">InnovCorp</div>
+                    <div class="p-3 bg-danger text-white rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;">InnovCorp
+                    </div>
                 </div>
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-warning text-dark rounded" style="height:60px;display:flex;align-items:center;justify-content:center;">DesignCo</div>
+                    <div class="p-3 bg-warning text-dark rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;">DesignCo
+                    </div>
                 </div>
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-info text-white rounded" style="height:60px;display:flex;align-items:center;justify-content:center;">DataTech</div>
+                    <div class="p-3 bg-info text-white rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;">DataTech
+                    </div>
                 </div>
                 <div class="col-6 col-md-2 mb-4 text-center">
-                    <div class="p-3 bg-purple text-white rounded" style="height:60px;display:flex;align-items:center;justify-content:center;background-color:#6f42c1;">FutureLab</div>
+                    <div class="p-3 bg-purple text-white rounded"
+                        style="height:60px;display:flex;align-items:center;justify-content:center;background-color:#6f42c1;">
+                        FutureLab</div>
                 </div>
             </div>
         </div>
     </section>
-
     <!-- Call to Action -->
     <section class="cta-section text-center position-relative">
         <div class="container position-relative" style="z-index: 2;">
             <div class="row justify-content-center">
-                <div class="col-lg-8">                    <h2 class="display-4 fw-bold mb-4">Sẵn sàng Nâng tầm Sự nghiệp?</h2>
-                    <p class="lead mb-5">Hàng ngàn chuyên gia đã thúc đẩy sự nghiệp của họ thông qua Trung tâm Hội nghị</p>
+                <div class="col-lg-8">
+                    <h2 class="display-4 fw-bold mb-4">Sẵn sàng Nâng tầm Sự nghiệp?</h2>
+                    <p class="lead mb-5">Hàng ngàn chuyên gia đã thúc đẩy sự nghiệp của họ thông qua Trung tâm
+                        Hội nghị</p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                         <a href="/confab-web-oasis/conferences.html" class="btn btn-light btn-lg px-5 py-3">
                             <i class="fas fa-rocket me-2"></i>Tìm Hội nghị Tiếp theo
@@ -434,18 +441,19 @@
                 </div>
             </div>
         </div>
-    </section>    <!-- Footer Container -->
-    <div id="footer-container"></div>    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- API helper phải được tải trước các file JS khác -->
+    </section> <!-- Footer Container -->
+    <div id="footer-container"></div> <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api-helper.js"></script>
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>    <script src="js/home-api.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/home-api.js"></script>
     <script>
         // Enhanced home page functionality
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Gọi hàm từ home.js để tải hội nghị đã được chuẩn hóa
             if (typeof loadUpcomingConferences === 'function') {
                 loadUpcomingConferences();
@@ -453,7 +461,7 @@
                 // Fallback nếu home.js không được load hoặc không có hàm
                 loadFeaturedConferences();
             }
-            
+
             // Animation counter
             animateStats();
         });
@@ -463,7 +471,7 @@
             if (typeof getUpcomingConferences === 'function') {
                 const featuredConferences = getUpcomingConferences(3);
                 const container = document.getElementById('featured-conferences');
-                
+
                 if (featuredConferences && featuredConferences.length > 0) {
                     container.innerHTML = featuredConferences
                         .map(conference => renderConferenceCard(conference))
@@ -488,7 +496,7 @@
                 const target = parseInt(counter.getAttribute('data-count'));
                 const increment = target / 100;
                 let current = 0;
-                
+
                 const updateCounter = () => {
                     if (current < target) {
                         current += increment;
@@ -498,31 +506,10 @@
                         counter.textContent = target.toLocaleString();
                     }
                 };
-                
-                // Start animation when element is visible
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            updateCounter();
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                });
-                
-                observer.observe(counter);
+                updateCounter();
             });
         }
+    </script>
+</body>
 
-        // Add smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });        });
-    </script>    
+</html>

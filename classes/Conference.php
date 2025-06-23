@@ -1,6 +1,7 @@
 <?php
 /**
  * Lớp Conference quản lý thông tin hội nghị
+ * Phiên bản: 3.0 (Complete Edition) - Tương thích với schema mới
  */
 class Conference
 {
@@ -12,17 +13,41 @@ class Conference
     public function __construct()
     {
         $this->db = Database::getInstance();
-    }    /**
-         * Lấy tất cả hội nghị
-         *
-         * @param int $limit Số lượng tối đa
-         * @param int $offset Vị trí bắt đầu
-         * @return array Danh sách hội nghị
-         */
-    public function getAllConferences($limit = null, $offset = 0)
+    }
+
+    /**
+     * Lấy tất cả hội nghị (với JOIN categories và venues)
+     *
+     * @param int $limit Số lượng tối đa
+     * @param int $offset Vị trí bắt đầu
+     * @param string $status Trạng thái hội nghị
+     * @return array Danh sách hội nghị
+     */
+    public function getAllConferences($limit = null, $offset = 0, $status = 'published')
     {
-        $sql = "SELECT * FROM conferences ORDER BY date DESC";
+        $sql = "SELECT 
+                    c.*,
+                    cat.name as category_name,
+                    cat.slug as category_slug,
+                    cat.color as category_color,
+                    v.name as venue_name,
+                    v.city as venue_city,
+                    u1.firstName as created_by_name,
+                    u1.lastName as created_by_lastname
+                FROM conferences c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN venues v ON c.venue_id = v.id
+                LEFT JOIN users u1 ON c.created_by = u1.id
+                WHERE c.deleted_at IS NULL";
+        
         $params = [];
+
+        if (!empty($status)) {
+            $sql .= " AND c.status = ?";
+            $params[] = $status;
+        }
+
+        $sql .= " ORDER BY c.start_date DESC";
 
         if ($limit !== null) {
             $sql .= " LIMIT ?, ?";
@@ -30,7 +55,10 @@ class Conference
             $params[] = $limit;
         }
 
-        return $this->db->fetchAll($sql, $params);
+        $conferences = $this->db->fetchAll($sql, $params);
+        
+        // Xử lý JSON fields
+        return $this->processConferencesData($conferences);
     }
 
     /**

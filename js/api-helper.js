@@ -36,8 +36,7 @@ async function apiGet(endpoint, options = {}) {
     try {
         const url = getApiUrl(endpoint);
         console.log(`API GET request to: ${url}`);
-        
-        const response = await fetch(url, {
+          const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -47,7 +46,21 @@ async function apiGet(endpoint, options = {}) {
             ...options
         });
         
-        return await response.json();
+        // Check if response is ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Get response text first to check if it's JSON
+        const responseText = await response.text();
+        
+        // Try to parse as JSON
+        try {
+            return JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Response is not valid JSON:', responseText);
+            throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+        }
     } catch (error) {
         console.error(`Error in API GET to ${endpoint}:`, error);
         throw error;

@@ -1,6 +1,7 @@
 <?php
 /**
- * API cho hội nghị
+ * API cho hội nghị - Tương thích với schema mới
+ * Phiên bản: 3.0 (Complete Edition)
  */
 // Define this file as an API endpoint to prevent HTML redirects
 define('API_ENDPOINT', true);
@@ -21,7 +22,7 @@ try {
     header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
     // Khởi tạo Conference
-$conference = new Conference();
+    $conference = new Conference();
 
 // Xác định request method
 $method = $_SERVER['REQUEST_METHOD'];

@@ -4,50 +4,33 @@
  */
 ?>
 
-<footer class="footer">
+<footer class="bg-dark text-light py-4 mt-5">
     <div class="container">
         <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">Về Chúng Tôi</h5>
-                <p>Trung tâm Hội nghị - Nền tảng kết nối, học hỏi và truyền cảm hứng thông qua các hội nghị chất lượng
-                    tại Việt Nam và trên toàn thế giới.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5 class="text-white">Confab Web Oasis</h5>
+                <p class="text-light">Nền tảng quản lý và tham gia hội nghị hàng đầu Việt Nam</p>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">Liên kết nhanh</h5>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5 class="text-white">Liên kết</h5>
                 <ul class="list-unstyled">
-                    <li><a href="index.html" class="text-white">Trang chủ</a></li>
-                    <li><a href="conferences.html" class="text-white">Khám phá Hội nghị</a></li>
-                    <li><a href="conference-manager.html" class="text-white">Tổ chức Hội nghị</a></li>
-                    <li><a href="#" class="text-white">Về Chúng tôi</a></li>
-                    <li><a href="#" class="text-white">Liên hệ</a></li>
+                    <li><a href="index.html" class="text-decoration-none text-light">Trang chủ</a></li>
+                    <li><a href="conferences.html" class="text-decoration-none text-light">Danh sách Hội nghị</a></li>
+                    <li><a href="profile.html" class="text-decoration-none text-light">Hồ sơ cá nhân</a></li>
+                    <li><a href="admin.html" class="text-decoration-none text-light">Quản trị</a></li>
                 </ul>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">Liên hệ</h5>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-map-marker-alt me-2"></i> 123 Đường Trung Tâm, Quận Đống Đa, Hà Nội</li>
-                    <li><i class="fas fa-phone me-2"></i> (024) 1234 5678</li>
-                    <li><i class="fas fa-envelope me-2"></i> info@trungtamhoinghi.vn</li>
+            <div class="col-md-4">
+                <h5 class="text-white">Liên hệ</h5>
+                <ul class="list-unstyled text-light">
+                    <li><i class="fas fa-envelope me-2"></i>contact@confab-web-oasis.vn</li>
+                    <li><i class="fas fa-phone me-2"></i>(+84) 123-456-789</li>
+                    <li><i class="fas fa-map-marker-alt me-2"></i>Hà Nội, Việt Nam</li>
                 </ul>
             </div>
         </div>
-        <hr class="mt-4 mb-4" style="background-color: rgba(255,255,255,0.2);">
-        <div class="row">
-            <div class="col-md-6 text-md-start text-center">
-                <p class="mb-0">&copy; <?php echo date('Y'); ?> Trung tâm Hội nghị. Bản quyền thuộc về chúng tôi.</p>
-            </div>
-            <div class="col-md-6 text-md-end text-center">
-                <p class="mb-0">
-                    <a href="#" class="text-white me-3">Điều khoản sử dụng</a>
-                    <a href="#" class="text-white">Chính sách bảo mật</a>
-                </p>
-            </div>
+        <div class="text-center mt-4 pt-4 border-top border-secondary">
+            <p class="mb-0 text-light">&copy; <?php echo date('Y'); ?> Confab Web Oasis. Tất cả các quyền được bảo lưu.</p>
         </div>
     </div>
 </footer>

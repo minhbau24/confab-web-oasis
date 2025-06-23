@@ -2,48 +2,107 @@
 /**
  * API xóa hội nghị
  */
+// CORS and API headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=UTF-8');
+header('Access-Control-Allow-Methods: DELETE, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
+// Handle preflight request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../classes/Conference.php';
 
 // Kiểm tra xác thực
 if (!isLoggedIn() || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'organizer')) {
-    // Redirect nếu không có quyền
-    setFlashMessage('danger', 'Bạn không có quyền thực hiện thao tác này!');
-    redirect('../login.php');
+    echo json_encode([
+        'status' => false,
+        'message' => 'Permission denied',
+        'code' => 403
+    ]);
     exit;
 }
 
-// Xử lý yêu cầu xóa
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-    $conferenceId = intval($_POST['id']);
-    $conferenceModel = new Conference();
-
-    // Kiểm tra nếu là organizer thì chỉ được xóa hội nghị do mình tạo
-    if ($_SESSION['user_role'] === 'organizer') {
-        $conference = $conferenceModel->getConferenceById($conferenceId);
-
-        if (!$conference || $conference['created_by'] != $_SESSION['user_id']) {
-            setFlashMessage('danger', 'Bạn không có quyền xóa hội nghị này!');
-            redirect('../admin.php');
-            exit;
+// Support both POST and DELETE methods
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get conference ID
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        // For DELETE: Parse from URL or request body
+        $parts = explode('/', trim($_SERVER['PATH_INFO'] ?? '', '/'));
+        $conferenceId = intval(end($parts));
+        
+        // If no ID in URL, try to get from request body
+        if ($conferenceId === 0) {
+            $json_data = json_decode(file_get_contents('php://input'), true);
+            $conferenceId = intval($json_data['id'] ?? 0);
         }
+    } else {
+        // For POST: Get from form data or JSON
+        $json_data = json_decode(file_get_contents('php://input'), true);
+        $request_data = !empty($json_data) ? $json_data : $_POST;
+        $conferenceId = intval($request_data['id'] ?? 0);
+    }
+    
+    // Validate conference ID
+    if ($conferenceId <= 0) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'Invalid conference ID',
+            'code' => 400
+        ]);
+        exit;
     }
 
-    // Thực hiện xóa hội nghị
+    $conferenceModel = new Conference();
+
+    // Check if conference exists
+    $conference = $conferenceModel->getConferenceById($conferenceId);
+    if (!$conference) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'Conference not found',
+            'code' => 404
+        ]);
+        exit;
+    }
+
+    // Check permissions: organizers can only delete their own conferences
+    if ($_SESSION['user_role'] === 'organizer' && $conference['created_by'] != $_SESSION['user_id']) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'You do not have permission to delete this conference',
+            'code' => 403
+        ]);
+        exit;
+    }
+
+    // Delete the conference
     $result = $conferenceModel->deleteConference($conferenceId);
 
     if ($result) {
-        setFlashMessage('success', 'Hội nghị đã được xóa thành công!');
+        echo json_encode([
+            'status' => true,
+            'message' => 'Conference deleted successfully',
+            'data' => ['id' => $conferenceId],
+            'code' => 200
+        ]);
     } else {
-        setFlashMessage('danger', 'Có lỗi xảy ra khi xóa hội nghị!');
+        echo json_encode([
+            'status' => false,
+            'message' => 'Failed to delete conference',
+            'code' => 500
+        ]);
     }
-
-    // Chuyển hướng về trang admin
-    redirect('../admin.php');
 } else {
-    // Phương thức không được hỗ trợ hoặc thiếu tham số
-    setFlashMessage('danger', 'Yêu cầu không hợp lệ!');
-    redirect('../admin.php');
+    echo json_encode([
+        'status' => false,
+        'message' => 'Method not allowed',
+        'code' => 405
+    ]);
 }
 ?>
