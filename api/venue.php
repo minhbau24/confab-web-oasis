@@ -117,8 +117,7 @@ switch ($method) {
             // Get venues
             $venues = $db->fetchAll(
                 "SELECT id, name, slug, description, address, city, country, capacity, 
-                        contact_name, contact_phone, contact_email, featured_image, is_featured,
-                        created_at, updated_at
+                        contact_name, contact_phone, contact_email, created_at, updated_at
                  FROM venues 
                  {$whereClause}
                  ORDER BY {$sortBy} {$sortOrder}
@@ -206,8 +205,7 @@ switch ($method) {
             $db->execute(
                 "INSERT INTO venues (
                     name, slug, description, address, city, country, capacity,
-                    contact_name, contact_phone, contact_email, featured_image,
-                    is_featured, status, created_at, updated_at
+                    contact_name, contact_phone, contact_email, status, created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())",
                 [
                     $data['name'],
@@ -220,7 +218,6 @@ switch ($method) {
                     $data['contact_name'] ?? null,
                     $data['contact_phone'] ?? null,
                     $data['contact_email'] ?? null,
-                    $data['featured_image'] ?? null,
                     isset($data['is_featured']) ? ($data['is_featured'] ? 1 : 0) : 0
                 ]
             );

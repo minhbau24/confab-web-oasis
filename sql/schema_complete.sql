@@ -1797,6 +1797,120 @@ VALUES
 
 (5, 4, 'keynote', 'Blockchain & DeFi', 'Tương lai DeFi và Web3', 50, 'confirmed'),
 (5, 3, 'panelist', 'Panel: Đầu tư Web3', 'Cơ hội và thách thức đầu tư blockchain', 40, 'confirmed');
+
+DROP TABLE IF EXISTS `conference_objectives`;
+CREATE TABLE `conference_objectives` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `conference_id` INT NOT NULL,
+  `text` VARCHAR(500) NOT NULL,
+  `display_order` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`conference_id`) REFERENCES `conferences`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Sample data cho conference_objectives (5 hội nghị)
+DELETE FROM `conference_objectives`;
+-- INSERT INTO `conference_objectives` (`conference_id`, `text`, `display_order`) VALUES
+-- (1, 'Kết nối cộng đồng tech', 1),
+-- (1, 'Chia sẻ kiến thức', 2),
+-- (1, 'Thúc đẩy đổi mới sáng tạo', 3),
+-- (2, 'Khuyến khích tinh thần khởi nghiệp', 1),
+-- (2, 'Kết nối cộng đồng startup', 2),
+-- (2, 'Hỗ trợ ý tưởng kinh doanh', 3),
+-- (3, 'Thúc đẩy chuyển đổi số trong y tế', 1),
+-- (3, 'Kết nối chuyên gia y tế và công nghệ', 2),
+-- (3, 'Giới thiệu giải pháp innovative', 3),
+-- (4, 'Dạy AI/ML thực tế', 1),
+-- (4, 'Hands-on experience', 2),
+-- (4, 'Networking', 3),
+-- (5, 'Giáo dục về blockchain', 1),
+-- (5, 'Kết nối cộng đồng crypto', 2),
+-- (5, 'Thúc đẩy adoption', 3);
+
+DROP TABLE IF EXISTS `conference_audience`;
+CREATE TABLE `conference_audience` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `conference_id` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `description` TEXT,
+  `icon` VARCHAR(100) DEFAULT NULL,
+  `display_order` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`conference_id`) REFERENCES `conferences`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Sample data cho conference_audience (5 hội nghị)
+DELETE FROM `conference_audience`;
+INSERT INTO `conference_audience` (`conference_id`, `title`, `description`, `icon`, `display_order`) VALUES
+(1, 'Nhà phát triển phần mềm', 'Những người xây dựng và phát triển ứng dụng, hệ thống phần mềm.', 'fas fa-code', 1),
+(1, 'Nhà quản lý dự án', 'Quản lý, điều phối các dự án công nghệ.', 'fas fa-tasks', 2),
+(1, 'Sinh viên CNTT', 'Sinh viên các ngành công nghệ thông tin, kỹ thuật.', 'fas fa-user-graduate', 3),
+(2, 'Nhà sáng lập startup', 'Những người khởi nghiệp, xây dựng doanh nghiệp mới.', 'fas fa-lightbulb', 1),
+(2, 'Nhà đầu tư', 'Nhà đầu tư quan tâm đến lĩnh vực khởi nghiệp.', 'fas fa-hand-holding-usd', 2),
+(2, 'Mentor', 'Chuyên gia, cố vấn hỗ trợ các đội nhóm startup.', 'fas fa-chalkboard-teacher', 3),
+(3, 'Bác sĩ, chuyên gia y tế', 'Những người làm việc trong lĩnh vực y tế, chăm sóc sức khỏe.', 'fas fa-user-md', 1),
+(3, 'Nhà phát triển AI/HealthTech', 'Nhà phát triển giải pháp AI cho y tế.', 'fas fa-robot', 2),
+(3, 'Nhà quản lý bệnh viện', 'Quản lý, điều hành các cơ sở y tế.', 'fas fa-hospital', 3),
+(4, 'Kỹ sư AI/ML', 'Kỹ sư, lập trình viên chuyên về AI, Machine Learning.', 'fas fa-brain', 1),
+(4, 'Sinh viên ngành dữ liệu', 'Sinh viên các ngành khoa học dữ liệu, AI.', 'fas fa-database', 2),
+(4, 'Nhà nghiên cứu', 'Nhà nghiên cứu, học giả trong lĩnh vực AI/ML.', 'fas fa-flask', 3),
+(5, 'Nhà phát triển blockchain', 'Những người xây dựng giải pháp blockchain.', 'fas fa-link', 1),
+(5, 'Nhà đầu tư crypto', 'Nhà đầu tư, trader trong lĩnh vực tiền mã hóa.', 'fas fa-coins', 2),
+(5, 'Doanh nghiệp Web3', 'Các doanh nghiệp, tổ chức hoạt động trong lĩnh vực Web3.', 'fas fa-network-wired', 3);
+
+DROP TABLE IF EXISTS `conference_faq`;
+CREATE TABLE `conference_faq` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `conference_id` INT NOT NULL,
+  `question` VARCHAR(500) NOT NULL,
+  `answer` TEXT NOT NULL,
+  `order_num` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`conference_id`) REFERENCES `conferences`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Sample data cho conference_faq (5 hội nghị)
+DELETE FROM `conference_faq`;
+INSERT INTO `conference_faq` (`conference_id`, `question`, `answer`, `order_num`) VALUES
+(1, 'Làm sao để đăng ký tham dự hội nghị?', 'Bạn có thể đăng ký trực tuyến qua website hoặc tại quầy check-in trong ngày diễn ra sự kiện.', 1),
+(1, 'Có cấp chứng nhận tham dự không?', 'Sau khi tham dự đầy đủ, bạn sẽ nhận được chứng nhận điện tử qua email.', 2),
+(2, 'Có hỗ trợ đội nhóm startup không?', 'Chúng tôi có các mentor và workshop dành riêng cho startup.', 1),
+(2, 'Có cần chuẩn bị gì trước khi tham gia?', 'Bạn nên chuẩn bị ý tưởng và đội nhóm để tận dụng tối đa thời gian hackathon.', 2),
+(3, 'Hội nghị có phiên dịch không?', 'Có, chúng tôi hỗ trợ phiên dịch Anh-Việt cho các phiên chính.', 1),
+(3, 'Có tài liệu hội nghị không?', 'Tài liệu sẽ được gửi qua email cho người đăng ký.', 2),
+(4, 'Workshop có yêu cầu kiến thức nền tảng không?', 'Bạn nên có kiến thức cơ bản về AI/ML để theo kịp nội dung.', 1),
+(4, 'Có cấp chứng nhận hoàn thành không?', 'Có, chứng nhận sẽ được cấp sau khi hoàn thành workshop.', 2),
+(5, 'Có cần mang laptop không?', 'Bạn nên mang laptop để tham gia các hoạt động thực hành.', 1),
+(5, 'Có hỗ trợ networking với chuyên gia không?', 'Chúng tôi tổ chức các phiên networking với chuyên gia trong ngành.', 2);
+
+DROP TABLE IF EXISTS `conference_support_info`;
+CREATE TABLE conference_support_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conference_id INT NOT NULL,
+    support_email VARCHAR(255),
+    support_phone VARCHAR(50),
+    support_address VARCHAR(255),
+    facebook_url VARCHAR(255),
+    twitter_url VARCHAR(255),
+    linkedin_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
+);
+
+-- Sample data for conference_support_info (5 conferences)
+DELETE FROM conference_support_info;
+INSERT INTO conference_support_info
+(conference_id, support_email, support_phone, support_address, facebook_url, twitter_url, linkedin_url)
+VALUES
+(1, 'support@techcrunch2024.com', '+84 123 456 789', '123 Đường Lê Lợi, Quận 1, TP.HCM', 'https://facebook.com/techcrunch2024vn', 'https://twitter.com/techcrunch2024vn', 'https://linkedin.com/company/techcrunch2024vn'),
+(2, 'help@startupfest.vn', '+84 987 654 321', '456 Đường Nguyễn Huệ, Quận 1, TP.HCM', 'https://facebook.com/startupfestvn', 'https://twitter.com/startupfestvn', 'https://linkedin.com/company/startupfestvn'),
+(3, 'contact@devsummit.vn', '+84 222 333 444', '789 Đường Trần Hưng Đạo, Quận 5, TP.HCM', 'https://facebook.com/devsummitvn', 'https://twitter.com/devsummitvn', 'https://linkedin.com/company/devsummitvn'),
+(4, 'info@ai-expo.vn', '+84 555 666 777', '12 Đường Phạm Ngọc Thạch, Quận 3, TP.HCM', 'https://facebook.com/aiexpovn', 'https://twitter.com/aiexpovn', 'https://linkedin.com/company/aiexpovn'),
+(5, 'support@blockchainconf.vn', '+84 888 999 000', '34 Đường Cách Mạng Tháng 8, Quận 10, TP.HCM', 'https://facebook.com/blockchainconfvn', 'https://twitter.com/blockchainconfvn', 'https://linkedin.com/company/blockchainconfvn');
 -- ========================================================
 -- COMPLETION MESSAGE
 -- ========================================================

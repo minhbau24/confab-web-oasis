@@ -87,14 +87,13 @@ class Conference
                     v.capacity as venue_capacity,
                     v.parking_info as venue_parking_info,
                     v.transport_info as venue_transport_info,
-                    v.accessibility as venue_accessibility,
                     v.amenities as venue_amenities,
-                    v.floor_plan_image as venue_floor_plan_image,
                     v.images as venue_images,
                     creator.firstName as creator_first_name,
                     creator.lastName as creator_last_name,
                     creator.email as creator_email,
-                    creator.profile_image as creator_profile_image                FROM conferences c
+                    creator.avatar as creator_profile_image
+                FROM conferences c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN venues v ON c.venue_id = v.id
                 LEFT JOIN users creator ON c.created_by = creator.id
@@ -546,15 +545,15 @@ class Conference
      * @param int $limit Số lượng tối đa
      * @return array Danh sách hội nghị liên quan
      */
-    public function getRelatedConferences($conferenceId, $category, $limit = 3)
+    public function getRelatedConferences($conferenceId, $categoryId, $limit = 3)
     {
         return $this->db->fetchAll("
-            SELECT id, title, date, image
+            SELECT id, title, start_date, image
             FROM conferences
-            WHERE category LIKE ? AND id != ?
-            ORDER BY date DESC
+            WHERE category_id = ? AND id != ?
+            ORDER BY start_date DESC
             LIMIT ?
-        ", ['%' . $category . '%', $conferenceId, $limit]);
+        ", [$categoryId, $conferenceId, $limit]);
     }    /**
          * Lấy hội nghị sắp tới
          *
@@ -597,21 +596,22 @@ class Conference
         try {
             $this->db->execute("
                 INSERT INTO conferences (
-                    title, description, date, endDate, location, 
-                    category, price, capacity, status, image, 
+                    title, short_description, description, start_date, end_date, location, 
+                    category_id, price, capacity, status, image, 
                     organizer_name, organizer_email, organizer_phone, created_by
                 ) VALUES (
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?
+                    ?, ?, ?, ?, ?
                 )
             ", [
                 $data['title'],
+                $data['short_description'] ?? '',
                 $data['description'],
-                $data['date'],
-                $data['endDate'],
+                $data['start_date'],
+                $data['end_date'] ?? null,
                 $data['location'],
-                $data['category'],
+                $data['category_id'],
                 $data['price'],
                 $data['capacity'],
                 $data['status'],
@@ -630,7 +630,7 @@ class Conference
     }
 
     /**
-     * Cập nhật thông tin hội nghị
+     * Cập nhật thông tin hội nghị (mở rộng theo schema mới)
      *
      * @param int $id ID hội nghị
      * @param array $data Thông tin cập nhật
@@ -639,41 +639,31 @@ class Conference
     public function updateConference($id, $data)
     {
         try {
-            $this->db->execute("
-                UPDATE conferences
-                SET 
-                    title = ?,
-                    description = ?,
-                    date = ?,
-                    endDate = ?,
-                    location = ?,
-                    category = ?,
-                    price = ?,
-                    capacity = ?,
-                    status = ?,
-                    image = ?,
-                    organizer_name = ?,
-                    organizer_email = ?,
-                    organizer_phone = ?,
-                    updated_at = NOW()
-                WHERE id = ?
-            ", [
-                $data['title'],
-                $data['description'],
-                $data['date'],
-                $data['endDate'],
-                $data['location'],
-                $data['category'],
-                $data['price'],
-                $data['capacity'],
-                $data['status'],
-                $data['image'],
-                $data['organizer_name'],
-                $data['organizer_email'],
-                $data['organizer_phone'],
-                $id
-            ]);
-
+            // Chuẩn bị danh sách trường và giá trị động
+            $fields = [];
+            $params = [];
+            $schemaFields = [
+                'title', 'slug', 'description', 'short_description', 'start_date', 'end_date',
+                'category_id', 'venue_id', 'type', 'format', 'price', 'currency', 'capacity',
+                'current_attendees', 'status', 'featured', 'trending', 'certificate_available',
+                'website', 'contact_email', 'contact_phone', 'featured_image', 'social_links',
+                'registration_enabled', 'is_featured', 'meta_data', 'updated_at'
+            ];
+            foreach ($schemaFields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $fields[] = "$field = ?";
+                    // Xử lý các trường JSON
+                    if (in_array($field, ['meta_data', 'social_links'])) {
+                        $params[] = is_array($data[$field]) ? json_encode($data[$field], JSON_UNESCAPED_UNICODE) : $data[$field];
+                    } else {
+                        $params[] = $data[$field];
+                    }
+                }
+            }
+            if (empty($fields)) return false;
+            $params[] = $id;
+            $sql = "UPDATE conferences SET ".implode(", ", $fields)." WHERE id = ?";
+            $this->db->execute($sql, $params);
             return true;
         } catch (Exception $e) {
             error_log('Error updating conference: ' . $e->getMessage());

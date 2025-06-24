@@ -70,6 +70,9 @@ try {
     // Lấy đối tượng tham dự (nếu có phương thức này)
     $audience = method_exists($conference, 'getConferenceAudience') ? $conference->getConferenceAudience($id) : [];
 
+    // Lấy FAQ (nếu có phương thức này)
+    $faq = method_exists($conference, 'getConferenceFaq') ? $conference->getConferenceFaq($id) : [];
+
     // Trả về dữ liệu đầy đủ
     echo json_encode([
         'status' => true,
@@ -78,7 +81,8 @@ try {
             'speakers' => $speakers ?: [],
             'schedule' => $schedule ?: [],
             'objectives' => $objectives ?: [],
-            'audience' => $audience ?: []
+            'audience' => $audience ?: [],
+            'faq' => $faq ?: []
         ]
     ]);
 

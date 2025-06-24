@@ -1,69 +1,86 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confab Web Oasis - Quản trị Hội nghị</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">    <style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
         body {
-            padding-top: 55px; /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
+            padding-top: 55px;
+            /* Đảm bảo nội dung không bị che khuất bởi thanh navbar fixed */
         }
+
         .admin-sidebar {
             background: #f8f9fa;
             min-height: 100vh;
             border-right: 1px solid #dee2e6;
         }
+
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 15px;
             transition: transform 0.3s ease;
         }
+
         .stat-card:hover {
             transform: scale(1.05);
         }
+
         .chart-container {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         .action-btn {
             border-radius: 50px;
             padding: 10px 20px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
+
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+
         .nav-pills .nav-link {
             border-radius: 25px;
             margin-bottom: 5px;
-            text-align: left; /* Căn trái nội dung */
-            justify-content: flex-start !important; /* Đảm bảo icon và text sát trái */
+            text-align: left;
+            /* Căn trái nội dung */
+            justify-content: flex-start !important;
+            /* Đảm bảo icon và text sát trái */
             display: flex;
             align-items: center;
         }
+
         .nav-pills .nav-link i {
             margin-right: 8px;
         }
+
         .nav-pills .nav-link.active {
             background: linear-gradient(135deg, #007bff, #0056b3);
         }
+
         .management-card {
             border: none;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
             border-radius: 15px;
             transition: all 0.3s ease;
         }
+
         .management-card:hover {
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
             transform: translateY(-3px);
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation Container -->
     <div id="header-container"></div>
@@ -72,13 +89,14 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 admin-sidebar p-0">
-                <div class="p-3">                    <div class="d-flex align-items-center mb-4">
+                <div class="p-3">
+                    <div class="d-flex align-items-center mb-4">
                         <a href="admin.html" class="btn btn-outline-secondary me-2">
                             <i class="fas fa-arrow-left"></i>
                         </a>
                         <h6 class="mb-0">Bảng Điều khiển Admin</h6>
                     </div>
-                      <div class="nav flex-column nav-pills" role="tablist">
+                    <div class="nav flex-column nav-pills" role="tablist">
                         <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#overview">
                             <i class="fas fa-chart-line me-2"></i>Tổng quan
                         </button>
@@ -99,9 +117,6 @@
                         </button>
                         <button class="nav-link" data-bs-toggle="pill" data-bs-target="#faq-management">
                             <i class="fas fa-question-circle me-2"></i>FAQ
-                        </button>
-                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#testimonials">
-                            <i class="fas fa-quote-right me-2"></i>Testimonials
                         </button>
                         <button class="nav-link" data-bs-toggle="pill" data-bs-target="#support-info">
                             <i class="fas fa-headset me-2"></i>Thông tin hỗ trợ
@@ -124,14 +139,15 @@
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10">
-                <div class="p-4">                    <!-- Conference Header -->
+                <div class="p-4"> <!-- Conference Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h1 class="mb-0" id="conference-title">TechCrunch Disrupt 2024</h1>
                             <p class="text-muted mb-0">Bảng Điều khiển Quản lý Hội nghị</p>
                         </div>
                         <div class="d-flex gap-2"> <!-- Thêm d-flex và gap-2 để nút nằm ngang và cách nhau -->
-                            <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#editConferenceModal">
+                            <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                data-bs-target="#editConferenceModal">
                                 <i class="fas fa-edit me-1"></i>Chỉnh sửa Hội nghị
                             </button>
                             <button class="btn btn-warning action-btn" onclick="toggleConferenceStatus()">
@@ -141,53 +157,56 @@
                     </div>
 
                     <!-- Tab Content -->
-                    <div class="tab-content">                        <!-- Overview Tab -->
+                    <div class="tab-content"> <!-- Overview Tab -->
                         <div class="tab-pane fade show active" id="overview">
                             <!-- Summary Stats -->
                             <div class="row mb-4">
-                                <div class="col-md-3 mb-3">
-                                    <div class="stat-card p-4 text-center">
-                                        <i class="fas fa-users fa-2x mb-2"></i>                                        <h3 id="attendee-count">4,200</h3>
-                                        <p class="mb-0">Số người tham dự</p>
+                                <div class="col-md-3">
+                                    <div class="stat-card p-3 text-center">
+                                        <h6 class="mb-1">Số người tham dự</h6>
+                                        <h3 id="total-attendees">0</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <div class="stat-card p-4 text-center">
-                                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                                        <h3 id="total-revenue">$1.2M</h3>
-                                        <p class="mb-0">Tổng doanh thu</p>
+                                <div class="col-md-3">
+                                    <div class="stat-card p-3 text-center">
+                                        <h6 class="mb-1">Tổng doanh thu</h6>
+                                        <h3 id="total-revenue">0</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <div class="stat-card p-4 text-center">
-                                        <i class="fas fa-percentage fa-2x mb-2"></i>
-                                        <h3 id="capacity-percentage">84%</h3>
-                                        <p class="mb-0">Tỷ lệ lấp đầy</p>
+                                <div class="col-md-3">
+                                    <div class="stat-card p-3 text-center">
+                                        <h6 class="mb-1">Tỷ lệ lấp đầy</h6>
+                                        <h3 id="fill-rate">0%</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <div class="stat-card p-4 text-center">
-                                        <i class="fas fa-clock fa-2x mb-2"></i>
-                                        <h3 id="days-until">25</h3>
-                                        <p class="mb-0">Số ngày còn lại</p>
+                                <div class="col-md-3">
+                                    <div class="stat-card p-3 text-center">
+                                        <h6 class="mb-1">Số ngày còn lại</h6>
+                                        <h3 id="days-left">0</h3>
                                     </div>
                                 </div>
-                            </div>                            <!-- Charts -->
+                            </div>
+                            <!-- Charts & Thống kê động -->
                             <div class="row mb-4">
-                                <div class="col-md-8">
+                                <div class="col-md-4">
                                     <div class="chart-container p-4">
-                                        <h5>Xu hướng Đăng ký</h5>
-                                        <canvas id="registrationChart" height="300"></canvas>
+                                        <h6 class="mb-3">Xu hướng đăng ký</h6>
+                                        <canvas id="registrationTrendChart" height="200"></canvas>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="chart-container p-4">
-                                        <h5>Phân loại Người tham dự</h5>
-                                        <canvas id="categoryChart" height="300"></canvas>
+                                        <h6 class="mb-3">Phân loại theo loại vé</h6>
+                                        <canvas id="ticketTypeChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="chart-container p-4">
+                                        <h6 class="mb-3">Phân loại theo trạng thái</h6>
+                                        <canvas id="statusChart" height="200"></canvas>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Quick Actions -->
                             <div class="row">
                                 <div class="col-md-4 mb-3">
@@ -205,7 +224,8 @@
                                         <p class="text-muted">Tải xuống danh sách người tham dự và báo cáo</p>
                                         <button class="btn btn-success action-btn">Xuất CSV</button>
                                     </div>
-                                </div>                                <div class="col-md-4 mb-3">
+                                </div>
+                                <div class="col-md-4 mb-3">
                                     <div class="management-card p-4 text-center">
                                         <i class="fas fa-cog fa-3x text-warning mb-3"></i>
                                         <h5>Cài đặt</h5>
@@ -221,9 +241,10 @@
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Quản lý Người tham dự</h3>
                                 <div>
-                                    <input type="text" id="attendee-search" class="form-control d-inline-block me-2" 
-                                           placeholder="Tìm kiếm người tham dự..." style="width: 250px;">
-                                    <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addAttendeeModal">
+                                    <input type="text" id="attendee-search" class="form-control d-inline-block me-2"
+                                        placeholder="Tìm kiếm người tham dự..." style="width: 250px;">
+                                    <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                        data-bs-target="#addAttendeeModal">
                                         <i class="fas fa-plus me-1"></i>Thêm Người tham dự
                                     </button>
                                 </div>
@@ -236,6 +257,7 @@
                                                 <th>Họ tên</th>
                                                 <th>Email</th>
                                                 <th>Ngày đăng ký</th>
+                                                <th>Loại vé</th>
                                                 <th>Trạng thái</th>
                                                 <th>Thao tác</th>
                                             </tr>
@@ -252,10 +274,12 @@
                         <div class="tab-pane fade" id="agenda">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Quản lý Lịch trình</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addSessionModal">
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#addSessionModal">
                                     <i class="fas fa-plus me-1"></i>Thêm Phiên
                                 </button>
-                            </div>                            <div class="management-card p-4">
+                            </div>
+                            <div class="management-card p-4">
                                 <div id="agenda-management">
                                     <!-- Agenda sessions will be loaded here -->
                                     <div class="row mb-3">
@@ -265,23 +289,29 @@
                                         <div class="col-md-2"><strong>Thời lượng</strong></div>
                                         <div class="col-md-1"><strong>Thao tác</strong></div>
                                     </div>
-                                    <hr>                                    <div class="row mb-3 p-3 bg-light rounded">
+                                    <hr>
+                                    <div class="row mb-3 p-3 bg-light rounded">
                                         <div class="col-md-2">09:00</div>
                                         <div class="col-md-4">Đăng ký & Chào mừng</div>
                                         <div class="col-md-3">-</div>
                                         <div class="col-md-2">60 phút</div>
                                         <div class="col-md-1">
-                                            <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </div>
                                     </div>
                                     <div class="row mb-3 p-3 bg-light rounded">
-                                        <div class="col-md-2">10:00</div>                                        <div class="col-md-4">Bài phát biểu: Tương lai của AI</div>
+                                        <div class="col-md-2">10:00</div>
+                                        <div class="col-md-4">Bài phát biểu: Tương lai của AI</div>
                                         <div class="col-md-3">Nguyễn Thị Minh</div>
                                         <div class="col-md-2">90 phút</div>
                                         <div class="col-md-1">
-                                            <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="fas fa-trash"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -292,21 +322,25 @@
                         <div class="tab-pane fade" id="speakers">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Quản lý Diễn giả</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addSpeakerModal">
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#addSpeakerModal">
                                     <i class="fas fa-plus me-1"></i>Thêm Diễn giả
                                 </button>
                             </div>
                             <div class="row" id="speakers-management">
-                                <!-- Speakers will be loaded here -->                                <div class="col-md-6 mb-4">
+                                <!-- Speakers will be loaded here -->
+                                <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
                                         <div class="d-flex align-items-center mb-3">
-                                            <img src="https://images.unsplash.com/photo-1494790108755-2616b9997c94?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Speaker">
+                                            <img src="https://images.unsplash.com/photo-1494790108755-2616b9997c94?w=80&h=80&fit=crop&crop=face"
+                                                class="rounded-circle me-3" width="80" height="80" alt="Speaker">
                                             <div>
                                                 <h5>Nguyễn Thị Minh</h5>
                                                 <p class="text-muted mb-0">CEO, InnovateTech</p>
                                             </div>
                                         </div>
-                                        <p class="mb-3">Chuyên gia hàng đầu về AI và học máy với hơn 15 năm kinh nghiệm.</p>
+                                        <p class="mb-3">Chuyên gia hàng đầu về AI và học máy với hơn 15 năm kinh nghiệm.
+                                        </p>
                                         <div class="d-flex justify-content-between">
                                             <button class="btn btn-outline-primary btn-sm">Sửa</button>
                                             <button class="btn btn-outline-danger btn-sm">Xóa</button>
@@ -316,13 +350,15 @@
                                 <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
                                         <div class="d-flex align-items-center mb-3">
-                                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Speaker">
+                                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face"
+                                                class="rounded-circle me-3" width="80" height="80" alt="Speaker">
                                             <div>
                                                 <h5>Trần Minh Đức</h5>
                                                 <p class="text-muted mb-0">CTO, StartupCorp</p>
                                             </div>
                                         </div>
-                                        <p class="mb-3">Người tiên phong trong công nghệ blockchain và đổi mới tiền điện tử.</p>
+                                        <p class="mb-3">Người tiên phong trong công nghệ blockchain và đổi mới tiền điện
+                                            tử.</p>
                                         <div class="d-flex justify-content-between">
                                             <button class="btn btn-outline-primary btn-sm">Sửa</button>
                                             <button class="btn btn-outline-danger btn-sm">Xóa</button>
@@ -330,11 +366,12 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                        <!-- Resources Tab -->
+                        </div> <!-- Resources Tab -->
                         <div class="tab-pane fade" id="resources">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Tài liệu & Tệp tin</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#uploadResourceModal">
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#uploadResourceModal">
                                     <i class="fas fa-upload me-1"></i>Tải lên Tài liệu
                                 </button>
                             </div>
@@ -373,7 +410,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                        <!-- Analytics Tab -->
+                        </div> <!-- Analytics Tab -->
                         <div class="tab-pane fade" id="analytics">
                             <h3 class="mb-4">Bảng điều khiển Phân tích</h3>
                             <div class="row mb-4">
@@ -392,7 +429,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="chart-container p-4">                                        <h5>Phân tích Doanh thu</h5>
+                                    <div class="chart-container p-4">
+                                        <h5>Phân tích Doanh thu</h5>
                                         <canvas id="revenueChart" height="300"></canvas>
                                     </div>
                                 </div>
@@ -418,14 +456,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>                            </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Objectives Management Tab -->
                         <div class="tab-pane fade" id="objectives">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Quản lý Mục tiêu Hội nghị</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addObjectiveModal">
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#addObjectiveModal">
                                     <i class="fas fa-plus me-1"></i>Thêm Mục tiêu
                                 </button>
                             </div>
@@ -444,36 +484,48 @@
                                                 <td>Học hỏi công nghệ mới</td>
                                                 <td>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch" id="obj1-visible" checked>
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="obj1-visible" checked>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                        data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Kết nối với chuyên gia trong ngành</td>
                                                 <td>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch" id="obj2-visible" checked>
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="obj2-visible" checked>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                        data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>Tìm kiếm cơ hội hợp tác kinh doanh</td>
                                                 <td>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch" id="obj3-visible" checked>
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="obj3-visible" checked>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                        data-bs-toggle="modal" data-bs-target="#editObjectiveModal"><i
+                                                            class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -486,10 +538,12 @@
                         <div class="tab-pane fade" id="target-audience">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3>Quản lý Đối tượng Tham dự</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addAudienceModal">
+                                <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#addAudienceModal">
                                     <i class="fas fa-plus me-1"></i>Thêm Đối tượng
                                 </button>
-                            </div>                            <div class="row" id="target-audience-container">
+                            </div>
+                            <div class="row" id="target-audience-container">
                                 <!-- Audience Group Card -->
                                 <div class="col-md-4 mb-4">
                                     <div class="audience-card management-card p-4 text-center" data-id="1">
@@ -499,17 +553,22 @@
                                             </button>
                                         </div>
                                         <div class="d-flex align-items-center mb-3">
-                                            <div class="rounded-circle bg-primary text-white p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="rounded-circle bg-primary text-white p-3 me-3"
+                                                style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-laptop-code fa-2x"></i>
                                             </div>
                                             <div class="text-start">
                                                 <h5>Lập trình viên</h5>
                                             </div>
                                         </div>
-                                        <p class="mb-3">Những người phát triển phần mềm, kỹ sư front-end và back-end muốn cập nhật công nghệ mới nhất.</p>
+                                        <p class="mb-3">Những người phát triển phần mềm, kỹ sư front-end và back-end
+                                            muốn cập nhật công nghệ mới nhất.</p>
                                         <div class="d-flex justify-content-between">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editAudienceModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash me-1"></i>Xóa</button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editAudienceModal"><i
+                                                    class="fas fa-edit me-1"></i>Sửa</button>
+                                            <button class="btn btn-outline-danger btn-sm"><i
+                                                    class="fas fa-trash me-1"></i>Xóa</button>
                                         </div>
                                     </div>
                                 </div>
@@ -517,17 +576,22 @@
                                 <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
                                         <div class="d-flex align-items-center mb-3">
-                                            <div class="rounded-circle bg-info text-white p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="rounded-circle bg-info text-white p-3 me-3"
+                                                style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-user-tie fa-2x"></i>
                                             </div>
                                             <div>
                                                 <h5>CTO / Giám đốc kỹ thuật</h5>
                                             </div>
                                         </div>
-                                        <p class="mb-3">Những người đưa ra quyết định chiến lược về công nghệ, tìm kiếm giải pháp phù hợp cho doanh nghiệp.</p>
+                                        <p class="mb-3">Những người đưa ra quyết định chiến lược về công nghệ, tìm kiếm
+                                            giải pháp phù hợp cho doanh nghiệp.</p>
                                         <div class="d-flex justify-content-between">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editAudienceModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash me-1"></i>Xóa</button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editAudienceModal"><i
+                                                    class="fas fa-edit me-1"></i>Sửa</button>
+                                            <button class="btn btn-outline-danger btn-sm"><i
+                                                    class="fas fa-trash me-1"></i>Xóa</button>
                                         </div>
                                     </div>
                                 </div>
@@ -535,17 +599,22 @@
                                 <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
                                         <div class="d-flex align-items-center mb-3">
-                                            <div class="rounded-circle bg-success text-white p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="rounded-circle bg-success text-white p-3 me-3"
+                                                style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fas fa-graduation-cap fa-2x"></i>
                                             </div>
                                             <div>
                                                 <h5>Sinh viên</h5>
                                             </div>
                                         </div>
-                                        <p class="mb-3">Sinh viên công nghệ thông tin và các ngành liên quan muốn tìm hiểu xu hướng mới và cơ hội việc làm.</p>
+                                        <p class="mb-3">Sinh viên công nghệ thông tin và các ngành liên quan muốn tìm
+                                            hiểu xu hướng mới và cơ hội việc làm.</p>
                                         <div class="d-flex justify-content-between">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editAudienceModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash me-1"></i>Xóa</button>
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#editAudienceModal"><i
+                                                    class="fas fa-edit me-1"></i>Sửa</button>
+                                            <button class="btn btn-outline-danger btn-sm"><i
+                                                    class="fas fa-trash me-1"></i>Xóa</button>
                                         </div>
                                     </div>
                                 </div>
@@ -555,7 +624,8 @@
                         <!-- FAQ Management Tab -->
                         <div class="tab-pane fade" id="faq-management">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h3>Quản lý FAQ</h3>                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addFAQModal">
+                                <h3>Quản lý FAQ</h3> <button class="btn btn-success action-btn" data-bs-toggle="modal"
+                                    data-bs-target="#addFAQModal">
                                     <i class="fas fa-plus me-1"></i>Thêm FAQ
                                 </button>
                             </div>
@@ -563,94 +633,47 @@
                                 <div class="accordion" id="faq-accordion">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#faq1">
                                                 Hội nghị có livestream không?
                                             </button>
                                         </h2>
-                                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                        <div id="faq1" class="accordion-collapse collapse show"
+                                            data-bs-parent="#faqAccordion">
                                             <div class="accordion-body">
-                                                <p>Có, tất cả các phiên chính sẽ được livestream cho người tham dự từ xa. Bạn sẽ nhận được link truy cập qua email đăng ký.</p>
+                                                <p>Có, tất cả các phiên chính sẽ được livestream cho người tham dự từ
+                                                    xa. Bạn sẽ nhận được link truy cập qua email đăng ký.</p>
                                                 <div class="d-flex justify-content-end">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editFaqModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i>Xóa</button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                        data-bs-toggle="modal" data-bs-target="#editFaqModal"><i
+                                                            class="fas fa-edit me-1"></i>Sửa</button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash me-1"></i>Xóa</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#faq2">
                                                 Tôi có thể nhận được bản ghi lại của các phiên không?
                                             </button>
                                         </h2>
-                                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div id="faq2" class="accordion-collapse collapse"
+                                            data-bs-parent="#faqAccordion">
                                             <div class="accordion-body">
-                                                <p>Tất cả các phiên sẽ được ghi lại và gửi cho người tham dự trong vòng 24-48 giờ sau khi phiên kết thúc. Bạn có thể truy cập tất cả các bản ghi thông qua tài khoản của mình trên nền tảng.</p>
+                                                <p>Tất cả các phiên sẽ được ghi lại và gửi cho người tham dự trong vòng
+                                                    24-48 giờ sau khi phiên kết thúc. Bạn có thể truy cập tất cả các bản
+                                                    ghi thông qua tài khoản của mình trên nền tảng.</p>
                                                 <div class="d-flex justify-content-end">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editFaqModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i>Xóa</button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                        data-bs-toggle="modal" data-bs-target="#editFaqModal"><i
+                                                            class="fas fa-edit me-1"></i>Sửa</button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i
+                                                            class="fas fa-trash me-1"></i>Xóa</button>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testimonials Tab -->
-                        <div class="tab-pane fade" id="testimonials">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h3>Quản lý Testimonials</h3>
-                                <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addTestimonialModal">
-                                    <i class="fas fa-plus me-1"></i>Thêm Testimonial
-                                </button>
-                            </div>
-                            <div class="row" id="testimonials-container">
-                                <!-- Testimonial Card -->
-                                <div class="col-md-6 mb-4">
-                                    <div class="management-card p-4">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Avatar">
-                                            <div>
-                                                <h5>Nguyễn Thị Linh</h5>
-                                                <p class="text-muted mb-0">Giám đốc Marketing, TechVision</p>
-                                                <div class="text-warning">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="mb-3">"Hội nghị đã mang lại cho tôi những kiến thức quý giá và cơ hội kết nối tuyệt vời. Tôi đã gặp được nhiều đối tác tiềm năng và học hỏi từ những chuyên gia hàng đầu trong ngành."</p>
-                                        <div class="d-flex justify-content-between">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTestimonialModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash me-1"></i>Xóa</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Testimonial Card -->
-                                <div class="col-md-6 mb-4">
-                                    <div class="management-card p-4">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=80&h=80&fit=crop&crop=face" class="rounded-circle me-3" width="80" height="80" alt="Avatar">
-                                            <div>
-                                                <h5>Trần Văn Minh</h5>
-                                                <p class="text-muted mb-0">Lập trình viên Senior, CodeCraft</p>
-                                                <div class="text-warning">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="far fa-star"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p class="mb-3">"Workshop về microservice architecture đã giải quyết được nhiều thắc mắc của tôi. Cách tổ chức chuyên nghiệp, diễn giả có kiến thức chuyên sâu và không khí giao lưu rất thoải mái."</p>
-                                        <div class="d-flex justify-content-between">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTestimonialModal"><i class="fas fa-edit me-1"></i>Sửa</button>
-                                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash me-1"></i>Xóa</button>
                                         </div>
                                     </div>
                                 </div>
@@ -660,21 +683,25 @@
                         <!-- Support Info Tab -->
                         <div class="tab-pane fade" id="support-info">
                             <h3 class="mb-4">Cấu hình Thông tin Hỗ trợ</h3>
-                            <div class="row">                                <div class="col-md-6 mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
                                         <h5 class="mb-3"><i class="fas fa-envelope me-2"></i>Thông tin Liên hệ</h5>
                                         <form id="contact-info-form">
                                             <div class="mb-3">
                                                 <label class="form-label">Email Hỗ trợ</label>
-                                                <input type="email" class="form-control" id="support-email" value="support@techcrunch2024.com">
+                                                <input type="email" class="form-control" id="support-email"
+                                                    value="support@techcrunch2024.com">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Số Điện thoại Hỗ trợ</label>
-                                                <input type="tel" class="form-control" id="support-phone" value="(+84) 123-456-789">
+                                                <input type="tel" class="form-control" id="support-phone"
+                                                    value="(+84) 123-456-789">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Địa chỉ</label>
-                                                <textarea class="form-control" id="support-address" rows="3">Trung tâm Hội nghị Quốc gia, Thăng Long, Hà Nội, Việt Nam</textarea>
+                                                <textarea class="form-control" id="support-address"
+                                                    rows="3">Trung tâm Hội nghị Quốc gia, Thăng Long, Hà Nội, Việt Nam</textarea>
                                             </div>
                                             <button type="submit" class="btn btn-primary">Cập nhật</button>
                                         </form>
@@ -682,18 +709,25 @@
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="management-card p-4">
-                                        <h5 class="mb-3"><i class="fas fa-share-alt me-2"></i>Mạng Xã hội</h5>                                        <form id="social-links-form">
+                                        <h5 class="mb-3"><i class="fas fa-share-alt me-2"></i>Mạng Xã hội</h5>
+                                        <form id="social-links-form">
                                             <div class="mb-3">
-                                                <label class="form-label"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</label>
-                                                <input type="url" class="form-control" id="facebook-url" value="https://facebook.com/techcrunch2024vn">
+                                                <label class="form-label"><i
+                                                        class="fab fa-facebook me-2 text-primary"></i>Facebook</label>
+                                                <input type="url" class="form-control" id="facebook-url"
+                                                    value="https://facebook.com/techcrunch2024vn">
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label"><i class="fab fa-twitter me-2 text-info"></i>Twitter</label>
-                                                <input type="url" class="form-control" id="twitter-url" value="https://twitter.com/techcrunch2024vn">
+                                                <label class="form-label"><i
+                                                        class="fab fa-twitter me-2 text-info"></i>Twitter</label>
+                                                <input type="url" class="form-control" id="twitter-url"
+                                                    value="https://twitter.com/techcrunch2024vn">
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label"><i class="fab fa-linkedin me-2 text-primary"></i>LinkedIn</label>
-                                                <input type="url" class="form-control" id="linkedin-url" value="https://linkedin.com/company/techcrunch2024vn">
+                                                <label class="form-label"><i
+                                                        class="fab fa-linkedin me-2 text-primary"></i>LinkedIn</label>
+                                                <input type="url" class="form-control" id="linkedin-url"
+                                                    value="https://linkedin.com/company/techcrunch2024vn">
                                             </div>
                                             <button type="submit" class="btn btn-primary">Cập nhật</button>
                                         </form>
@@ -709,11 +743,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h5 class="mb-3">Ảnh nền hiện tại</h5>
-                                        <div class="position-relative mb-3" style="height: 200px; overflow: hidden; border-radius: 10px;">
-                                            <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=200&fit=crop" 
-                                                 class="w-100 h-100 object-fit-cover" alt="Hero image preview">
+                                        <div class="position-relative mb-3"
+                                            style="height: 200px; overflow: hidden; border-radius: 10px;">
+                                            <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=200&fit=crop"
+                                                class="w-100 h-100 object-fit-cover" alt="Hero image preview">
                                             <div class="position-absolute top-0 end-0 m-2">
-                                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                <button class="btn btn-sm btn-danger"><i
+                                                        class="fas fa-trash"></i></button>
                                             </div>
                                         </div>
                                         <div class="mb-3">
@@ -722,9 +758,11 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Mô tả ngắn</label>
-                                            <textarea class="form-control" rows="2">Nơi công nghệ và đổi mới gặp gỡ</textarea>
+                                            <textarea class="form-control"
+                                                rows="2">Nơi công nghệ và đổi mới gặp gỡ</textarea>
                                         </div>
-                                    </div>                                    <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
                                         <h5 class="mb-3">Cập nhật ảnh mới</h5>
                                         <form id="hero-image-form">
                                             <div class="mb-3">
@@ -733,19 +771,26 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Hoặc nhập URL ảnh</label>
-                                                <input type="url" id="hero-image-url" class="form-control" placeholder="https://example.com/image.jpg" value="https://images.unsplash.com/photo-1540575467063-178a50c2df87">
+                                                <input type="url" id="hero-image-url" class="form-control"
+                                                    placeholder="https://example.com/image.jpg"
+                                                    value="https://images.unsplash.com/photo-1540575467063-178a50c2df87">
                                             </div>
                                             <div class="mb-3">
                                                 <div class="form-check form-switch mb-2">
-                                                    <input class="form-check-input" type="checkbox" id="hero-overlay" checked>
-                                                    <label class="form-check-label" for="hero-overlay">Hiệu ứng overlay</label>
+                                                    <input class="form-check-input" type="checkbox" id="hero-overlay"
+                                                        checked>
+                                                    <label class="form-check-label" for="hero-overlay">Hiệu ứng
+                                                        overlay</label>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <label for="hero-overlay-opacity" class="form-label">Độ mờ overlay: <span id="opacity-value">50%</span></label>
-                                                    <input type="range" class="form-range" id="hero-overlay-opacity" min="0" max="1" step="0.1" value="0.5">
+                                                    <label for="hero-overlay-opacity" class="form-label">Độ mờ overlay:
+                                                        <span id="opacity-value">50%</span></label>
+                                                    <input type="range" class="form-range" id="hero-overlay-opacity"
+                                                        min="0" max="1" step="0.1" value="0.5">
                                                 </div>
                                                 <div class="mb-2">
-                                                    <label for="hero-text-position" class="form-label">Vị trí văn bản</label>
+                                                    <label for="hero-text-position" class="form-label">Vị trí văn
+                                                        bản</label>
                                                     <select class="form-select" id="hero-text-position">
                                                         <option value="start">Trái</option>
                                                         <option value="center" selected>Giữa</option>
@@ -753,11 +798,13 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div id="hero-preview" class="position-relative mb-3" 
-                                                 style="height: 100px; background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87'); 
+                                            <div id="hero-preview" class="position-relative mb-3"
+                                                style="height: 100px; background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87'); 
                                                  background-size: cover; background-position: center; border-radius: 5px;">
-                                                <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity: 0.5;"></div>
-                                                <div class="hero-text position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 bg-dark"
+                                                    style="opacity: 0.5;"></div>
+                                                <div
+                                                    class="hero-text position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
                                                     <div class="text-center">
                                                         <h6>TechCrunch Disrupt 2024</h6>
                                                         <small>Xem trước vị trí văn bản</small>
@@ -787,13 +834,16 @@
                                                     <option>Người tham dự VIP</option>
                                                     <option>Diễn giả</option>
                                                 </select>
-                                            </div>                                            <div class="mb-3">
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label">Tiêu đề</label>
-                                                <input type="text" class="form-control" placeholder="Nhập tiêu đề email">
+                                                <input type="text" class="form-control"
+                                                    placeholder="Nhập tiêu đề email">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Nội dung</label>
-                                                <textarea class="form-control" rows="4" placeholder="Nhập nội dung tin nhắn của bạn..."></textarea>
+                                                <textarea class="form-control" rows="4"
+                                                    placeholder="Nhập nội dung tin nhắn của bạn..."></textarea>
                                             </div>
                                             <button type="submit" class="btn btn-primary action-btn">Gửi Email</button>
                                         </form>
@@ -819,7 +869,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">                                <div class="col-12">
+                            <div class="row">
+                                <div class="col-12">
                                     <div class="management-card p-4">
                                         <h5><i class="fas fa-history me-2"></i>Lịch sử Liên lạc</h5>
                                         <div class="table-responsive">
@@ -836,7 +887,8 @@
                                                 <tbody>
                                                     <tr>
                                                         <td>10/01/2024</td>
-                                                        <td><span class="badge bg-info">Email</span></td>                                                        <td>Chào mừng đến với TechCrunch Disrupt 2024</td>
+                                                        <td><span class="badge bg-info">Email</span></td>
+                                                        <td>Chào mừng đến với TechCrunch Disrupt 2024</td>
                                                         <td>4.200</td>
                                                         <td><span class="badge bg-success">Đã gửi</span></td>
                                                     </tr>
@@ -860,47 +912,107 @@
         </div>
     </div>
 
-    <!-- Modals -->    <!-- Edit Conference Modal -->
-    <div class="modal fade" id="editConferenceModal" tabindex="-1">
+    <!-- Modals --> <!-- Edit Conference Modal -->
+    <div class="modal fade" id="editConferenceModal" tabindex="-1" aria-labelledby="editConferenceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa Thông tin Hội nghị</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="editConferenceModalLabel">Chỉnh sửa Hội nghị</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="editConferenceForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Tên hội nghị</label>
-                                <input type="text" class="form-control" id="conference-name" required>
+                <form id="edit-conference-form">
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-title-input" class="form-label">Tên hội nghị</label>
+                                <input type="text" class="form-control" id="conference-title-input" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Ngày tổ chức</label>
-                                <input type="date" class="form-control" id="conference-date" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Mô tả</label>
-                                <textarea class="form-control" id="conference-description" rows="3"></textarea>
+                            <div class="col-md-6">
+                                <label for="conference-venue-input" class="form-label">Địa điểm</label>
+                                <select class="form-select" id="conference-venue-input" required></select>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Trạng thái</label>
-                                <select class="form-select" id="conference-status">
-                                    <option value="active">Đang diễn ra</option>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-type-input" class="form-label">Loại hình</label>
+                                <select class="form-select" id="conference-type-input">
+                                    <option value="onsite">Trực tiếp</option>
+                                    <option value="online">Trực tuyến</option>
+                                    <option value="hybrid">Kết hợp</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conference-format-input" class="form-label">Định dạng</label>
+                                <select class="form-select" id="conference-format-input">
+                                    <option value="workshop">Workshop</option>
+                                    <option value="seminar">Seminar</option>
+                                    <option value="expo">Triển lãm</option>
+                                    <option value="summit">Hội nghị</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-currency-input" class="form-label">Tiền tệ</label>
+                                <select class="form-select" id="conference-currency-input">
+                                    <option value="VND">VND</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="JPY">JPY</option>
+                                    <option value="KRW">KRW</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="conference-registration-enabled-input">
+                                    <label class="form-check-label" for="conference-registration-enabled-input">Bật đăng ký</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-date-input" class="form-label">Ngày bắt đầu</label>
+                                <input type="date" class="form-control" id="conference-date-input" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conference-end-date-input" class="form-label">Ngày kết thúc</label>
+                                <input type="date" class="form-control" id="conference-end-date-input">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-category-input" class="form-label">Danh mục</label>
+                                <input type="text" class="form-control" id="conference-category-input" required placeholder="Nhập danh mục...">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conference-status-input" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="conference-status-input">
+                                    <option value="active">Đang hoạt động</option>
                                     <option value="archived">Đã lưu trữ</option>
                                 </select>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="saveConferenceChanges()">Lưu thay đổi</button>
-                </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="conference-price-input" class="form-label">Giá vé</label>
+                                <input type="number" class="form-control" id="conference-price-input" min="0" step="1000">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conference-capacity-input" class="form-label">Số lượng tối đa</label>
+                                <input type="number" class="form-control" id="conference-capacity-input" min="1">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="conference-description-input" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="conference-description-input" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -913,7 +1025,8 @@
                     <h5 class="modal-title">Thêm Người tham dự mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">                    <form id="addAttendeeForm">
+                <div class="modal-body">
+                    <form id="addAttendeeForm">
                         <div class="mb-3">
                             <label for="attendeeName" class="form-label">Họ và tên</label>
                             <input type="text" class="form-control" id="attendeeName" required>
@@ -938,7 +1051,7 @@
                 </div>
             </div>
         </div>
-    </div>    <!-- Add Session Modal -->
+    </div> <!-- Add Session Modal -->
     <div class="modal fade" id="addSessionModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -961,7 +1074,8 @@
                                 <label class="form-label">Thời lượng (phút)</label>
                                 <input type="number" class="form-control" required>
                             </div>
-                        </div>                        <div class="mb-3">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Diễn giả</label>
                             <select class="form-select">
                                 <option value="">Chọn Diễn giả</option>
@@ -980,8 +1094,9 @@
                     <button type="button" class="btn btn-success">Thêm Phiên</button>
                 </div>
             </div>
-        </div>    </div>    <!-- Additional modals for speakers and resources would go here -->
-    
+        </div>
+    </div> <!-- Additional modals for speakers and resources would go here -->
+
     <!-- Add Objective Modal -->
     <div class="modal fade" id="addObjectiveModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -994,7 +1109,8 @@
                     <form id="add-objective-form">
                         <div class="mb-3">
                             <label for="new-objective-text" class="form-label">Nội dung Mục tiêu</label>
-                            <input type="text" class="form-control" id="new-objective-text" placeholder="Nhập mục tiêu hội nghị" required>
+                            <input type="text" class="form-control" id="new-objective-text"
+                                placeholder="Nhập mục tiêu hội nghị" required>
                         </div>
                     </form>
                 </div>
@@ -1043,17 +1159,20 @@
                     <form id="add-audience-form">
                         <div class="mb-3">
                             <label for="new-audience-title" class="form-label">Tiêu đề</label>
-                            <input type="text" class="form-control" id="new-audience-title" placeholder="Ví dụ: Lập trình viên" required>
+                            <input type="text" class="form-control" id="new-audience-title"
+                                placeholder="Ví dụ: Lập trình viên" required>
                         </div>
                         <div class="mb-3">
                             <label for="new-audience-description" class="form-label">Mô tả</label>
-                            <input type="text" class="form-control" id="new-audience-description" placeholder="Mô tả ngắn gọn về đối tượng tham dự" required>
+                            <input type="text" class="form-control" id="new-audience-description"
+                                placeholder="Mô tả ngắn gọn về đối tượng tham dự" required>
                         </div>
                         <div class="mb-3">
                             <label for="new-audience-icon" class="form-label">Icon</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-icons"></i></span>
-                                <input type="text" class="form-control" id="new-audience-icon" placeholder="Ví dụ: fas fa-laptop-code" value="fas fa-users" required>
+                                <input type="text" class="form-control" id="new-audience-icon"
+                                    placeholder="Ví dụ: fas fa-laptop-code" value="fas fa-users" required>
                             </div>
                             <small class="form-text text-muted">Sử dụng Font Awesome class (fas fa-*)</small>
                         </div>
@@ -1116,11 +1235,13 @@
                     <form id="add-faq-form">
                         <div class="mb-3">
                             <label for="new-faq-question" class="form-label">Câu hỏi</label>
-                            <input type="text" class="form-control" id="new-faq-question" placeholder="Nhập câu hỏi" required>
+                            <input type="text" class="form-control" id="new-faq-question" placeholder="Nhập câu hỏi"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="new-faq-answer" class="form-label">Câu trả lời</label>
-                            <textarea class="form-control" id="new-faq-answer" rows="4" placeholder="Nhập câu trả lời" required></textarea>
+                            <textarea class="form-control" id="new-faq-answer" rows="4" placeholder="Nhập câu trả lời"
+                                required></textarea>
                         </div>
                     </form>
                 </div>
@@ -1161,211 +1282,31 @@
         </div>
     </div>
 
-    <!-- Add Testimonial Modal -->
-    <div class="modal fade" id="addTestimonialModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm Đánh giá Mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="add-testimonial-form">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="new-testimonial-name" class="form-label">Tên người đánh giá</label>
-                                <input type="text" class="form-control" id="new-testimonial-name" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="new-testimonial-position" class="form-label">Chức danh</label>
-                                <input type="text" class="form-control" id="new-testimonial-position" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="new-testimonial-avatar" class="form-label">URL Hình đại diện</label>
-                            <input type="url" class="form-control" id="new-testimonial-avatar" placeholder="https://example.com/avatar.jpg">
-                            <small class="form-text text-muted">Để trống để sử dụng ảnh mặc định</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Đánh giá</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="newRating" id="newRating1" value="1">
-                                    <label class="form-check-label" for="newRating1">1</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="newRating" id="newRating2" value="2">
-                                    <label class="form-check-label" for="newRating2">2</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="newRating" id="newRating3" value="3">
-                                    <label class="form-check-label" for="newRating3">3</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="newRating" id="newRating4" value="4">
-                                    <label class="form-check-label" for="newRating4">4</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="newRating" id="newRating5" value="5" checked>
-                                    <label class="form-check-label" for="newRating5">5</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="new-testimonial-comment" class="form-label">Nội dung đánh giá</label>
-                            <textarea class="form-control" id="new-testimonial-comment" rows="4" required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="add-testimonial-form" class="btn btn-success">Thêm đánh giá</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Testimonial Modal -->
-    <div class="modal fade" id="editTestimonialModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa Đánh giá</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="edit-testimonial-form">
-                        <input type="hidden" id="edit-testimonial-id">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="edit-testimonial-name" class="form-label">Tên người đánh giá</label>
-                                <input type="text" class="form-control" id="edit-testimonial-name" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="edit-testimonial-position" class="form-label">Chức danh</label>
-                                <input type="text" class="form-control" id="edit-testimonial-position" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-testimonial-avatar" class="form-label">URL Hình đại diện</label>
-                            <input type="url" class="form-control" id="edit-testimonial-avatar">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Đánh giá</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="editRating" id="editRating1" value="1">
-                                    <label class="form-check-label" for="editRating1">1</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="editRating" id="editRating2" value="2">
-                                    <label class="form-check-label" for="editRating2">2</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="editRating" id="editRating3" value="3">
-                                    <label class="form-check-label" for="editRating3">3</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="editRating" id="editRating4" value="4">
-                                    <label class="form-check-label" for="editRating4">4</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="editRating" id="editRating5" value="5" checked>
-                                    <label class="form-check-label" for="editRating5">5</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-testimonial-comment" class="form-label">Nội dung đánh giá</label>
-                            <textarea class="form-control" id="edit-testimonial-comment" rows="4" required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="edit-testimonial-form" class="btn btn-primary">Cập nhật</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer Container -->
     <div id="footer-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    <script src="js/data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/data.js"></script>
     <script src="js/render.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/header.js"></script>
     <script src="js/footer.js"></script>
     <script src="js/conference-admin.js"></script>
-    <script src="js/conference-admin-extended.js"></script>
-    <script>
-// Lấy thông tin hội nghị (giả định id = 1, bạn có thể sửa lại lấy id động nếu cần)
-function fetchConferenceInfo() {
-    fetch('api/conference_by_id.php?id=1')
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success) {
-                document.getElementById('conference-name').value = data.conference.name || '';
-                document.getElementById('conference-date').value = data.conference.date || '';
-                document.getElementById('conference-description').value = data.conference.description || '';
-                document.getElementById('conference-status').value = data.conference.status || 'active';
-            }
-        });
-}
-
-// Khi mở modal chỉnh sửa, load dữ liệu
-const editModal = document.getElementById('editConferenceModal');
-editModal.addEventListener('show.bs.modal', fetchConferenceInfo);
-
-// Lưu thay đổi hội nghị
-function saveConferenceChanges() {
-    const name = document.getElementById('conference-name').value;
-    const date = document.getElementById('conference-date').value;
-    const description = document.getElementById('conference-description').value;
-    const status = document.getElementById('conference-status').value;
-    fetch('api/update_conference.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: 1, name, date, description, status })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data && data.success) {
-            alert('Cập nhật thành công!');
-            location.reload();
-        } else {
-            alert('Có lỗi khi cập nhật hội nghị!');
-        }
-    });
-}
-
-// Lưu trữ/khôi phục hội nghị
-function toggleConferenceStatus() {
-    fetch('api/conference_by_id.php?id=1')
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success) {
-                const currentStatus = data.conference.status;
-                const newStatus = currentStatus === 'archived' ? 'active' : 'archived';
-                fetch('api/update_conference.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: 1, status: newStatus })
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if (result && result.success) {
-                        alert('Đã cập nhật trạng thái hội nghị!');
-                        location.reload();
-                    } else {
-                        alert('Có lỗi khi cập nhật trạng thái!');
-                    }
-                });
-            }
-        });
-}
-</script>
-</body>
+    <!-- <script src="js/conference-admin-extended.js"></script> -->
+    <script src="js/admin-overview.js"></script>
+    <script src="js/admin-attendees.js"></script>
+    <script src="js/admin-agenda.js"></script>
+    <script src="js/admin-speakers.js"></script>
+    <script src="js/admin-objectives.js"></script>
+    <script src="js/admin-audience.js"></script>
+    <script src="js/admin-faq.js"></script>
+    <!-- <script src="js/admin-testimonials.js"></script> -->
+    <script src="js/admin-support.js"></script>
+    <script src="js/admin-hero-image.js"></script>
+    <script src="js/admin-resources.js"></script>
+    <script src="js/admin-analytics.js"></script>
+    <script src="js/admin-communication.js"></script>
+    <!-- Logic JS đã được chuyển sang các file riêng biệt tương ứng từng tab. -->
+  </body>
 </html>

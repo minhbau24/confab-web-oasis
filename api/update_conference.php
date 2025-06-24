@@ -87,7 +87,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PU
         exit;
     }
 
-    // Prepare data for the new schema
+    // Chuẩn hóa và gom các trường hiện đại
     $data = [
         'title' => sanitize($request_data['title']),
         'slug' => sanitize($request_data['slug'] ?? strtolower(str_replace(' ', '-', $request_data['title']))),
@@ -95,53 +95,51 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PU
         'short_description' => sanitize($request_data['short_description'] ?? substr($request_data['description'], 0, 150) . '...'),
         'start_date' => $request_data['start_date'],
         'end_date' => $request_data['end_date'],
-        'venue_id' => intval($request_data['venue_id'] ?? $conference['venue_id']),
         'category_id' => intval($request_data['category_id'] ?? $conference['category_id']),
+        'venue_id' => intval($request_data['venue_id'] ?? $conference['venue_id']),
+        'type' => $request_data['type'] ?? $conference['type'] ?? 'in_person',
+        'format' => $request_data['format'] ?? $conference['format'] ?? 'conference',
         'price' => floatval($request_data['price'] ?? 0),
+        'currency' => $request_data['currency'] ?? $conference['currency'] ?? 'VND',
         'capacity' => intval($request_data['capacity'] ?? 100),
-        'status' => $request_data['status'] ?? 'active',
-        'is_featured' => isset($request_data['is_featured']) ? ($request_data['is_featured'] ? 1 : 0) : $conference['is_featured'],
-        'registration_enabled' => isset($request_data['registration_enabled']) ? ($request_data['registration_enabled'] ? 1 : 0) : $conference['registration_enabled'],
+        'current_attendees' => intval($request_data['current_attendees'] ?? $conference['current_attendees'] ?? 0),
+        'status' => $request_data['status'] ?? $conference['status'] ?? 'active',
+        'featured' => isset($request_data['featured']) ? (int)$request_data['featured'] : (int)($conference['featured'] ?? 0),
+        'trending' => isset($request_data['trending']) ? (int)$request_data['trending'] : (int)($conference['trending'] ?? 0),
+        'certificate_available' => isset($request_data['certificate_available']) ? (int)$request_data['certificate_available'] : (int)($conference['certificate_available'] ?? 0),
+        'website' => isset($request_data['website']) ? sanitize($request_data['website']) : ($conference['website'] ?? null),
+        'contact_email' => isset($request_data['contact_email']) ? sanitize($request_data['contact_email']) : ($conference['contact_email'] ?? null),
+        'contact_phone' => isset($request_data['contact_phone']) ? sanitize($request_data['contact_phone']) : ($conference['contact_phone'] ?? null),
+        'registration_enabled' => isset($request_data['registration_enabled']) ? (int)$request_data['registration_enabled'] : (int)($conference['registration_enabled'] ?? 1),
+        'is_featured' => isset($request_data['is_featured']) ? (int)$request_data['is_featured'] : (int)($conference['is_featured'] ?? 0),
         'updated_at' => date('Y-m-d H:i:s')
     ];
-
-    // Optional fields
-    if (isset($request_data['website'])) {
-        $data['website'] = sanitize($request_data['website']);
+    // Xử lý các trường JSON động
+    if (isset($request_data['social_links'])) {
+        $data['social_links'] = is_array($request_data['social_links']) ? $request_data['social_links'] : json_decode($request_data['social_links'], true);
     }
-    
-    if (isset($request_data['contact_email'])) {
-        $data['contact_email'] = sanitize($request_data['contact_email']);
+    if (isset($request_data['meta_data'])) {
+        $data['meta_data'] = is_array($request_data['meta_data']) ? $request_data['meta_data'] : json_decode($request_data['meta_data'], true);
     }
-    
-    if (isset($request_data['contact_phone'])) {
-        $data['contact_phone'] = sanitize($request_data['contact_phone']);
-    }
-    
-    // Process featured image upload if available
+    // Xử lý featured_image upload hoặc url
     if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] == 0) {
         $uploadDir = '../uploads/conferences/';
-
-        // Create uploads directory if it doesn't exist
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-
         $fileName = time() . '_' . basename($_FILES['featured_image']['name']);
         $uploadPath = $uploadDir . $fileName;
-
         if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $uploadPath)) {
             $data['featured_image'] = 'uploads/conferences/' . $fileName;
         } else {
-            // Log error but continue with other updates
             error_log("Failed to upload image for conference ID: $conferenceId");
         }
     } elseif (!empty($request_data['featured_image_url'])) {
-        // If an image URL was provided in JSON data
         $data['featured_image'] = sanitize($request_data['featured_image_url']);
+    } elseif (isset($request_data['featured_image'])) {
+        $data['featured_image'] = sanitize($request_data['featured_image']);
     }
-
-    // Update conference information
+    // Gọi cập nhật
     $result = $conferenceModel->updateConference($conferenceId, $data);
 
     if ($result) {

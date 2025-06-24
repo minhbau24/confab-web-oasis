@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 /**
  * Class Database - Xử lý kết nối và truy vấn cơ sở dữ liệu
  */

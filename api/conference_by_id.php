@@ -35,7 +35,7 @@ try {
     $checkSql = "SELECT id, title FROM conferences WHERE id = ?";
     $checkResult = $db->fetch($checkSql, [$id]);
     
-    if (!$checkResult) {
+    if (empty($checkResult)) {
         echo json_encode([
             'status' => false,
             'message' => 'Không tìm thấy hội nghị với ID: ' . $id,
