@@ -137,9 +137,10 @@ function renderConferences() {
     
     if (filteredConferences.length > 0) {
         container.innerHTML = filteredConferences.map(conference => {
-            // Calculate progress of registrations
-            const progress = Math.min(100, Math.round((conference.attendees / conference.capacity) * 100));
-            
+            // Lấy số người tham dự thực tế từ API (attendees hoặc current_attendees)
+            const attendees = (typeof conference.attendees !== 'undefined') ? conference.attendees : (conference.current_attendees || 0);
+            const capacity = conference.capacity || 0;
+            const progress = capacity > 0 ? Math.min(100, Math.round((attendees / capacity) * 100)) : 0;
             // Format date
             const date = new Date(conference.start_date || conference.date);
             const formattedDate = date.toLocaleDateString('vi-VN', {
@@ -147,19 +148,15 @@ function renderConferences() {
                 month: 'long',
                 day: 'numeric'
             });
-            
             // Format price
             const formattedPrice = conference.price > 0 
                 ? `${conference.price.toLocaleString('vi-VN')} ${conference.currency}` 
                 : 'Miễn phí';
-            
             // Use image from database or fallback
             const imageUrl = conference.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop';
-            
             // Check if user is registered
             const user = getCurrentUser();
             const isRegistered = checkIfUserRegistered(conference.id, user);
-            
             // Create register button based on status
             const registerButton = isRegistered ? 
                 `<button class="btn btn-secondary register-btn" data-id="${conference.id}" disabled title="Bạn đã đăng ký tham dự hội nghị này">
@@ -168,11 +165,9 @@ function renderConferences() {
                 `<button class="btn btn-success register-btn" data-id="${conference.id}">
                     <i class="fas fa-check-circle me-1"></i>Đăng ký
                 </button>`;
-            
             // Status badge
             const statusBadge = conference.status === 'published' ? '' : 
                 `<span class="badge bg-warning text-dark mb-2">${conference.status}</span>`;
-            
             return `
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card conference-card shadow-sm h-100">
@@ -198,7 +193,7 @@ function renderConferences() {
                                     <i class="fas fa-tag text-success me-2"></i>${formattedPrice}
                                 </div>
                                 <div class="mb-3">
-                                    <p class="mb-1 small">Số người tham dự: ${conference.attendees}/${conference.capacity}</p>
+                                    <p class="mb-1 small">Số người tham dự: <strong>${attendees}/${capacity}</strong></p>
                                     <div class="progress">
                                         <div class="progress-bar ${progress >= 90 ? 'bg-danger' : 'bg-success'}" 
                                             role="progressbar" 

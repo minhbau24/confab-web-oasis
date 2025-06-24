@@ -45,8 +45,12 @@ let currentUser = {
 
 // Hàm kiểm tra trạng thái đăng nhập
 function isLoggedIn() {
-    // Kiểm tra token hoặc session
-    return currentUser && currentUser.token;
+    // Kiểm tra token hoặc session từ window scope để đảm bảo sync
+    
+    // Dùng window.authCurrentUser thay vì currentUser local để đảm bảo sync
+    const user = window.authCurrentUser || currentUser;
+    const result = user && user.token;
+    return result;
 }
 
 // Expose isLoggedIn to window for other scripts to use
@@ -104,11 +108,8 @@ async function register(userData) {
             userType: userData.userType,
             phone: userData.phone || ''
         });
-        
-        // Nếu API trả về thành công
+          // Nếu API trả về thành công
         if (result.success) {
-            console.log('Đăng ký thành công:', result.user);
-            
             return { 
                 success: true, 
                 message: result.message || 'Đăng ký thành công. Vui lòng đăng nhập với tài khoản mới.',
@@ -145,12 +146,8 @@ async function register(userData) {
             role: userData.userType === 'organizer' ? USER_ROLES.ORGANIZER : USER_ROLES.USER,
             phone: userData.phone || null,
             createdAt: new Date().toISOString().split('T')[0]
-        };
-
-        // Thêm vào danh sách người dùng
+        };        // Thêm vào danh sách người dùng
         users.push(newUser);
-        
-        console.log('Đăng ký thành công (dữ liệu mẫu):', newUser);
         
         return { 
             success: true, 
@@ -185,42 +182,31 @@ async function login(email, password, rememberMe = false) {
                 email: result.user.email,
                 role: result.user.role,
                 token: token
-            };
-              // Kiểm tra và log thông tin session từ server
+            };              // Kiểm tra và log thông tin session từ server
             if (result.debug) {
-                console.log('Server session data:', result.debug);
+                // Server session data available
             }
-            
-            // Lưu token
+              // Lưu token
             if (rememberMe) {
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('user', JSON.stringify(currentUser));
-                console.log('User data saved to localStorage');
             } else {
                 sessionStorage.setItem('authToken', token);
                 sessionStorage.setItem('user', JSON.stringify(currentUser));
-                console.log('User data saved to sessionStorage');
             }
-            
-            console.log('Đăng nhập thành công:', currentUser);
-            
+              
             // Thêm debug để kiểm tra nếu có URL chuyển hướng không mong muốn
             try {
                 const pageUrl = window.location.href;
-                console.log('Current page URL:', pageUrl);
                 
                 // Kiểm tra các trường hợp URL đặc biệt trong document
                 if (document.referrer) {
-                    console.log('Referrer URL:', document.referrer);
+                    // Log referrer if needed for debugging
                 }
-                
-                // Log ra các meta redirect nếu có
+                  // Log ra các meta redirect nếu có
                 const metaTags = document.querySelectorAll('meta[http-equiv="refresh"]');
                 if (metaTags.length > 0) {
-                    console.warn('Found meta refresh tags:', metaTags.length);
-                    metaTags.forEach(tag => {
-                        console.warn('Meta refresh content:', tag.getAttribute('content'));
-                    });
+                    // Handle meta refresh tags if needed
                 }
             } catch (e) {
                 console.error('Error in login debugging:', e);
@@ -335,12 +321,10 @@ function initAuth() {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     const user = localStorage.getItem('user') || sessionStorage.getItem('user');
     
-    if (token && user) {
-        try {
+    if (token && user) {        try {
             currentUser = JSON.parse(user);
             currentUser.token = token;
             updateGlobalUser(); // Đảm bảo cập nhật global
-            console.log('Đã khôi phục phiên đăng nhập:', currentUser.name);
         } catch (error) {
             console.error('Lỗi khi phân tích thông tin người dùng:', error);
             logout(); // Đăng xuất nếu có lỗi
@@ -392,17 +376,10 @@ function getRedirectUrl() {
         
         // Only accept .html files with valid names
         if (simplifiedRedirect.endsWith('.html')) {
-            redirectUrl = simplifiedRedirect;
-        }
-        
-        console.log('Redirect parameter:', redirect);
-        console.log('Using redirect URL:', redirectUrl);
+            redirectUrl = simplifiedRedirect;        }
     }
     
     return redirectUrl;
 }
 
-// Gọi hàm khởi tạo khi trang được tải
-document.addEventListener('DOMContentLoaded', function() {
-    initAuth();
-});
+// initAuth() sẽ được gọi từ header.js để đảm bảo thứ tự đúng

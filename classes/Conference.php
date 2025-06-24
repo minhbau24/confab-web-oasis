@@ -33,20 +33,17 @@ class Conference
                     v.name as venue_name,
                     v.city as venue_city,
                     u1.firstName as created_by_name,
-                    u1.lastName as created_by_lastname                
-                    FROM conferences c
+                    u1.lastName as created_by_lastname,
+                    (
+                        SELECT COUNT(*) FROM registrations r WHERE r.conference_id = c.id AND r.status IN ('paid', 'active')
+                    ) as attendees
+                FROM conferences c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN venues v ON c.venue_id = v.id
                 LEFT JOIN users u1 ON c.created_by = u1.id
                 WHERE 1=1";
 
         $params = [];
-
-        // Không lọc status nữa
-        // if (!empty($status)) {
-        //     $sql .= " AND c.status = ?";
-        //     $params[] = $status;
-        // }
 
         $sql .= " ORDER BY c.start_date DESC";
 
@@ -92,7 +89,10 @@ class Conference
                     creator.firstName as creator_first_name,
                     creator.lastName as creator_last_name,
                     creator.email as creator_email,
-                    creator.avatar as creator_profile_image
+                    creator.avatar as creator_profile_image,
+                    (
+                        SELECT COUNT(*) FROM registrations r WHERE r.conference_id = c.id AND r.status IN ('paid', 'active')
+                    ) as attendees
                 FROM conferences c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN venues v ON c.venue_id = v.id
@@ -885,8 +885,8 @@ class Conference
                 'price' => floatval($conference['price'] ?? 0),
                 'currency' => $conference['currency'] ?? 'VND',
                 'capacity' => intval($conference['capacity'] ?? 0),
-                'current_attendees' => intval($conference['current_attendees'] ?? 0),
-                'attendees' => intval($conference['current_attendees'] ?? 0), // Alias for compatibility
+                'attendees' => intval($conference['attendees'] ?? 0), // attendees lấy từ subquery SQL
+                'current_attendees' => intval($conference['attendees'] ?? 0), // alias cho frontend cũ nếu cần
                 'status' => $conference['status'] ?? 'draft',
                 'type' => $conference['type'] ?? 'in_person',
                 'format' => $conference['format'] ?? 'conference',

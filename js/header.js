@@ -7,7 +7,10 @@ function renderHeader() {
     
     // Kiểm tra xem auth.js có được load không
     if (typeof isLoggedIn === 'function') {
-        isUserLoggedIn = isLoggedIn();
+        // Fix: Ghi đè isLoggedIn() để dùng window.authCurrentUser
+        const user = window.authCurrentUser || (window.getCurrentUser ? window.getCurrentUser() : null);
+        isUserLoggedIn = user && user.token ? true : false;
+        
         if (isUserLoggedIn && typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
             // Handle potentially null user
@@ -19,7 +22,7 @@ function renderHeader() {
                 userRole = "user";
             }
         }
-    }    // Menu items sẽ hiển thị dựa trên quyền
+    }// Menu items sẽ hiển thị dựa trên quyền
     const adminMenu = userRole === 'admin' ? `
         <li class="nav-item">
             <a class="nav-link ${isActivePage('admin.html') ? 'active' : ''}" href="admin.html">
@@ -89,9 +92,7 @@ function renderHeader() {
                 </ul>
             </div>
         </div>
-    </nav>`;
-
-    document.getElementById('header-container').innerHTML = header;
+    </nav>    `;    document.getElementById('header-container').innerHTML = header;
     
     // Thêm modal đăng nhập nếu chưa có
     if (!document.getElementById('loginModal') && !isUserLoggedIn) {
@@ -193,10 +194,8 @@ function addLoginModal() {
                 .catch(error => {
                     console.error('Login error:', error);
                     showModalAlert('danger', 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.');
-                });
-        } else {
+                });        } else {
             // Fallback nếu không có hàm login từ auth.js
-            console.log('Đăng nhập với:', { email, password, rememberMe });
             showModalAlert('success', 'Đăng nhập thành công! Đang chuyển hướng...');
             setTimeout(() => {
                 window.location.reload();
@@ -214,5 +213,18 @@ function addLoginModal() {
 
 // Khi trang được tải sẽ render header
 document.addEventListener('DOMContentLoaded', function() {
-    renderHeader();
+    // Delay để đảm bảo auth.js được load xong
+    setTimeout(function() {
+        // Gọi initAuth() nếu có, sau đó render header
+        if (typeof initAuth === 'function') {
+            initAuth();
+            
+            // Delay thêm để đảm bảo initAuth() hoàn tất
+            setTimeout(function() {
+                renderHeader();
+            }, 50);
+        } else {
+            renderHeader();
+        }
+    }, 100);
 });

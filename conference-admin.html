@@ -1067,31 +1067,37 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngày diễn ra</label>
+                                <input type="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Thời gian bắt đầu</label>
                                 <input type="time" class="form-control" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Thời lượng (phút)</label>
                                 <input type="number" class="form-control" required>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Diễn giả</label>
-                            <select class="form-select">
+                            <label class="form-label" for="session-speaker">Diễn giả</label>
+                            <select class="form-select" name="session-speaker" id="session-speaker">
                                 <option value="">Chọn Diễn giả</option>
-                                <option value="sarah">Nguyễn Thị Minh</option>
-                                <option value="mike">Trần Minh Đức</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mô tả</label>
                             <textarea class="form-control" rows="3"></textarea>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phòng</label>
+                            <input type="text" class="form-control" name="session-room" placeholder="Nhập tên phòng hoặc số phòng">
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-success">Thêm Phiên</button>
+                    <button type="button" class="btn btn-success">Lưu</button>
                 </div>
             </div>
         </div>
@@ -1116,7 +1122,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="add-objective-form" class="btn btn-success">Thêm mục tiêu</button>
+                    <!-- Đổi type thành button để ngăn submit mặc định, xử lý bằng JS -->
+                    <button type="button" class="btn btn-success" id="btn-add-objective">Thêm mục tiêu</button>
                 </div>
             </div>
         </div>
@@ -1141,7 +1148,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="edit-objective-form" class="btn btn-primary">Cập nhật</button>
+                    <!-- Đổi type thành button để ngăn submit mặc định, xử lý bằng JS -->
+                    <button type="button" class="btn btn-primary" id="btn-edit-objective">Cập nhật</button>
                 </div>
             </div>
         </div>
@@ -1282,6 +1290,123 @@
         </div>
     </div>
 
+    <!-- Add Speaker Modal -->
+    <div class="modal fade" id="addSpeakerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm Diễn giả Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-speaker-form">
+                        <div class="mb-3">
+                            <label for="new-speaker-name" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="new-speaker-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-speaker-title" class="form-label">Chức danh</label>
+                            <input type="text" class="form-control" id="new-speaker-title">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-speaker-company" class="form-label">Công ty</label>
+                            <input type="text" class="form-control" id="new-speaker-company">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-speaker-bio" class="form-label">Tiểu sử</label>
+                            <textarea class="form-control" id="new-speaker-bio" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-speaker-image" class="form-label">Ảnh đại diện (URL)</label>
+                            <input type="url" class="form-control" id="new-speaker-image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="add-speaker-form" class="btn btn-success">Thêm diễn giả</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Speaker Modal -->
+    <div class="modal fade" id="editSpeakerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa Diễn giả</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-speaker-form">
+                        <input type="hidden" id="edit-speaker-id">
+                        <div class="mb-3">
+                            <label for="edit-speaker-name" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="edit-speaker-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-speaker-title" class="form-label">Chức danh</label>
+                            <input type="text" class="form-control" id="edit-speaker-title">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-speaker-company" class="form-label">Công ty</label>
+                            <input type="text" class="form-control" id="edit-speaker-company">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-speaker-bio" class="form-label">Tiểu sử</label>
+                            <textarea class="form-control" id="edit-speaker-bio" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-speaker-image" class="form-label">Ảnh đại diện (URL)</label>
+                            <input type="url" class="form-control" id="edit-speaker-image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="edit-speaker-form" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa phiên ở giữa màn hình -->
+<div class="modal fade" id="confirmDeleteSessionModal" tabindex="-1" aria-labelledby="confirmDeleteSessionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning-subtle">
+        <h5 class="modal-title" id="confirmDeleteSessionLabel">Xác nhận xóa phiên</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="mb-3">
+          <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+          <div>Bạn có chắc chắn muốn xóa phiên này?</div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete-session-modal">Xóa</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal xác nhận xóa phiên -->
+
+    <!-- Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+      <div id="adminToast" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body" id="adminToastBody">
+            Thông báo mẫu
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    <!-- End Toast Notification -->
+
     <!-- Footer Container -->
     <div id="footer-container"></div>
 
@@ -1296,6 +1421,7 @@
     <!-- <script src="js/conference-admin-extended.js"></script> -->
     <script src="js/admin-overview.js"></script>
     <script src="js/admin-attendees.js"></script>
+    <script src="js/api-helper.js"></script>
     <script src="js/admin-agenda.js"></script>
     <script src="js/admin-speakers.js"></script>
     <script src="js/admin-objectives.js"></script>
