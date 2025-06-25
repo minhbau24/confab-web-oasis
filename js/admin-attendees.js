@@ -224,14 +224,21 @@ if (attendeesTab) {
 }
 
 // Khi trang load lần đầu, nếu tab attendees đang active thì cũng load luôn
+// KHÔNG GỌI TRÙNG với conference-admin.js
+// Thay vào đó, chỉ setup event listener cho tab switch
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('Admin attendees JS loaded');
+    // Chỉ setup tab switch event, không init toàn bộ app
+    const attendeesTab = document.querySelector('[data-bs-target="#attendees"]');
+    if (attendeesTab) {
+        attendeesTab.addEventListener('shown.bs.tab', function () {
+            initializeAttendeesTab();
+        });
+    }
+    
+    // Check nếu attendees tab đang active từ đầu
     const attendeesTabPane = document.getElementById('attendees');
     if (attendeesTabPane && attendeesTabPane.classList.contains('active')) {
-        initializeAttendeesTab();
-    }
-    // Đảm bảo filter hoạt động
-    const searchInput = document.getElementById('attendee-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', filterAttendees);
+        setTimeout(() => initializeAttendeesTab(), 100); // Delay nhỏ để đảm bảo currentConference đã được set
     }
 });

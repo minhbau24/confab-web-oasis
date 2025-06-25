@@ -1,5 +1,5 @@
 // Quản lý tab Tổng quan (Overview)
-// Thêm code xử lý cho tab Tổng quan ở đây
+// File này chỉ xử lý tab Overview, không init toàn bộ app
 
 // --- Các hàm dùng chung cho nhiều tab (ví dụ: showToast, translateCategory) ---
 function showToast(message, type = 'info') {
@@ -16,35 +16,18 @@ function translateCategory(category) {
     return translations[category] || category;
 }
 
-// --- Khởi tạo trang Conference Admin và các sự kiện ---
-document.addEventListener('DOMContentLoaded', function () {
-    initializeConferenceAdmin();
-    setupEventListeners();
-});
+// --- KHÔNG GỌI DOMContentLoaded Ở ĐÂY - để conference-admin.js xử lý ---
+// Thay vào đó, export các hàm để conference-admin.js gọi
 
-function initializeConferenceAdmin() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const conferenceId = urlParams.get('id');
-    if (!conferenceId) {
-        showToast('Không tìm thấy ID hội nghị. Chuyển hướng về trang quản trị...', 'warning');
-        setTimeout(() => {
-            window.location.href = 'admin.html';
-        }, 2000);
-        return;
-    }
-    // Không dùng window.currentConference từ data.js nữa
-    // Chỉ khởi tạo attendeesData nếu cần, không fetch conference tĩnh
-    initializeAttendeesData();
-    loadConferenceInfo();
+function initializeOverviewTab() {
+    console.log('Overview tab initialized');
     loadSummaryStats();
-    loadAttendeesTable();
+    // Các logic khác cho overview tab
 }
 
-function setupEventListeners() {
-    const searchInput = document.getElementById('attendee-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', filterAttendees);
-    }
+function setupOverviewEventListeners() {
+    console.log('Overview event listeners setup');
+    // Setup các event listener riêng cho overview tab
 }
 
 // --- Quản lý thông tin hội nghị (Overview tab) ---

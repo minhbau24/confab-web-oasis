@@ -979,11 +979,12 @@
                                 <label for="conference-end-date-input" class="form-label">Ngày kết thúc</label>
                                 <input type="date" class="form-control" id="conference-end-date-input">
                             </div>
-                        </div>
-                        <div class="row mb-3">
+                        </div>                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="conference-category-input" class="form-label">Danh mục</label>
-                                <input type="text" class="form-control" id="conference-category-input" required placeholder="Nhập danh mục...">
+                                <select class="form-select" id="conference-category-input" required>
+                                    <option value="">Chọn danh mục...</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="conference-status-input" class="form-label">Trạng thái</label>
@@ -1415,10 +1416,17 @@
     <script src="js/data.js"></script>
     <script src="js/render.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/header.js"></script>
-    <script src="js/footer.js"></script>
-    <script src="js/conference-admin.js"></script>
-    <!-- <script src="js/conference-admin-extended.js"></script> -->
+    <script src="js/header.js"></script>    
+    <script src="js/footer.js"></script>    
+    <script src="js/conference-admin-combined.js"></script>
+    <!-- Test script để kiểm tra -->
+    <script>
+        console.log('=== HTML script tag chạy được! ===');
+        console.log('Current URL:', window.location.href);
+        console.log('Document ready state:', document.readyState);
+    </script>
+    <!-- Đã gộp tất cả logic vào conference-admin-combined.js -->
+    <!-- <script src="js/conference-admin.js"></script>
     <script src="js/admin-overview.js"></script>
     <script src="js/admin-attendees.js"></script>
     <script src="js/api-helper.js"></script>
@@ -1427,12 +1435,12 @@
     <script src="js/admin-objectives.js"></script>
     <script src="js/admin-audience.js"></script>
     <script src="js/admin-faq.js"></script>
-    <!-- <script src="js/admin-testimonials.js"></script> -->
+    <script src="js/admin-testimonials.js"></script>
     <script src="js/admin-support.js"></script>
     <script src="js/admin-hero-image.js"></script>
     <script src="js/admin-resources.js"></script>
     <script src="js/admin-analytics.js"></script>
-    <script src="js/admin-communication.js"></script>
+    <script src="js/admin-communication.js"></script> -->
     <!-- Logic JS đã được chuyển sang các file riêng biệt tương ứng từng tab. -->
   </body>
 </html>

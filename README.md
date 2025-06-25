@@ -163,10 +163,10 @@ Sau khi setup, hệ thống tạo sẵn các tài khoản:
 
 | Role      | Email                  | Password    |
 |-----------|------------------------|-------------|
-| Admin     | admin@confab.local     | password123 |
-| Organizer | organizer@confab.local | password123 |
-| Speaker   | speaker@confab.local   | password123 |
-| User      | user@confab.local      | password123 |
+| Admin     | admin@confab.local     | password    |
+| Organizer | organizer@confab.local | password    |
+| Speaker   | speaker@confab.local   | password    |
+| User      | user@confab.local      | password    |
 
 ## 🔄 Upgrade Path
 
